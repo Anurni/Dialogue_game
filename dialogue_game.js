@@ -78,7 +78,7 @@ const dialogueGame = setup({
         }
     },
 
-    ListenGreeting: {
+    listenGreeting: {
     entry: "listenForUsersAnswer",
     on: {
         RECOGNISED: "SayInstructions"
