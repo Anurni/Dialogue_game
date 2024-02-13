@@ -104,6 +104,11 @@ const dialogueGame = setup({
       SPEAK_COMPLETE: "Game1"
       },
     },
+
+  AHistory: {
+    type: "history",
+    history: "deep"
+  },
   },
 })
 
