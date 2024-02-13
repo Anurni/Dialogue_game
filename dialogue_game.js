@@ -23,14 +23,21 @@ const settings = {
 
 // our grammar:
 const grammar = {
-  agreeWords: ["yes","yup","of course","yeah", "absolutely", "it will", "yes please"],
-  disagreewords: ["no","nope","nah", "no thanks"]
+  agreeWords: ["yes","yup","of course","yeah", "absolutely"],
+  disagreeWords: ["no","nope","nah"],
+  correctAnswer: ["That's correct!", "Well done!", "Exactly!", "You got it!" ],
+  wrongAnswer: ["Try again!", "Better luck next time!"]
 };
 
 // our functions:
 function isInGrammar(utterance) {
     return (utterance.toLowerCase() in grammar);
   }
+
+function randomRepeat(myArray) {
+  const randomIndex = Math.floor(Math,random()*myArray.length);
+  return myArray[randomIndex]
+}
 
 //creating the machine:
 const dialogueGame = setup({
