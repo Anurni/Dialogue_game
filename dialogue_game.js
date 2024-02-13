@@ -71,19 +71,32 @@ const dialogueGame = setup({
             ASRTTS_READY: "WaitToStart" },
     },
 
+  WaitToStart: {
+    on: {
+      CLICK: "SayGreeting"
+    }
+  },
+
   SayGreeting: {
     entry: [{type: "speakToTheUser", params: "Welcome to the game! What is your name?"}],
     on: {
-        SPEAK_COMPLETE: "listenGreeting"
+        SPEAK_COMPLETE: "ListenGreeting"
         }
     },
 
-    listenGreeting: {
+  ListenGreeting: {
     entry: "listenForUsersAnswer",
     on: {
         RECOGNISED: "SayInstructions"
     },
     },
+
+  SayInstructions: {
+    entry: [{ type: "speakToTheUser", params: "These are the instructions..."}],
+    on: {
+      SPEAK_COMPLETE: "Game1"
+      },
     },
-  })
+  },
+})
 
