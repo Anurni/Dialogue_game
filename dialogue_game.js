@@ -108,7 +108,19 @@ const dialogueGame = setup({
   AHistory: {
     type: "history",
     history: "deep"
+    },
   },
-  },
+
+  // our guards which will be modified later
+  guards: {
+    didPlayerWin: (context, event) => {
+      // check if player won
+      return context.points > 99;
+    },
+    didPlayerLose: (context, event) => {
+      // check if player lost
+      return context.points < 0;
+    }
+  }
 })
 
