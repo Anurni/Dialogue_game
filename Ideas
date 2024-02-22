@@ -9,6 +9,8 @@ Game planning 22/2/2024
 -Three levels. 
 -User can choose the category but it cannot be the same on all levels.
 -Hints 
--When you answer correctly, you pick a box/ card with points or symbols.
+-When you answer correctly, you pick a box/card with points or symbols. In these boxes/cards, one of them will be Typhoon (player loses all their points), 
+one of them will be bonus, couple of them will be some basic points??
+-The user will choose a box
 -When User1 cannot answer the question, possibility for User2 to steals points? (let's check how to do this)
 
