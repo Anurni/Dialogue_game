@@ -1,16 +1,14 @@
--Wordle??
--Alphabet game??
--Werewolf social deduction game?
+Game planning 22/2/2024
 
-Brainstorming:
--Typhoon game? Multiuser? Multiple levels? Questions could be about languages/vocabulary/grammar: https://eslspeaking.org/typhoon-esl-game/?utm_content=cmp-true
-        -Use three adjectives to describe a dog.
-        -Give a synonym for the word "understand".
-        -Show a photo and ask for definition?
-        -Mention three winter clothes etc.
-        -
+-Typhoon-style simple Trivia game. Multiuser. Multiple levels?
+-Choose a category (geography, maths, sports, history). 
+        -What is the most spoken language in the world?
+        -How many continents are there?
+        -What is the smallest country in the world?
 
--Hints (showing a photo when asking for a synonym, showing the word's written form?)
--When you answer correctly, you pick a box/ card with points or symbols
--When User1 cannot answer the question, possibility for User2 to steals points?
--
+-Three levels. 
+-User can choose the category but it cannot be the same on all levels.
+-Hints 
+-When you answer correctly, you pick a box/ card with points or symbols.
+-When User1 cannot answer the question, possibility for User2 to steals points? (let's check how to do this)
+
