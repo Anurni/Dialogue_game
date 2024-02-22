@@ -110,7 +110,7 @@ const dialogueGame = setup({
     history: "deep"
     },
   },
-
+Question :{},
   // our guards which will be modified later
   guards: {
     didPlayerWin: (context, event) => {
