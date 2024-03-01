@@ -124,3 +124,20 @@ Question :{ },
   }
 })
 
+const dmActor = createActor(dmMachine, {
+  inspect: inspector.inspect,
+}).start();
+
+dmActor.subscribe((state) => {
+  /* if you want to log some parts of the state */
+});
+
+export function setupButton(element) {
+  element.addEventListener("click", () => {
+    dmActor.send({ type: "CLICK" });
+  });
+  dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
+    element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
+  });
+}
+
