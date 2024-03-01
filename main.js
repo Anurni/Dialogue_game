@@ -1,5 +1,5 @@
 import "./style.css";
-import { setupButton } from "./dm5.js";
+import { setupButton } from "./dialogue_game.js";
 
 document.querySelector("#app").innerHTML = `
   <div>
