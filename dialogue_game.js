@@ -21,7 +21,7 @@ const settings = {
   ttsDefaultVoice: "en-US-JaneNeural",
 };
 
-// our grammar:
+// our grammar, replace yes/no/hint/quit with NLU:
 const grammar = {
   agreeWords: ["yes","yup","of course","yeah", "absolutely"],
   disagreeWords: ["no","nope","nah"],
@@ -105,6 +105,11 @@ const dialogueGame = setup({
       },
     },
 
+
+  Game1: {
+    entry: [{ type: "speakToTheUser", params: "This is game 1"}],
+  },
+
   AHistory: {
     type: "history",
     history: "deep"
@@ -124,7 +129,7 @@ Question :{ },
   }
 })
 
-const dmActor = createActor(dmMachine, {
+const dmActor = createActor(dialogueGame, {
   inspect: inspector.inspect,
 }).start();
 
