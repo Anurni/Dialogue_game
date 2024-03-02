@@ -101,13 +101,25 @@ const dialogueGame = setup({
   SayInstructions: {
     entry: [{ type: "speakToTheUser", params: "These are the instructions..."}],
     on: {
-      SPEAK_COMPLETE: "Game1"
+      SPEAK_COMPLETE: "Geography"
       },
     },
 
+                  //just testing out stuff, 
+  Geography: {    //target for Listen sub-states needs to be some sort of reaction state, need to add that later
+    initial: "Question1Speak",
+    states: {
+      Question1Speak: { entry: [{ type: "speakToTheUser", params: "What is the capital city of Australia?"}], on: {SPEAK_COMPLETE: "Question1Listen"}},
+      Question1Listen: { entry: "listenForUsersAnswer", on: {RECOGNISED: "Question2Speak"}},
+      Question2Speak: {entry: [{ type: "speakToTheUser", params: "What is the hottest country in the world?"}], on: {SPEAK_COMPLETE: "Question2Listen"}},
+      Question2Listen: {entry: "listenForUsersAnswer", on: {RECOGNISED: "Question2Speak"}},
+      Question3Speak: {entry: [{ type: "speakToTheUser", params: "How many continents are there?"}], on: {SPEAK_COMPLETE: "Question3Listen"}},
+      Question3Listen: {entry: "listenForUsersAnswer", on: {RECOGNISED: "#dialogueGame.Done"}},
+    }
+  },
 
-  Game1: {
-    entry: [{ type: "speakToTheUser", params: "This is game 1"}],
+  Done: {
+    on: { CLICK: "SayGreeting"}
   },
 
   AHistory: {
