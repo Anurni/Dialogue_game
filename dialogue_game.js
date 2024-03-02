@@ -1,7 +1,7 @@
 import { assign, createActor, setup } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
-import { KEY } from "./azure.js"; //whose key should we be using?
+import { KEY, NLU_KEY } from "./azure.js"; 
 
 
 const inspector = createBrowserInspector();
@@ -9,11 +9,19 @@ const inspector = createBrowserInspector();
 const azureCredentials = {
   endpoint:
     "https://northeurope.api.cognitive.microsoft.com/sts/v1.0/issuetoken",
-  key: KEY, //whose key??
+  key: KEY, 
+};
+
+const azureLanguageCredentials = {
+  endpoint: "https://annis-lab4.cognitiveservices.azure.com/language/:analyze-conversations?api-version=2022-10-01-preview",
+  key: NLU_KEY,
+  deploymentName: "dialogue_game",
+  projectName: "dialogue_game",
 };
 
 // our settings:
 const settings = {
+  azureLanguageCredentials: azureLanguageCredentials,
   azureCredentials: azureCredentials,
   asrDefaultCompleteTimeout: 0,
   asrDefaultNoInputTimeout: 5000,
@@ -44,7 +52,7 @@ const dialogueGame = setup({
     actions: {
       listenForUsersAnswer : ({ context }) => 
       context.ssRef.send({
-         type: "LISTEN" }),
+         type: "LISTEN", value: { nlu: true } }),
   
       speakToTheUser : ({ context}, params) => 
       context.ssRef.send({
@@ -57,15 +65,14 @@ const dialogueGame = setup({
       //add assign action
   
   }}).createMachine({
-    
-    context: {
+  id: "dialogueGame",
+  initial: "Prepare",
+  context: {
+    user_name: '',
     something_1: '',
     something_2: '',
     something_3: '',
   },
-
-  id: "dialogueGame",
-  initial: "Prepare",
   states: {
     Prepare: {
         entry: [
@@ -94,12 +101,12 @@ const dialogueGame = setup({
   ListenGreeting: {
     entry: "listenForUsersAnswer",
     on: {
-        RECOGNISED: "SayInstructions"
+        RECOGNISED: {actions: assign({user_name: ({event}) => event.value[0].utterance}), target: "SayInstructions"},
     },
-    },
+  },
 
   SayInstructions: {
-    entry: [{ type: "speakToTheUser", params: "These are the instructions..."}],
+    entry: [{ type: "speakToTheUser", params: ({context}) => `Hi there ${context.user_name}! These are the instructions...`}],
     on: {
       SPEAK_COMPLETE: "Geography"
       },
