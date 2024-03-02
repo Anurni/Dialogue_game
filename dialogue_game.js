@@ -92,21 +92,36 @@ const dialogueGame = setup({
   },
 
   SayGreeting: {
-    entry: [{type: "speakToTheUser", params: "Welcome to the game! What is your name?"}],
+    entry: [{type: "speakToTheUser", params: "Welcome to the Typhoon game! What is your name?"}],
     on: {
         SPEAK_COMPLETE: "ListenGreeting"
         }
     },
 
-  ListenGreeting: {
+    ListenGreeting: {
+      entry: "listenForUsersAnswer",
+      on: {
+          RECOGNISED: {actions: assign({user_name: ({event}) => event.nluValue.entities[0].text}), target: "TestingYesOrNo"},
+      },
+    },
+
+  TestingYesOrNo: {
+    entry: [{type: "speakToTheUser", params: `Hi there ${context.user_name}!Do you want to start the game?`}],
+    on: {
+      SPEAK_COMPLETE: "ListenYesOrNo"
+    }
+  },
+
+  ListenYesOrNo: {
     entry: "listenForUsersAnswer",
     on: {
-        RECOGNISED: {actions: assign({user_name: ({event}) => event.value[0].utterance}), target: "SayInstructions"},
-    },
+      RECOGNISED: [{guard: ({event}) => event.nluValue.entities[0].category === "yes", target: "SayInstructions" },
+      {guard:({event}) => event.nluValue.entities[0].category === "no", target: "Done" }],
+    }
   },
 
   SayInstructions: {
-    entry: [{ type: "speakToTheUser", params: ({context}) => `Hi there ${context.user_name}! These are the instructions...`}],
+    entry: [{ type: "speakToTheUser", params: ({context}) => `Here we gooo! These are the instructions...`}],
     on: {
       SPEAK_COMPLETE: "Geography"
       },
