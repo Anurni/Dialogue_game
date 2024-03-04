@@ -106,7 +106,7 @@ const dialogueGame = setup({
     },
 
   TestingYesOrNo: {
-    entry: [{type: "speakToTheUser", params: `Hi there ${context.user_name}!Do you want to start the game?`}],
+    entry: [{type: "speakToTheUser", params: ({context}) => `Hi there ${context.user_name}!Do you want to start the game?`}],
     on: {
       SPEAK_COMPLETE: "ListenYesOrNo"
     }
