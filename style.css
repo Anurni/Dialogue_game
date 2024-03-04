@@ -38,7 +38,7 @@ h1 {
 #app {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem; /* space between box and up and down*/
   text-align: center;
 }
 
@@ -66,16 +66,16 @@ h1 {
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 1em 1.2em;
+  padding: 2em 3em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #1b1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #f50d18;
+  border-color: #0a1ce2;
 }
 button:focus,
 button:focus-visible {
@@ -85,12 +85,12 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #f40a0a;
+    background-color: #0dbcd0;
   }
   a:hover {
     color: #0814f0;
   }
   button {
-    background-color: #def608;
+    background-color: #6308f6;
   }
 }

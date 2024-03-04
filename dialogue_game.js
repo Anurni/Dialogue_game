@@ -175,6 +175,8 @@ export function setupButton(element) {
   element.addEventListener("click", () => {
     dmActor.send({ type: "CLICK" });
   });
+
+  //as I understand we need to add more buttons here and synchronize with main
   dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
     element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
   });
