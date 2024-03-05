@@ -134,7 +134,7 @@ const dialogueGame = setup({
       Question1Speak: { entry: [{ type: "speakToTheUser", params: "What is the capital city of Australia?"}], on: {SPEAK_COMPLETE: "Question1Listen"}},
       Question1Listen: { entry: "listenForUsersAnswer", on: {RECOGNISED: "Question2Speak"}},
       Question2Speak: {entry: [{ type: "speakToTheUser", params: "What is the hottest country in the world?"}], on: {SPEAK_COMPLETE: "Question2Listen"}},
-      Question2Listen: {entry: "listenForUsersAnswer", on: {RECOGNISED: "Question2Speak"}},
+      Question2Listen: {entry: "listenForUsersAnswer", on: {RECOGNISED: "Question3Speak"}},
       Question3Speak: {entry: [{ type: "speakToTheUser", params: "How many continents are there?"}], on: {SPEAK_COMPLETE: "Question3Listen"}},
       Question3Listen: {entry: "listenForUsersAnswer", on: {RECOGNISED: "#dialogueGame.Done"}},
     }
