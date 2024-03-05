@@ -175,8 +175,25 @@ export function setupButton(element) {
   element.addEventListener("click", () => {
     dmActor.send({ type: "CLICK" });
   });
-
-  //as I understand we need to add more buttons here and synchronize with main
+//trying to intergrate the logic of multiple buttons but get error
+export function setupSelect(element) {
+  const options = [
+    {emoji : "🏫", name : "General Knowledge" },
+    {emoji : "🌍", name : "Geography"},
+    {emoji : "📕", name : "History"},
+    {emoji : "🧪", name : "Science"}
+    ];
+    for (const option of options) {
+      const optionButton = document.createElement("button");
+      optionButton.type = "button";
+      optionButton.innerHTML = option.emoji;
+      optionButton.addEventListener("click", () => {
+        dmActor.send({type:"CLICK"});
+      });
+      element.appendChild(optionButton);
+    }
+  }
+  
   dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
     element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
   });
