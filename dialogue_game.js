@@ -182,8 +182,7 @@ export function setupButton(element) {
   element.addEventListener("click", () => {
     dmActor.send({ type: "CLICK" });
   });
-//trying to intergrate the logic of multiple buttons but get error
-export function setupSelect(element) {
+  function setupSelect(element) {
   const options = [
     {emoji : "🏫", name : "General Knowledge" },
     {emoji : "🌍", name : "Geography"},
