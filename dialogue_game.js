@@ -34,7 +34,7 @@ const grammar = {
   agreeWords: ["yes","yup","of course","yeah", "absolutely"],
   disagreeWords: ["no","nope","nah"],
   correctAnswer: ["That's correct!", "Well done!", "Exactly!", "You got it!" ],
-  wrongAnswer: ["Try again!", "Better luck next time!"]
+  wrongAnswer: ["Try again!", "Better luck next time!"],
 };
 
 // our functions:
@@ -121,11 +121,18 @@ const dialogueGame = setup({
   },
 
   SayInstructions: {
-    entry: [{ type: "speakToTheUser", params: ({context}) => `Here we gooo! These are the instructions...`}],
+    entry: [{ type: "speakToTheUser", params: ({context}) => `Here we gooo! These are the instructions.. `}],
     on: {
-      SPEAK_COMPLETE: "Geography"
+      SPEAK_COMPLETE: "ChooseCategory"
       },
     },
+  ChooseCategory : {
+    entry : "listenForUsersAnswer",
+    on : {
+      RECOGNISED : [{guard },
+      {guard  }]
+    }
+  },
 
                   //just testing out stuff, 
   Geography: {    //target for Listen sub-states needs to be some sort of reaction state, need to add that later
@@ -175,8 +182,25 @@ export function setupButton(element) {
   element.addEventListener("click", () => {
     dmActor.send({ type: "CLICK" });
   });
-
-  //as I understand we need to add more buttons here and synchronize with main
+//trying to intergrate the logic of multiple buttons but get error
+export function setupSelect(element) {
+  const options = [
+    {emoji : "🏫", name : "General Knowledge" },
+    {emoji : "🌍", name : "Geography"},
+    {emoji : "📕", name : "History"},
+    {emoji : "🧪", name : "Science"}
+    ];
+    for (const option of options) {
+      const optionButton = document.createElement("button");
+      optionButton.type = "button";
+      optionButton.innerHTML = option.emoji;
+      optionButton.addEventListener("click", () => {
+        dmActor.send({type:"CLICK"});
+      });
+      element.appendChild(optionButton);
+    }
+  }
+  
   dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
     element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
   });
