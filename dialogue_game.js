@@ -34,7 +34,7 @@ const grammar = {
   agreeWords: ["yes","yup","of course","yeah", "absolutely"],
   disagreeWords: ["no","nope","nah"],
   correctAnswer: ["That's correct!", "Well done!", "Exactly!", "You got it!" ],
-  wrongAnswer: ["Try again!", "Better luck next time!"]
+  wrongAnswer: ["Try again!", "Better luck next time!"],
 };
 
 // our functions:
@@ -121,11 +121,18 @@ const dialogueGame = setup({
   },
 
   SayInstructions: {
-    entry: [{ type: "speakToTheUser", params: ({context}) => `Here we gooo! These are the instructions...`}],
+    entry: [{ type: "speakToTheUser", params: ({context}) => `Here we gooo! These are the instructions.. `}],
     on: {
-      SPEAK_COMPLETE: "Geography"
+      SPEAK_COMPLETE: "ChooseCategory"
       },
     },
+  ChooseCategory : {
+    entry : "listenForUsersAnswer",
+    on : {
+      RECOGNISED : [{guard },
+      {guard  }]
+    }
+  },
 
                   //just testing out stuff, 
   Geography: {    //target for Listen sub-states needs to be some sort of reaction state, need to add that later
