@@ -1,0 +1,370 @@
+{
+    "projectFileVersion": "2022-10-01-preview",
+    "stringIndexType": "Utf16CodeUnit",
+    "metadata": {
+        "projectKind": "Conversation",
+        "settings": {
+            "confidenceThreshold": 0,
+            "normalizeCasing": true
+        },
+        "projectName": "dialogue_game",
+        "multilingual": false,
+        "description": "nlu model for Eleni and Anni's dialogue game",
+        "language": "en-us"
+    },
+    "assets": {
+        "projectKind": "Conversation",
+        "intents": [
+            {
+                "category": "None"
+            },
+            {
+                "category": "agreement_or_disagreement"
+            },
+            {
+                "category": "hint"
+            },
+            {
+                "category": "multiplayer_options"
+            },
+            {
+                "category": "game_options"
+            },
+            {
+                "category": "user_name"
+            }
+        ],
+        "entities": [
+            {
+                "category": "no",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "yes",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "quit",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "hint_option",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "steal",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "users_name",
+                "compositionSetting": "combineComponents",
+                "prebuilts": [
+                    {
+                        "category": "Person.Name"
+                    }
+                ]
+            }
+        ],
+        "utterances": [
+            {
+                "text": "steal their points",
+                "language": "en-us",
+                "intent": "multiplayer_options",
+                "entities": [
+                    {
+                        "category": "steal",
+                        "offset": 0,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "get their points",
+                "language": "en-us",
+                "intent": "multiplayer_options",
+                "entities": [
+                    {
+                        "category": "steal",
+                        "offset": 0,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "steal points",
+                "language": "en-us",
+                "intent": "multiplayer_options",
+                "entities": [
+                    {
+                        "category": "steal",
+                        "offset": 0,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "yes I want to steal points",
+                "language": "en-us",
+                "intent": "multiplayer_options",
+                "entities": [
+                    {
+                        "category": "steal",
+                        "offset": 14,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like to steal points",
+                "language": "en-us",
+                "intent": "multiplayer_options",
+                "entities": [
+                    {
+                        "category": "steal",
+                        "offset": 12,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "hint",
+                "language": "en-us",
+                "intent": "hint",
+                "entities": [
+                    {
+                        "category": "hint_option",
+                        "offset": 0,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like a hint please",
+                "language": "en-us",
+                "intent": "hint",
+                "entities": [
+                    {
+                        "category": "hint_option",
+                        "offset": 9,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "can I get a hint",
+                "language": "en-us",
+                "intent": "hint",
+                "entities": [
+                    {
+                        "category": "hint_option",
+                        "offset": 10,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "hint please",
+                "language": "en-us",
+                "intent": "hint",
+                "entities": [
+                    {
+                        "category": "hint_option",
+                        "offset": 0,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I would like a hint",
+                "language": "en-us",
+                "intent": "hint",
+                "entities": [
+                    {
+                        "category": "hint_option",
+                        "offset": 13,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'm done",
+                "language": "en-us",
+                "intent": "game_options",
+                "entities": [
+                    {
+                        "category": "quit",
+                        "offset": 0,
+                        "length": 8
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "exit the game",
+                "language": "en-us",
+                "intent": "game_options",
+                "entities": [
+                    {
+                        "category": "quit",
+                        "offset": 0,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "end the game",
+                "language": "en-us",
+                "intent": "game_options",
+                "entities": [
+                    {
+                        "category": "quit",
+                        "offset": 0,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "quit",
+                "language": "en-us",
+                "intent": "game_options",
+                "entities": [
+                    {
+                        "category": "quit",
+                        "offset": 0,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to quit",
+                "language": "en-us",
+                "intent": "game_options",
+                "entities": [
+                    {
+                        "category": "quit",
+                        "offset": 10,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to end the game",
+                "language": "en-us",
+                "intent": "game_options",
+                "entities": [
+                    {
+                        "category": "quit",
+                        "offset": 10,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "no I don't",
+                "language": "en-us",
+                "intent": "agreement_or_disagreement",
+                "entities": [
+                    {
+                        "category": "no",
+                        "offset": 0,
+                        "length": 2
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "yes I do",
+                "language": "en-us",
+                "intent": "agreement_or_disagreement",
+                "entities": [
+                    {
+                        "category": "yes",
+                        "offset": 0,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "absolutely",
+                "language": "en-us",
+                "intent": "agreement_or_disagreement",
+                "entities": [
+                    {
+                        "category": "yes",
+                        "offset": 0,
+                        "length": 10
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "no thanks",
+                "language": "en-us",
+                "intent": "agreement_or_disagreement",
+                "entities": [
+                    {
+                        "category": "no",
+                        "offset": 0,
+                        "length": 2
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "yes please",
+                "language": "en-us",
+                "intent": "agreement_or_disagreement",
+                "entities": [
+                    {
+                        "category": "yes",
+                        "offset": 0,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "no",
+                "language": "en-us",
+                "intent": "agreement_or_disagreement",
+                "entities": [
+                    {
+                        "category": "no",
+                        "offset": 0,
+                        "length": 2
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "yes",
+                "language": "en-us",
+                "intent": "agreement_or_disagreement",
+                "entities": [
+                    {
+                        "category": "yes",
+                        "offset": 0,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            }
+        ]
+    }
+}
