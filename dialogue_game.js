@@ -47,14 +47,17 @@ function randomRepeat(myArray) {
   return myArray[randomIndex]
 }
 
+function checkPositive(event) {
+  return event === "yes";
+}
 //creating the machine:
 const dialogueGame = setup({
     actions: {
-      listenForUsersAnswer : ({ context }) => 
+      listen : ({ context }) => 
       context.ssRef.send({
          type: "LISTEN", value: { nlu: true } }),
   
-      speakToTheUser : ({ context}, params) => 
+      say : ({ context}, params) => 
       context.ssRef.send({
          type: "SPEAK",
         value: {
@@ -92,60 +95,88 @@ const dialogueGame = setup({
   },
 
   SayGreeting: {
-    entry: [{type: "speakToTheUser", params: "Welcome to the Typhoon game! What is your name?"}],
+    entry: [{type: "say", params: "Welcome to the Typhoon game! What is your name?"}],
     on: {
         SPEAK_COMPLETE: "ListenGreeting"
         }
     },
 
     ListenGreeting: {
-      entry: "listenForUsersAnswer",
+      entry: "listen",
       on: {
           RECOGNISED: {actions: assign({user_name: ({event}) => event.nluValue.entities[0].text}), target: "TestingYesOrNo"},
       },
     },
 
   TestingYesOrNo: {
-    entry: [{type: "speakToTheUser", params: ({context}) => `Hi there ${context.user_name}!Do you want to start the game?`}],
+    entry: [{type: "say", params: ({context}) => `Hi there ${context.user_name}!Do you want to start the game?`}],
     on: {
       SPEAK_COMPLETE: "ListenYesOrNo"
     }
   },
 
   ListenYesOrNo: {
-    entry: "listenForUsersAnswer",
+    entry: "listen",
     on: {
-      RECOGNISED: [{guard: ({event}) => event.nluValue.entities[0].category === "yes", target: "SayInstructions" },
+      RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "SayInstructions" },
       {guard:({event}) => event.nluValue.entities[0].category === "no", target: "Done" }],
     }
   },
 
   SayInstructions: {
-    entry: [{ type: "speakToTheUser", params: ({context}) => `Here we gooo! These are the instructions.. `}],
+    entry: [{ type: "say", params: `Here we gooo! These are the instructions..Are you ready?`}], 
     on: {
-      SPEAK_COMPLETE: "ChooseCategory"
+      SPEAK_COMPLETE: "CheckIfReady"
       },
     },
-  ChooseCategory : {
-    entry : "listenForUsersAnswer",
+  CheckIfReady : {
+    entry : "listen",
     on : {
-      RECOGNISED : [{guard },
-      {guard  }]
+      RECOGNISED : [{guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
+      target : "ChooseCategory",
+      actions : {type : "say", params : "Time to choose a category. Choose wisely!" }},
+      {target : "Done"}]
     }
   },
-
+  ChooseCategory : {
+    entry : "listen",
+    on : {
+      RECOGNISED : [{guard : ({event}) => event.nluValue.entities[0].text === "Geography", target : "Geography"},
+      {guard : ({event}) => event.nluValue.entities[0].text === "General Knowledge", target : "GeneralKnowledge"},
+      {guard : ({event}) => event.nluValue.entities[0].text === "History", target : "History"},
+      {target : "ChooseCategory", reenter : true,
+      actions : {type : "say", params : ({context}) => `You need to choose a category, ${context.user_name}`}}]
+    }
+  },
                   //just testing out stuff, 
   Geography: {    //target for Listen sub-states needs to be some sort of reaction state, need to add that later
     initial: "Question1Speak",
     states: {
-      Question1Speak: { entry: [{ type: "speakToTheUser", params: "What is the capital city of Australia?"}], on: {SPEAK_COMPLETE: "Question1Listen"}},
-      Question1Listen: { entry: "listenForUsersAnswer", on: {RECOGNISED: "Question2Speak"}},
-      Question2Speak: {entry: [{ type: "speakToTheUser", params: "What is the hottest country in the world?"}], on: {SPEAK_COMPLETE: "Question2Listen"}},
-      Question2Listen: {entry: "listenForUsersAnswer", on: {RECOGNISED: "Question3Speak"}},
-      Question3Speak: {entry: [{ type: "speakToTheUser", params: "How many continents are there?"}], on: {SPEAK_COMPLETE: "Question3Listen"}},
-      Question3Listen: {entry: "listenForUsersAnswer", on: {RECOGNISED: "#dialogueGame.Done"}},
+      Question1Speak: { entry: [{ type: "say", params: "What is the capital city of Australia?"}], on: {SPEAK_COMPLETE: "Question1Listen"}},
+      Question1Listen: { entry: "listen", on: {RECOGNISED: "Question2Speak"}},
+      Question2Speak: {entry: [{ type: "say", params: "What is the hottest country in the world?"}], on: {SPEAK_COMPLETE: "Question2Listen"}},
+      Question2Listen: {entry: "listen", on: {RECOGNISED: "Question3Speak"}},
+      Question3Speak: {entry: [{ type: "say", params: "How many continents are there?"}], on: {SPEAK_COMPLETE: "Question3Listen"}},
+      Question3Listen: {entry: "listen", on: {RECOGNISED: "#dialogueGame.ChooseCategory",
+      actions : {type : "say", params : "You need to choose another category now."}}},
     }
   },
+  GeneralKnowledge :{
+    initial: "Question1GN",
+    states : {
+      Question1GN : { entry: [{ type: "say", params: "Which planet is known as the \"Red Planet\"?"}], on: {SPEAK_COMPLETE: "Question1ListenGN"}},
+      Question1ListenGN :  { entry: "listen", on: {RECOGNISED: "Question2GN"}},
+      Question2GN : { entry: [{ type: "say", params: "What is the tallest mountain in the world?"}], on: {SPEAK_COMPLETE: "Question2ListenGN"}},
+      Question2ListenGN : { entry: "listen", on: {RECOGNISED: "Question3GN"}},
+      Question3GN : { entry: [{ type: "say", params: "What is the main ingredient in hummus?"}], on: {SPEAK_COMPLETE: "Question3ListenGN"}},
+      Question3ListenGN : { entry: "listen", on: {RECOGNISED: "Question4GN"}},
+      Question4GN : { entry: [{ type: "say", params: "Who is the current monarch of Sweden?"}], on: {SPEAK_COMPLETE: "Question4ListenGN"}},
+      Question4ListenGN : { entry: "listen", on: {RECOGNISED: "Question5GN"}},
+      Question5GN : { entry: [{ type: "say", params: "What is the largest organ in the human body?"}], on: {SPEAK_COMPLETE: "Question5ListenGN"}},
+      Question5ListenGN : { entry: "listen", on: {RECOGNISED: "#dialogueGame.ChooseCategory"}},
+    }
+  },
+  History :{},
 
   Done: {
     on: { CLICK: "SayGreeting"}
@@ -181,8 +212,8 @@ dmActor.subscribe((state) => {
 export function setupButton(element) {
   element.addEventListener("click", () => {
     dmActor.send({ type: "CLICK" });
-  });
-  function setupSelect(element) {
+  }) //} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
+  /*export function setupSelect(element) {
   const options = [
     {emoji : "🏫", name : "General Knowledge" },
     {emoji : "🌍", name : "Geography"},
@@ -197,11 +228,12 @@ export function setupButton(element) {
         dmActor.send({type:"CLICK"});
       });
       element.appendChild(optionButton);
-    }
-  }
+    }*/
+  
   
   dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
     element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
   });
-}
+  }
+//}
 

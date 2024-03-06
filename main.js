@@ -1,5 +1,5 @@
 import "./style.css";
-import { setupButton,setupSelect } from "./dialogue_game.js";
+import { setupButton } from "./dialogue_game.js"; //setupSelect in the brackets needed 
 
 document.querySelector("#app").innerHTML = `
   <div>
@@ -11,5 +11,5 @@ document.querySelector("#app").innerHTML = `
   </div>
 `;
 
-setupButton(document.querySelector("#select"))
+//setupSelect(document.querySelector("select"))
 setupButton(document.querySelector("#startButton"));
