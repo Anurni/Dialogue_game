@@ -184,7 +184,7 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED: 
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question1), target: "reactionState1"}}},    
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question1), actions: assign({points: points + 1}), target: "reactionState1"}}},    
 
       reactionState1: {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
@@ -201,7 +201,7 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED:
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question2), target: "reactionState2"}}}, 
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question2), actions: assign({points: points + 1}), target: "reactionState2"}}}, 
       
       reactionState2: {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
@@ -218,7 +218,7 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED: 
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question3), target: "reactionState3"}  
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question3), actions: assign({points: points + 1}), target: "reactionState3"}  
       },
     },
 
@@ -237,7 +237,7 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED: 
-            { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question4), target: "reactionState4"}  
+            { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question4), actions: assign({points: points + 1}), target: "reactionState4"}  
         },
       },
 
@@ -256,7 +256,7 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED: 
-            { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question5), target: "reactionState5"}  
+            { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question5), actions: assign({points: points + 1}), target: "reactionState5"}  
         },
       },
 
@@ -268,6 +268,7 @@ const dialogueGame = setup({
         },
 
       Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
+      actions: assign({points: 0}), //player loses all their points
       on: {SPEAK_COMPLETE: "#dialogueGame.Done"}}, // need to set the target elsewhere eventually
 
       geographyFinal: {
@@ -291,7 +292,7 @@ const dialogueGame = setup({
         entry: "listen", 
         on: {
           RECOGNISED:
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question1), target: "reactionQuestion1GN"}}},
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question1), actions: assign({points: points + 1}), target: "reactionQuestion1GN"}}},
 
       reactionQuestion1GN : {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
@@ -307,7 +308,7 @@ const dialogueGame = setup({
       Question2ListenGN : { 
         entry: "listen", 
         on: {RECOGNISED:
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question2), target: "reactionQuestion2GN"}}},
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question2), actions: assign({points: points + 1}), target: "reactionQuestion2GN"}}},
 
       reactionQuestion2GN : {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
@@ -323,7 +324,7 @@ const dialogueGame = setup({
       Question3ListenGN : { 
         entry: "listen", 
         on: {RECOGNISED:
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question3), target: "reactionQuestion3GN"}}},
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question3), actions: assign({points: points + 1}), target: "reactionQuestion3GN"}}},
 
       reactionQuestion3GN : {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
@@ -339,7 +340,7 @@ const dialogueGame = setup({
       Question4ListenGN : { 
         entry: "listen",
         on: {RECOGNISED:
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question4), target: "reactionQuestion4GN"}}},
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question4), actions: assign({points: points + 1}), target: "reactionQuestion4GN"}}},
 
       reactionQuestion4GN : {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
@@ -355,7 +356,7 @@ const dialogueGame = setup({
       Question5ListenGN : { 
         entry: "listen", 
         on: {RECOGNISED:
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question5), target: "reactionQuestion5GN"}}},
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question5), actions: assign({points: points + 1}), target: "reactionQuestion5GN"}}},
 
       reactionQuestion5GN : {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
@@ -370,6 +371,7 @@ const dialogueGame = setup({
     },
 
     Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
+    actions: assign({points: 0}), //player loses all their points
       on: {SPEAK_COMPLETE: "#dialogueGame.Done"}} // need to set the target elsewhere eventually
     }
   },
