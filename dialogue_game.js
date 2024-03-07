@@ -31,14 +31,15 @@ const settings = {
 
 // our grammar
 const grammar = {
-  correctAnswer: ["That's correct!", "Well done!", "Exactly!", "You got it!" ],
-  wrongAnswer: ["Try again!", "Better luck next time!", "Not quite!"],
   typhoonReaction: ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"],
-  generalKnowledge: {question1: [], question2: [], question3: [], question4: [], question5: []},  //insert the answer possibilities in the lists
-  science: {question1: [], question2: [], question3: [], question4: [], question5: []}, //insert the answer possibilities in the lists
-  history: {question1: [], question2: [], question3: [], question4: [], question5: []}, //insert the answer possibilities in the lists
-  geography: {question1: [], question2: [], question3: [], question4: [], question5: []}  //insert the answer possibilities in the lists
+  generalKnowledge: {question1: "canberra", question2: "mali", question3: "7", question4: "pacific", question5: "chile"},  
+  science: {question1: [], question2: [], question3: [], question4: [], question5: []}, 
+  history: {question1: [], question2: [], question3: [], question4: [], question5: []}, 
+  geography: {question1: [], question2: [], question3: [], question4: [], question5: []}  
 };
+
+const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
+const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
 
 // our functions:
 function isInGrammar(utterance) {
@@ -46,9 +47,9 @@ function isInGrammar(utterance) {
   }
 
 function randomRepeat(myArray) {
-  const randomIndex = Math.floor(Math,random()*myArray.length);
+  const randomIndex = Math.floor(Math.random()*myArray.length);
   return myArray[randomIndex]
-}
+  }
 
 //function that checks if the user's answer is correct
 function checkAnswer (event, category, question) {
@@ -124,11 +125,11 @@ const dialogueGame = setup({
     ListenGreeting: {
       entry: "listen",
       on: {
-          RECOGNISED: {actions: assign({user_name: ({event}) => event.nluValue.entities[0].text}), target: "TestingYesOrNo"},
+          RECOGNISED: {actions: assign({user_name: ({event}) => event.nluValue.entities[0].text}), target: "GameStartVerification"},
       },
     },
 
-  TestingYesOrNo: {
+  GameStartVerification: {
     entry: [{type: "say", params: ({context}) => `Hi there ${context.user_name}!Do you want to start the game?`}],
     on: {
       SPEAK_COMPLETE: "ListenYesOrNo"
@@ -149,6 +150,7 @@ const dialogueGame = setup({
       SPEAK_COMPLETE: "CheckIfReady"
       },
     },
+
   CheckIfReady : {
     entry : "listen",
     on : {
@@ -158,6 +160,7 @@ const dialogueGame = setup({
       {target : "Done"}]
     }
   },
+
   ChooseCategory : {
     entry : "listen",
     on : {
@@ -168,8 +171,8 @@ const dialogueGame = setup({
       actions : {type : "say", params : ({context}) => `You need to choose a category, ${context.user_name}`}}]
     }
   },
-                  //just testing out stuff, 
-  Geography: {    //target for Listen sub-states needs to be some sort of reaction state, need to add that later
+
+  Geography: {    
     initial: "Question1Speak",
     states: {
       Question1Speak: { 
@@ -181,7 +184,12 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED: 
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question1)}}},    // need to add target and reaction action(?)
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question1), target: "reactionState1"}}},    
+
+      reactionState1: {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        target: "Question2Speak"
+          },
 
       Question2Speak: { 
         entry: [{ type: "say", params: "What is the hottest country in the world?"}], 
@@ -191,7 +199,12 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED:
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question2)}}}, // need to add target and reaction action(?)
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question2), target: "reactionState2"}}}, 
+      
+      reactionState2: {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
+        target: "Question3Speak"
+          },
 
       Question3Speak: { 
         entry: [{ type: "say", params: "How many continents are there?"}], 
@@ -201,13 +214,59 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED: 
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question3),  // need to add target and reaction action(?)
-          actions : [{type : "say", params : "You need to choose another category now."}], target: "#dialogueGame.ChooseCategory"}   //check where this belongs
-        }
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question3), target: "reactionState3"}  
       },
     },
+
+      reactionState3: {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
+        target: "Question4Speak"
+      },
+
+      Question4Speak: { 
+        entry: [{ type: "say", params: "What is the name of the largest ocean in the world?"}], 
+        on: { SPEAK_COMPLETE: "Question4Listen"}},
+
+      Question4Listen: { 
+        entry: "listen", 
+        on: { 
+          RECOGNISED: 
+            { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question4), target: "reactionState4"}  
+        },
+      },
+
+      reactionState4: {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
+        target: "Question5Speak"
+      },
+
+      Question5Speak: { 
+        entry: [{ type: "say", params: "Which country does Easter Island belong to?"}], 
+        on: { SPEAK_COMPLETE: "Question5Listen"}},
+
+      Question5Listen: { 
+        entry: "listen", 
+        on: { 
+          RECOGNISED: 
+            { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question5), target: "reactionState5"}  
+        },
+      },
+
+      reactionState5: {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
+        target: "geographyFinal"
+      },
+
+      geographyFinal: {
+        entry: [{type : "say", params : "You need to choose another category now."}], 
+        on: {
+          SPEAK_COMPLETE: "#dialogueGame.ChooseCategory"
+      }
+    },
   },
-  GeneralKnowledge :{
+},
+
+  GeneralKnowledge : {
     initial: "Question1GN",
     states : {
       Question1GN : {
