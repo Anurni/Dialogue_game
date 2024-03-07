@@ -187,7 +187,7 @@ const dialogueGame = setup({
           { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question1), target: "reactionState1"}}},    
 
       reactionState1: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "Question2Speak"
           },
@@ -204,7 +204,7 @@ const dialogueGame = setup({
           { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question2), target: "reactionState2"}}}, 
       
       reactionState2: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "Question3Speak"
           },
@@ -223,7 +223,7 @@ const dialogueGame = setup({
     },
 
       reactionState3: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "Question4Speak"
           },
@@ -242,7 +242,7 @@ const dialogueGame = setup({
       },
 
       reactionState4: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "Question5Speak"
           },
@@ -261,7 +261,7 @@ const dialogueGame = setup({
       },
 
       reactionState5: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "geographyFinal"
           },
@@ -293,7 +293,7 @@ const dialogueGame = setup({
           { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question1), target: "reactionQuestion1GN"}}},
 
       reactionQuestion1GN : {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "Question2GN"
           },
@@ -309,7 +309,7 @@ const dialogueGame = setup({
           { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question2), target: "reactionQuestion2GN"}}},
 
       reactionQuestion2GN : {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "Question3GN"
           },
@@ -325,7 +325,7 @@ const dialogueGame = setup({
           { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question3), target: "reactionQuestion3GN"}}},
 
       reactionQuestion3GN : {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "Question4GN"
           },
@@ -341,7 +341,7 @@ const dialogueGame = setup({
           { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question4), target: "reactionQuestion4GN"}}},
 
       reactionQuestion4GN : {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
         on: { 
           SPEAK_COMPLETE: "Question5GN"
           },
@@ -357,7 +357,7 @@ const dialogueGame = setup({
           { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question5), target: "reactionQuestion5GN"}}},
 
       reactionQuestion5GN : {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
         target: "finalGeneralKnowledge"
             },
 
