@@ -31,15 +31,15 @@ const settings = {
 
 // our grammar
 const grammar = {
-  typhoonReaction: ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"],
   generalKnowledge: {question1: "canberra", question2: "mali", question3: "7", question4: "pacific", question5: "chile"},  
-  science: {question1: [], question2: [], question3: [], question4: [], question5: []}, 
+  science: {question1: "mars", question2: "mount everest", question3: "chickpea", question4: "carl gustav", question5: "skin"}, 
   history: {question1: [], question2: [], question3: [], question4: [], question5: []}, 
   geography: {question1: [], question2: [], question3: [], question4: [], question5: []}  
 };
 
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
 const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
+const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"];
 
 // our functions:
 function isInGrammar(utterance) {
@@ -188,8 +188,10 @@ const dialogueGame = setup({
 
       reactionState1: {
         entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
-        target: "Question2Speak"
+        on: { 
+          SPEAK_COMPLETE: "Question2Speak"
           },
+        },
 
       Question2Speak: { 
         entry: [{ type: "say", params: "What is the hottest country in the world?"}], 
@@ -202,9 +204,11 @@ const dialogueGame = setup({
           { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question2), target: "reactionState2"}}}, 
       
       reactionState2: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
-        target: "Question3Speak"
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question3Speak"
           },
+        },
 
       Question3Speak: { 
         entry: [{ type: "say", params: "How many continents are there?"}], 
@@ -219,9 +223,11 @@ const dialogueGame = setup({
     },
 
       reactionState3: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
-        target: "Question4Speak"
-      },
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question4Speak"
+          },
+        },
 
       Question4Speak: { 
         entry: [{ type: "say", params: "What is the name of the largest ocean in the world?"}], 
@@ -236,12 +242,14 @@ const dialogueGame = setup({
       },
 
       reactionState4: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
-        target: "Question5Speak"
-      },
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question5Speak"
+          },
+        },
 
       Question5Speak: { 
-        entry: [{ type: "say", params: "Which country does Easter Island belong to?"}], 
+        entry: [{ type: "say", params: "Which country does the Easter Island belong to?"}], 
         on: { SPEAK_COMPLETE: "Question5Listen"}},
 
       Question5Listen: { 
@@ -253,9 +261,14 @@ const dialogueGame = setup({
       },
 
       reactionState5: {
-        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
-        target: "geographyFinal"
-      },
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "geographyFinal"
+          },
+        },
+
+      Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
+      on: {SPEAK_COMPLETE: "#dialogueGame.Done"}}, // need to set the target elsewhere eventually
 
       geographyFinal: {
         entry: [{type : "say", params : "You need to choose another category now."}], 
@@ -275,7 +288,16 @@ const dialogueGame = setup({
 
       Question1ListenGN :  { 
         entry: "listen", 
-        on: {RECOGNISED: "Question2GN"}},
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question1), target: "reactionQuestion1GN"}}},
+
+      reactionQuestion1GN : {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question2GN"
+          },
+        },
 
       Question2GN : { 
         entry: [{ type: "say", params: "What is the tallest mountain in the world?"}], 
@@ -283,7 +305,15 @@ const dialogueGame = setup({
 
       Question2ListenGN : { 
         entry: "listen", 
-        on: {RECOGNISED: "Question3GN"}},
+        on: {RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question2), target: "reactionQuestion2GN"}}},
+
+      reactionQuestion2GN : {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question3GN"
+          },
+        },
 
       Question3GN : { 
         entry: [{ type: "say", params: "What is the main ingredient in hummus?"}], 
@@ -291,7 +321,15 @@ const dialogueGame = setup({
 
       Question3ListenGN : { 
         entry: "listen", 
-        on: {RECOGNISED: "Question4GN"}},
+        on: {RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question3), target: "reactionQuestion3GN"}}},
+
+      reactionQuestion3GN : {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question4GN"
+          },
+        },
 
       Question4GN : { 
         entry: [{ type: "say", params: "Who is the current monarch of Sweden?"}], 
@@ -299,7 +337,15 @@ const dialogueGame = setup({
 
       Question4ListenGN : { 
         entry: "listen",
-        on: {RECOGNISED: "Question5GN"}},
+        on: {RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question4), target: "reactionQuestion4GN"}}},
+
+      reactionQuestion4GN : {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question5GN"
+          },
+        },
 
       Question5GN : { 
         entry: [{ type: "say", params: "What is the largest organ in the human body?"}], 
@@ -307,9 +353,22 @@ const dialogueGame = setup({
 
       Question5ListenGN : { 
         entry: "listen", 
-        on: {RECOGNISED: "#dialogueGame.ChooseCategory"}},
+        on: {RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, generalKnowledge, question5), target: "reactionQuestion5GN"}}},
 
-      Typhoon: { entry: [{type: "say", params: `I'm sorry! Your luck run out!`}], 
+      reactionQuestion5GN : {
+        entry: [{type: "say", params: randomRepeat(grammar[correctAnswer])}],    
+        target: "finalGeneralKnowledge"
+            },
+
+      finalGeneralKnowledge: {
+        entry: [{type : "say", params : "You need to choose another category now."}], 
+        on: {
+          SPEAK_COMPLETE: "#dialogueGame.ChooseCategory"
+      }
+    },
+
+    Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
       on: {SPEAK_COMPLETE: "#dialogueGame.Done"}} // need to set the target elsewhere eventually
     }
   },
