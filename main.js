@@ -3,10 +3,12 @@ import { setupButton } from "./dialogue_game.js"; //setupSelect in the brackets 
 
 document.querySelector("#app").innerHTML = `
   <div>
-    <div class="card" id ="select">
+    <div class="container">
+    <div id = "question"> Question </div>
+    <div id="answer-buttons" class="btn-grid">
     </div>
-    <div class = "card">
-      <button id="startButton" type="button">Start</button>
+    <div class = "controls">
+      <button id="startButton" class="button">Start</button>
     </div> 
   </div>
 `;

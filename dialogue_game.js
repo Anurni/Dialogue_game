@@ -201,12 +201,12 @@ const dialogueGame = setup({
         entry: "listen", 
         on: { 
           RECOGNISED: 
-          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question3)},  // need to add target and reaction action(?)
-          { actions : [{type : "say", params : "You need to choose another category now."}], target: "#dialogueGame.ChooseCategory"}   //check where this belongs
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question3),  // need to add target and reaction action(?)
+          actions : [{type : "say", params : "You need to choose another category now."}], target: "#dialogueGame.ChooseCategory"}   //check where this belongs
         }
       },
     },
-  }
+  },
   GeneralKnowledge :{
     initial: "Question1GN",
     states : {
@@ -251,7 +251,7 @@ const dialogueGame = setup({
         on: {RECOGNISED: "#dialogueGame.ChooseCategory"}},
 
       Typhoon: { entry: [{type: "say", params: `I'm sorry! Your luck run out!`}], 
-      on: {SPEAK_COMPLETE: "Done"}} // need to set the target elsewhere eventually
+      on: {SPEAK_COMPLETE: "#dialogueGame.Done"}} // need to set the target elsewhere eventually
     }
   },
 
@@ -279,7 +279,7 @@ dmActor.subscribe((state) => {
 export function setupButton(element) {
   element.addEventListener("click", () => {
     dmActor.send({ type: "CLICK" });
-  }) //} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
+  })  }//} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
   /*export function setupSelect(element) {
   const options = [
     {emoji : "🏫", name : "General Knowledge" },
@@ -301,6 +301,6 @@ export function setupButton(element) {
   dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
     element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
   });
-  }
+  
 
 
