@@ -24,17 +24,17 @@ const settings = {
   azureLanguageCredentials: azureLanguageCredentials,
   azureCredentials: azureCredentials,
   asrDefaultCompleteTimeout: 0,
-  asrDefaultNoInputTimeout: 5000,
+  asrDefaultNoInputTimeout: 10000,
   locale: "en-US",
   ttsDefaultVoice: "en-US-JaneNeural",
 };
 
 // our grammar
 const grammar = {
-  generalKnowledge: {question1: "canberra", question2: "mali", question3: "7", question4: "pacific", question5: "chile"},  
-  science: {question1: "mars", question2: "mount everest", question3: "chickpea", question4: "carl gustav", question5: "skin"}, 
+  geography: {question1: "canberra", question2: "mali", question3: "7", question4: "pacific", question5: "chile"},  
+  generalKnowledge: {question1: "mars", question2: "mount everest", question3: "chickpea", question4: "carl gustav", question5: "skin"}, 
   history: {question1: [], question2: [], question3: [], question4: [], question5: []}, 
-  geography: {question1: [], question2: [], question3: [], question4: [], question5: []}  
+  science: {question1: [], question2: [], question3: [], question4: [], question5: []}  
 };
 
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
@@ -156,7 +156,7 @@ const dialogueGame = setup({
     on : {
       RECOGNISED : [{guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
       target : "ChooseCategory",
-      actions : {type : "say", params : "Time to choose a category. Choose wisely!" }},
+      actions : [{type : "say", params : "Time to choose a category. Choose wisely!" }]},
       {target : "Done"}]
     }
   },
@@ -282,6 +282,7 @@ const dialogueGame = setup({
   GeneralKnowledge : {
     initial: "Question1GN",
     states : {
+    hist : {type : "history"},
       Question1GN : {
          entry: [{ type: "say", params: "Which planet is known as the \"Red Planet\"?"}], 
          on: {SPEAK_COMPLETE: "Question1ListenGN"}},
@@ -397,7 +398,7 @@ dmActor.subscribe((state) => {
 export function setupButton(element) {
   element.addEventListener("click", () => {
     dmActor.send({ type: "CLICK" });
-  })  }//} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
+  })} //} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
   /*export function setupSelect(element) {
   const options = [
     {emoji : "🏫", name : "General Knowledge" },
@@ -416,9 +417,8 @@ export function setupButton(element) {
     }*/
   
   
-  dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
-    element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
-  });
-  
+  //dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
+  //  element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
+  //});
 
 

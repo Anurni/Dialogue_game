@@ -1,38 +1,16 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(243, 13, 13, 0.87);
-  background-color: #f60404;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+#start-container {
+  text-align: center;
+  justify-content: center;
 }
-
-a {
-  font-weight: 500;
-  color: #21f725;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
+  padding: 0;
   margin: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  width : 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: aquamarine;
 }
 
 #app {
@@ -42,55 +20,43 @@ h1 {
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vanilla:hover {
-  filter: drop-shadow(0 0 2em #f7df1eaa);
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 2em 3em;
-  font-size: 1em;
-  font-weight: 500;
+#startButton {
+  width: 100px;
+  max-width: 80%;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 0 10px 2px;
   font-family: inherit;
-  background-color: #1b1a1a;
+  font-size: 20px;
+  background-color: #a7d1d4;
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
+#startButton:hover {
   border-color: #0a1ce2;
 }
-button:focus,
+#startButton:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #0dbcd0;
-  }
-  a:hover {
-    color: #0814f0;
-  }
-  button {
-    background-color: #6308f6;
-  }
+.category-container {
+  text-align: center;
+  width: 800px;
+  max-width: 80%;
+  background-color: bisque;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 0 10px 2px;
 }
+
+.category-button {
+  background-color: blueviolet;
+  color: azure;
+  padding: auto;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+
+
