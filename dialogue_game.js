@@ -29,22 +29,30 @@ const settings = {
   ttsDefaultVoice: "en-US-JaneNeural",
 };
 
-// our grammar, replace yes/no/hint/quit with NLU:
+// our grammar
 const grammar = {
-  agreeWords: ["yes","yup","of course","yeah", "absolutely"],
-  disagreeWords: ["no","nope","nah"],
   correctAnswer: ["That's correct!", "Well done!", "Exactly!", "You got it!" ],
-  wrongAnswer: ["Try again!", "Better luck next time!"],
+  wrongAnswer: ["Try again!", "Better luck next time!", "Not quite!"],
+  typhoonReaction: ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"],
+  generalKnowledge: {question1: [], question2: [], question3: [], question4: [], question5: []},  //insert the answer possibilities in the lists
+  science: {question1: [], question2: [], question3: [], question4: [], question5: []}, //insert the answer possibilities in the lists
+  history: {question1: [], question2: [], question3: [], question4: [], question5: []}, //insert the answer possibilities in the lists
+  geography: {question1: [], question2: [], question3: [], question4: [], question5: []}  //insert the answer possibilities in the lists
 };
 
 // our functions:
 function isInGrammar(utterance) {
-    return (utterance.toLowerCase() in grammar);
+    return (utterance.toLowerCase() in grammar); //not sure if we'll need this
   }
 
 function randomRepeat(myArray) {
   const randomIndex = Math.floor(Math,random()*myArray.length);
   return myArray[randomIndex]
+}
+
+//function that checks if the user's answer is correct
+function checkAnswer (event, category, question) {
+    return grammar[category][question].includes(event.toLowerCase());
 }
 
 function checkPositive(event) {
@@ -64,10 +72,21 @@ const dialogueGame = setup({
           utterance: params
         },
       }),
-  
-      //add assign action
-  
-  }}).createMachine({
+
+      //add assign action hereee
+    },
+    guards: {
+      didPlayerWin: (context, event) => {
+          // check if player won
+          return context.points > 99;
+        },
+      didPlayerLose: (context, event) => {
+          // check if player lost
+          return context.points < 0;
+        }
+    }
+
+  }).createMachine({
   id: "dialogueGame",
   initial: "Prepare",
   context: {
@@ -75,6 +94,7 @@ const dialogueGame = setup({
     something_1: '',
     something_2: '',
     something_3: '',
+    points: 0,
   },
   states: {
     Prepare: {
@@ -124,7 +144,7 @@ const dialogueGame = setup({
   },
 
   SayInstructions: {
-    entry: [{ type: "say", params: `Here we gooo! These are the instructions..Are you ready?`}], 
+    entry: [{ type: "say", params: `Here we go! These are the instructions..Are you ready?`}], 
     on: {
       SPEAK_COMPLETE: "CheckIfReady"
       },
@@ -152,30 +172,89 @@ const dialogueGame = setup({
   Geography: {    //target for Listen sub-states needs to be some sort of reaction state, need to add that later
     initial: "Question1Speak",
     states: {
-      Question1Speak: { entry: [{ type: "say", params: "What is the capital city of Australia?"}], on: {SPEAK_COMPLETE: "Question1Listen"}},
-      Question1Listen: { entry: "listen", on: {RECOGNISED: "Question2Speak"}},
-      Question2Speak: {entry: [{ type: "say", params: "What is the hottest country in the world?"}], on: {SPEAK_COMPLETE: "Question2Listen"}},
-      Question2Listen: {entry: "listen", on: {RECOGNISED: "Question3Speak"}},
-      Question3Speak: {entry: [{ type: "say", params: "How many continents are there?"}], on: {SPEAK_COMPLETE: "Question3Listen"}},
-      Question3Listen: {entry: "listen", on: {RECOGNISED: "#dialogueGame.ChooseCategory",
-      actions : {type : "say", params : "You need to choose another category now."}}},
-    }
-  },
+      Question1Speak: { 
+        entry: [{ type: "say", params: "What is the capital city of Australia?"}], 
+        on: { 
+          SPEAK_COMPLETE: "Question1Listen"}},
+
+      Question1Listen: { 
+        entry: "listen", 
+        on: { 
+          RECOGNISED: 
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question1)}}},    // need to add target and reaction action(?)
+
+      Question2Speak: { 
+        entry: [{ type: "say", params: "What is the hottest country in the world?"}], 
+        on: { SPEAK_COMPLETE: "Question2Listen"}},
+
+      Question2Listen: { 
+        entry: "listen", 
+        on: { 
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question2)}}}, // need to add target and reaction action(?)
+
+      Question3Speak: { 
+        entry: [{ type: "say", params: "How many continents are there?"}], 
+        on: { SPEAK_COMPLETE: "Question3Listen"}},
+
+      Question3Listen: { 
+        entry: "listen", 
+        on: { 
+          RECOGNISED: 
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, geography, question3)},  // need to add target and reaction action(?)
+          { actions : [{type : "say", params : "You need to choose another category now."}], target: "#dialogueGame.ChooseCategory"}   //check where this belongs
+        }
+      },
+    },
+  }
   GeneralKnowledge :{
     initial: "Question1GN",
     states : {
-      Question1GN : { entry: [{ type: "say", params: "Which planet is known as the \"Red Planet\"?"}], on: {SPEAK_COMPLETE: "Question1ListenGN"}},
-      Question1ListenGN :  { entry: "listen", on: {RECOGNISED: "Question2GN"}},
-      Question2GN : { entry: [{ type: "say", params: "What is the tallest mountain in the world?"}], on: {SPEAK_COMPLETE: "Question2ListenGN"}},
-      Question2ListenGN : { entry: "listen", on: {RECOGNISED: "Question3GN"}},
-      Question3GN : { entry: [{ type: "say", params: "What is the main ingredient in hummus?"}], on: {SPEAK_COMPLETE: "Question3ListenGN"}},
-      Question3ListenGN : { entry: "listen", on: {RECOGNISED: "Question4GN"}},
-      Question4GN : { entry: [{ type: "say", params: "Who is the current monarch of Sweden?"}], on: {SPEAK_COMPLETE: "Question4ListenGN"}},
-      Question4ListenGN : { entry: "listen", on: {RECOGNISED: "Question5GN"}},
-      Question5GN : { entry: [{ type: "say", params: "What is the largest organ in the human body?"}], on: {SPEAK_COMPLETE: "Question5ListenGN"}},
-      Question5ListenGN : { entry: "listen", on: {RECOGNISED: "#dialogueGame.ChooseCategory"}},
+      Question1GN : {
+         entry: [{ type: "say", params: "Which planet is known as the \"Red Planet\"?"}], 
+         on: {SPEAK_COMPLETE: "Question1ListenGN"}},
+
+      Question1ListenGN :  { 
+        entry: "listen", 
+        on: {RECOGNISED: "Question2GN"}},
+
+      Question2GN : { 
+        entry: [{ type: "say", params: "What is the tallest mountain in the world?"}], 
+        on: {SPEAK_COMPLETE: "Question2ListenGN"}},
+
+      Question2ListenGN : { 
+        entry: "listen", 
+        on: {RECOGNISED: "Question3GN"}},
+
+      Question3GN : { 
+        entry: [{ type: "say", params: "What is the main ingredient in hummus?"}], 
+        on: {SPEAK_COMPLETE: "Question3ListenGN"}},
+
+      Question3ListenGN : { 
+        entry: "listen", 
+        on: {RECOGNISED: "Question4GN"}},
+
+      Question4GN : { 
+        entry: [{ type: "say", params: "Who is the current monarch of Sweden?"}], 
+        on: {SPEAK_COMPLETE: "Question4ListenGN"}},
+
+      Question4ListenGN : { 
+        entry: "listen",
+        on: {RECOGNISED: "Question5GN"}},
+
+      Question5GN : { 
+        entry: [{ type: "say", params: "What is the largest organ in the human body?"}], 
+        on: {SPEAK_COMPLETE: "Question5ListenGN"}},
+
+      Question5ListenGN : { 
+        entry: "listen", 
+        on: {RECOGNISED: "#dialogueGame.ChooseCategory"}},
+
+      Typhoon: { entry: [{type: "say", params: `I'm sorry! Your luck run out!`}], 
+      on: {SPEAK_COMPLETE: "Done"}} // need to set the target elsewhere eventually
     }
   },
+
   History :{},
 
   Done: {
@@ -187,18 +266,6 @@ const dialogueGame = setup({
     history: "deep"
     },
   },
-Question :{ },
-  // our guards which will be modified later
-  guards: {
-    didPlayerWin: (context, event) => {
-      // check if player won
-      return context.points > 99;
-    },
-    didPlayerLose: (context, event) => {
-      // check if player lost
-      return context.points < 0;
-    }
-  }
 })
 
 const dmActor = createActor(dialogueGame, {
@@ -235,5 +302,5 @@ export function setupButton(element) {
     element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
   });
   }
-//}
+
 
