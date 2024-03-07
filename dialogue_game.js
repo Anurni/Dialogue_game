@@ -161,7 +161,7 @@ const dialogueGame = setup({
     }
   },
 
-  ChooseCategory : {
+  ChooseCategory : { 
     entry : "listen",
     on : {
       RECOGNISED : [{guard : ({event}) => event.nluValue.entities[0].text === "Geography", target : "Geography"},
@@ -415,7 +415,6 @@ export function setupButton(element) {
       });
       element.appendChild(optionButton);
     }*/
-  
   
   //dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
   //  element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
