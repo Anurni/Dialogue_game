@@ -1,4 +1,4 @@
-import { assign, createActor, setup } from "xstate";
+import { assign, createActor, setup, fromCallback, sendTo } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js"; 
@@ -59,6 +59,27 @@ function checkAnswer (event, category, question) {
 function checkPositive(event) {
   return event === "yes";
 }
+
+// trying to move the setupSelect logic into a callback actor that we can invoke from the "choose a category" state  
+const setupSelect = fromCallback(({ sendBack, receive }) => {
+  const options = [
+    {emoji : "🏫", name : "General Knowledge" },
+    {emoji : "🌍", name : "Geography"},
+    {emoji : "📕", name : "History"},
+    {emoji : "🧪", name : "Science"}
+  ];
+  for (const option of options) {
+    const optionButton = document.createElement("button");
+    optionButton.type = "button";
+    optionButton.innerHTML = option.emoji;
+    optionButton.addEventListener("click", () => {
+      dmActor.send({type:"CLICK"});
+    });
+    element.appendChild(optionButton);
+  }
+  }
+ );
+ 
 //creating the machine:
 const dialogueGame = setup({
     actions: {
@@ -85,7 +106,11 @@ const dialogueGame = setup({
           // check if player lost
           return context.points < 0;
         }
-    }
+    },
+
+    //actors: {
+    //  setupSelect
+    //}
 
   }).createMachine({
   id: "dialogueGame",
@@ -162,6 +187,9 @@ const dialogueGame = setup({
 
   AskCategory: {
     entry: [{type : "say", params : "Time to choose a category. Choose wisely!"}],
+    invoke: {
+      src: "setupSelect"  //trying to invoke the callback actor here to display the emoji buttons
+    },
     on: {
       SPEAK_COMPLETE: "ListenCategory"
     }
@@ -406,7 +434,9 @@ dmActor.subscribe((state) => {
 export function setupButton(element) {
   element.addEventListener("click", () => {
     dmActor.send({ type: "CLICK" });
-  })} //} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
+  })}
+  
+  //} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
   /*export function setupSelect(element) {
   const options = [
     {emoji : "🏫", name : "General Knowledge" },
