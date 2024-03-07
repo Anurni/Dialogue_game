@@ -61,7 +61,7 @@ function checkPositive(event) {
 }
 
 // trying to move the setupSelect logic into a callback actor that we can invoke from the "choose a category" state  
-const setupSelect = fromCallback(({ sendBack, receive }) => {
+function setupSelect() { fromCallback(({ sendBack, receive }) => {
   const options = [
     {emoji : "🏫", name : "General Knowledge" },
     {emoji : "🌍", name : "Geography"},
@@ -78,8 +78,9 @@ const setupSelect = fromCallback(({ sendBack, receive }) => {
     element.appendChild(optionButton);
   }
   }
- );
- 
+ )
+}
+ export {setupSelect};
 //creating the machine:
 const dialogueGame = setup({
     actions: {
@@ -108,9 +109,9 @@ const dialogueGame = setup({
         }
     },
 
-    //actors: {
-    //  setupSelect
-    //}
+    actors: {
+    setupSelect
+    }
 
   }).createMachine({
   id: "dialogueGame",

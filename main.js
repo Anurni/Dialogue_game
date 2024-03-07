@@ -1,15 +1,18 @@
 import "./style.css";
-import { setupButton } from "./dialogue_game.js"; //setupSelect in the brackets needed 
+import { setupButton,setupSelect } from "./dialogue_game.js"; //setupSelect in the brackets needed 
 
 document.querySelector("#app").innerHTML = `
   <div id = "start container">
-   <h1>Welcome to Typhoon game</h1>
+   <h1>Typhoon game</h1>
       <button id="startButton" class="button">Start</button>
+  </div>
+  <div class = "card">
+  <button id="counter" type="button"></button>
   </div>
 `;
 
 setupButton(document.querySelector("#startButton"));
-
+setupSelect(document.querySelector("#counter"));
 function ChooseCategory() {
   appElement.innerHTML = `
 <div class="category-container">

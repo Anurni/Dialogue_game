@@ -54,7 +54,7 @@ button:focus-visible {
   background-color: blueviolet;
   color: azure;
   padding: auto;
-  border-radius: 5px;
+  border-radius: 2px;
   font-size: 16px;
 }
 
