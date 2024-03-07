@@ -2,8 +2,13 @@ import { assign, createActor, setup, fromCallback, sendTo } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js"; 
+import { nodeModuleNameResolver } from "typescript";
 
-
+/* comments :
+shouldn't we implement a listen without nlu since we are using that to check the answer to the questions?
+should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect
+we need to randomize the states or change the typhoon its always in 6 position
+*/
 const inspector = createBrowserInspector();
 
 const azureCredentials = {
@@ -33,8 +38,8 @@ const settings = {
 const grammar = {
   geography: {question1: "canberra", question2: "mali", question3: "7", question4: "pacific", question5: "chile"},  
   generalKnowledge: {question1: "mars", question2: "mount everest", question3: "chickpea", question4: "carl gustav", question5: "skin"}, 
-  history: {question1: [], question2: [], question3: [], question4: [], question5: []}, 
-  science: {question1: [], question2: [], question3: [], question4: [], question5: []}  
+  history: {question1: ["george washington"], question2: ["1914"], question3: ["ancient greece"], question4: ["hitler"] || ["adolfus hitler"], question5: ["egyptians"]||["the egyptians"]}, 
+  science: {question1: ["photosynthesis"], question2: ["gravity"], question3: ["diamond"], question4: ["evaporation"], question5: ["mercury"]}  
 };
 
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
@@ -61,7 +66,7 @@ function checkPositive(event) {
 }
 
 // trying to move the setupSelect logic into a callback actor that we can invoke from the "choose a category" state  
-function setupSelect() { fromCallback(({ sendBack, receive }) => {
+function setupSelect(element) { fromCallback(({ sendBack, receive }) => {
   const options = [
     {emoji : "🏫", name : "General Knowledge" },
     {emoji : "🌍", name : "Geography"},
@@ -189,6 +194,7 @@ const dialogueGame = setup({
   AskCategory: {
     entry: [{type : "say", params : "Time to choose a category. Choose wisely!"}],
     invoke: {
+      actors : "setupSelect",
       src: "setupSelect"  //trying to invoke the callback actor here to display the emoji buttons
     },
     on: {
@@ -202,8 +208,9 @@ const dialogueGame = setup({
       RECOGNISED : [{guard : ({event}) => event.value[0].utterance === "Geography", target : "Geography"},
       {guard : ({event}) => event.value[0].utterance === "General Knowledge", target : "GeneralKnowledge"},
       {guard : ({event}) => event.value[0].utterance === "History", target : "History"},
+      {guard : ({event}) => event.value[0].utterance === "Science", target : "Science"},
       {target : "AskCategory", reenter : true,
-      actions : {type : "say", params : ({context}) => `You need to choose a category, ${context.user_name}`}}]
+      actions : {type : "say", params : ({context}) => `You need to choose a category, ${context.user_name}`}}] //does this work?
     }
   },
 
@@ -411,8 +418,204 @@ const dialogueGame = setup({
     }
   },
 
-  History :{},
+  History :{
+    initial : "Question1Hist",
+    states :{
+      Question1Hist: {
+        entry: [{ type: "say", params: "Who was the first president of the United States? "}], 
+        on: {SPEAK_COMPLETE: "Question1ListenHist"}},
 
+      Question1ListenHist :  { 
+        entry: "listen", 
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, history, question1), actions: ({context}) => context.points++, target: "ReactionQuestion1Hist"}}},
+      
+        ReactionQuestion1Hist : {
+          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+          on: { 
+            SPEAK_COMPLETE: "Question2Hist"
+            },
+          },
+
+      Question2Hist: {
+        entry: [{ type: "say", params: "What year did World War I begin? "}], 
+        on: {SPEAK_COMPLETE: "Question2ListenHist"}},
+
+      Question2ListenHist :  { 
+        entry: "listen", 
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, history, question2), actions: ({context}) => context.points++, target: "ReactionQuestion2Hist"}}},
+       
+        ReactionQuestion2Hist : {
+          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+          on: { 
+            SPEAK_COMPLETE: "Question3Hist"
+            },
+          },
+
+      Question3Hist: {
+        entry: [{ type: "say", params: "What ancient civilization is credited with the invention of democracy? "}], 
+        on: {SPEAK_COMPLETE: "Question3ListenHist"}},
+
+        Question3ListenHist :  { 
+          entry: "listen", 
+          on: {
+            RECOGNISED:
+            { guard: ({event}) => checkAnswer(event.value[0].utterance, history, question3), actions: ({context}) => context.points++, target: "ReactionQuestion3Hist"}}},
+        
+        ReactionQuestion3Hist : {
+          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+          on: { 
+            SPEAK_COMPLETE: "Question4Hist"
+            },
+          },
+
+      Question4Hist: {
+        entry: [{ type: "say", params: "Who was the leader of Nazi Germany during World War II?"}], 
+        on: {SPEAK_COMPLETE: "Question4ListenHist"}},
+
+      Question4ListenHist :  { 
+        entry: "listen", 
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, history, question4), actions: ({context}) => context.points++, target: "ReactionQuestion4Hist"}}},
+
+      ReactionQuestion4Hist : {
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question5Hist"
+          },
+        },
+
+      Question5Hist: {
+        entry: [{ type: "say", params: "Which civilization build the Great Pyramids of Giza? "}], 
+        on: {SPEAK_COMPLETE: "Question5ListenHist"}},
+
+      Question5ListenHist :  { 
+        entry: "listen", 
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, history, question5), actions: ({context}) => context.points++, target: "ReactionQuestion5Hist"}}},
+
+      ReactionQuestion5Hist : {
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "FinalHist"
+          },
+        },
+      
+      FinalHist: {
+        entry: [{type : "say", params : "You need to choose another category now."}], 
+      on: {
+        SPEAK_COMPLETE: "#dialogueGame.AskCategory"
+      }
+    },
+    Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
+    actions: assign({points: 0}), //player loses all their points
+      on: {SPEAK_COMPLETE: "#dialogueGame.Done"}} // need to set the target elsewhere eventually
+  }
+},
+  Science : {
+    initial : "Question1Sci",
+    states : {
+      Question1Sci: {
+        entry: [{ type: "say", params: "What is the process by which plants make their food called?"}], 
+        on: {SPEAK_COMPLETE: "Question1ListenSci"}},
+
+      Question1ListenSci :  { 
+        entry: "listen", 
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, science, question1), actions: ({context}) => context.points++, target: "ReactionQuestion1Sci"}}},
+      
+        ReactionQuestion1Sci : {
+          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+          on: { 
+            SPEAK_COMPLETE: "Question2Sci"
+            },
+          },
+
+      Question2Sci: {
+        entry: [{ type: "say", params: "What is the force that pulls objects towards the center of the Earth called? "}], 
+        on: {SPEAK_COMPLETE: "Question2ListenSci"}},
+
+      Question2ListenSci :  { 
+        entry: "listen", 
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, science, question2), actions: ({context}) => context.points++, target: "ReactionQuestion2Sci"}}},
+       
+        ReactionQuestion2Sci : {
+          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+          on: { 
+            SPEAK_COMPLETE: "Question3Sci"
+            },
+          },
+
+      Question3Sci: {
+        entry: [{ type: "say", params: "What is the hardest natural substance on Earth? "}], 
+        on: {SPEAK_COMPLETE: "Question3ListenSci"}},
+
+        Question3ListenSci:  { 
+          entry: "listen", 
+          on: {
+            RECOGNISED:
+            { guard: ({event}) => checkAnswer(event.value[0].utterance, science, question3), actions: ({context}) => context.points++, target: "ReactionQuestion3Sci"}}},
+        
+        ReactionQuestion3Sci : {
+          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+          on: { 
+            SPEAK_COMPLETE: "Question4Sci"
+            },
+          },
+
+      Question4Sci: {
+        entry: [{ type: "say", params: "What is the process by which water changes from a liquid to a gas called?"}], 
+        on: {SPEAK_COMPLETE: "Question4ListenSci"}},
+
+      Question4ListenSci :  { 
+        entry: "listen", 
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, science, question4), actions: ({context}) => context.points++, target: "ReactionQuestion4Sci"}}},
+
+      ReactionQuestion4Sci : {
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "Question5Sci"
+          },
+        },
+
+      Question5Sci: {
+        entry: [{ type: "say", params: "What is the only metal that is liquid at room temperature? "}], 
+        on: {SPEAK_COMPLETE: "Question5ListenSci"}},
+
+      Question5ListenSci :  { 
+        entry: "listen", 
+        on: {
+          RECOGNISED:
+          { guard: ({event}) => checkAnswer(event.value[0].utterance, science, question5), actions: ({context}) => context.points++, target: "ReactionQuestion5Sci"}}},
+
+      ReactionQuestion5Sci : {
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    // maybe we can implement reaction state much nicer at some point, this way will result in a lot of states...
+        on: { 
+          SPEAK_COMPLETE: "FinalSci"
+          },
+        },
+      
+      FinalSci: {
+        entry: [{type : "say", params : "You need to choose another category now."}], 
+      on: {
+        SPEAK_COMPLETE: "#dialogueGame.AskCategory"
+      }
+    },
+    Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
+    actions: assign({points: 0}), //player loses all their points
+      on: {SPEAK_COMPLETE: "#dialogueGame.Done"}} // need to set the target elsewhere eventually
+    }
+  },
   Done: {
     on: { CLICK: "SayGreeting"}
   },

@@ -6,13 +6,15 @@ document.querySelector("#app").innerHTML = `
    <h1>Typhoon game</h1>
       <button id="startButton" class="button">Start</button>
   </div>
-  <div class = "card">
-  <button id="counter" type="button"></button>
+  <div class = "card" >
+  <button id="counter" type="button" ></button>
   </div>
 `;
 
 setupButton(document.querySelector("#startButton"));
 setupSelect(document.querySelector("#counter"));
+//maybe we need to add the buttons in the style and thats why it doesn't work
+//when I am in a specific state can I call this function somehow??-->
 function ChooseCategory() {
   appElement.innerHTML = `
 <div class="category-container">
