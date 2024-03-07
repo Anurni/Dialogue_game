@@ -154,20 +154,26 @@ const dialogueGame = setup({
   CheckIfReady : {
     entry : "listen",
     on : {
-      RECOGNISED : [{guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
-      target : "ChooseCategory",
-      actions : [{type : "say", params : "Time to choose a category. Choose wisely!" }]},
-      {target : "Done"}]
+      RECOGNISED :
+       { guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
+      target : "AskCategory"}
     }
   },
 
-  ChooseCategory : { 
+  AskCategory: {
+    entry: [{type : "say", params : "Time to choose a category. Choose wisely!"}],
+    on: {
+      SPEAK_COMPLETE: "ListenCategory"
+    }
+  },
+
+  ListenCategory : { 
     entry : "listen",
     on : {
-      RECOGNISED : [{guard : ({event}) => event.nluValue.entities[0].text === "Geography", target : "Geography"},
-      {guard : ({event}) => event.nluValue.entities[0].text === "General Knowledge", target : "GeneralKnowledge"},
-      {guard : ({event}) => event.nluValue.entities[0].text === "History", target : "History"},
-      {target : "ChooseCategory", reenter : true,
+      RECOGNISED : [{guard : ({event}) => event.value[0].utterance === "Geography", target : "Geography"},
+      {guard : ({event}) => event.value[0].utterance === "General Knowledge", target : "GeneralKnowledge"},
+      {guard : ({event}) => event.value[0].utterance === "History", target : "History"},
+      {target : "AskCategory", reenter : true,
       actions : {type : "say", params : ({context}) => `You need to choose a category, ${context.user_name}`}}]
     }
   },
@@ -274,7 +280,7 @@ const dialogueGame = setup({
       geographyFinal: {
         entry: [{type : "say", params : "You need to choose another category now."}], 
         on: {
-          SPEAK_COMPLETE: "#dialogueGame.ChooseCategory"
+          SPEAK_COMPLETE: "#dialogueGame.AskCategory"
       }
     },
   },
@@ -366,7 +372,7 @@ const dialogueGame = setup({
       finalGeneralKnowledge: {
         entry: [{type : "say", params : "You need to choose another category now."}], 
         on: {
-          SPEAK_COMPLETE: "#dialogueGame.ChooseCategory"
+          SPEAK_COMPLETE: "#dialogueGame.AskCategory"
       }
     },
 
