@@ -5,9 +5,8 @@ import { KEY, NLU_KEY } from "./azure.js";
 import { nodeModuleNameResolver } from "typescript";
 
 /* comments :
-shouldn't we implement a listen without nlu since we are using that to check the answer to the questions?
-should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect
-we need to randomize the states or change the typhoon its always in 6 position 
+-should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect
+-we need to randomize the states or change the typhoon its always in 6 position 
 */
 const inspector = createBrowserInspector();
 
@@ -89,9 +88,13 @@ function setupSelect(element) { fromCallback(({ sendBack, receive }) => {
 //creating the machine:
 const dialogueGame = setup({
     actions: {
-      listen : ({ context }) => 
+      listenNlu : ({ context }) => 
       context.ssRef.send({
          type: "LISTEN", value: { nlu: true } }),
+
+      listen : ({ context }) => 
+      context.ssRef.send({
+      type: "LISTEN"}),
   
       say : ({ context}, params) => 
       context.ssRef.send({
@@ -154,7 +157,7 @@ const dialogueGame = setup({
     },
 
     ListenGreeting: {
-      entry: "listen",
+      entry: "listenNlu",
       on: {
           RECOGNISED: {actions: assign({user_name: ({event}) => event.nluValue.entities[0].text}), target: "GameStartVerification"},
       },
@@ -168,7 +171,7 @@ const dialogueGame = setup({
   },
 
   ListenYesOrNo: {
-    entry: "listen",
+    entry: "listenNlu",
     on: {
       RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "SayInstructions" },
       {guard:({event}) => event.nluValue.entities[0].category === "no", target: "Done" }],
@@ -183,7 +186,7 @@ const dialogueGame = setup({
     },
 
   CheckIfReady : {
-    entry : "listen",
+    entry : "listenNlu",
     on : {
       RECOGNISED :
        { guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
