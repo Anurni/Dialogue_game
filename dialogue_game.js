@@ -5,8 +5,7 @@ import { KEY, NLU_KEY } from "./azure.js";
 import { nodeModuleNameResolver } from "typescript";
 
 /* comments :
--should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect
--we need to randomize the states or change the typhoon its always in 6 position 
+-should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect --> yes definitely
 */
 const inspector = createBrowserInspector();
 
@@ -33,13 +32,21 @@ const settings = {
   ttsDefaultVoice: "en-US-JaneNeural",
 };
 
-// our grammar
+// old grammar, works with old states
 const grammar = {
   geography: {question1: "canberra", question2: "mali", question3: "7", question4: "pacific", question5: "chile"},  
   generalKnowledge: {question1: "mars", question2: "mount everest", question3: "chickpea", question4: "carl gustav", question5: "skin"}, 
   history: {question1: ["george washington"], question2: ["1914"], question3: ["ancient greece"], question4: ["hitler"] || ["adolfus hitler"], question5: ["egyptians"]||["the egyptians"]}, 
   science: {question1: ["photosynthesis"], question2: ["gravity"], question3: ["diamond"], question4: ["evaporation"], question5: ["mercury"]}  
 };
+
+//new question database, will work once we have one/four working question states
+const questions = {
+  geography: [{ "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}],
+  generalKnowledge: [{ "Which planet is known as the red planet?" : "Mars"}, {"What is the main ingredient in hummus" : "Chickpea"}, {"Who is the current monarch of Sweden?" : "Carl Gustav"}, {"What is the largest organ in the human body?" : "skin"}, {"What is the tallest mountain in the world?": "Mount Everest"}],
+  history: [{ "Who was the first president of the United States?" : "George Washington"}, {"What year did World War I begin?" : "1914"}, {"What ancient civilization is credited with the invention of democracy?" : "ancient greece"}, {"Who was the leader of Nazi Germany during World War II?" : "hitler"}, {"Which civilization build the Great Pyramids of Giza?": "egyptians"}],
+  science: [{ "What is the process by which plants make their food called?" : "photosynthesis"}, {"What is the force that pulls objects towards the center of the Earth called? " : "gravity"}, {"What is the hardest natural substance on Earth?" : "diamond"}, {"What is the process by which water changes from a liquid to a gas called?" : "evaporation"}, {"What is the only metal that is liquid at room temperature?": "mercury"}]
+}
 
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
 const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
@@ -63,28 +70,36 @@ function checkAnswer (event, category, question) {
 function checkPositive(event) {
   return event === "yes";
 }
+//this function should work with the new randomizing questions state, once we have one...
+function chooseQuestion(category) {
+  const questionList = questions[category];
+  // put some if-statement here to check if the question is in the context.askedQuestions
+  const questionAndAnswer = randomRepeat(questionList);
+  return questionAndAnswer  //modify this so that it only returns the key, not the whole dictionary
+ }
 
 // trying to move the setupSelect logic into a callback actor that we can invoke from the "choose a category" state  
-function setupSelect(element) { fromCallback(({ sendBack, receive }) => {
-  const options = [
-    {emoji : "🏫", name : "General Knowledge" },
-    {emoji : "🌍", name : "Geography"},
-    {emoji : "📕", name : "History"},
-    {emoji : "🧪", name : "Science"}
-  ];
-  for (const option of options) {
-    const optionButton = document.createElement("button");
-    optionButton.type = "button";
-    optionButton.innerHTML = option.emoji;
-    optionButton.addEventListener("click", () => {
-      dmActor.send({type:"CLICK"});
-    });
-    element.appendChild(optionButton);
-  }
-  }
- )
-}
- export {setupSelect};
+//function setupSelect(element) { fromCallback(({ sendBack, receive }) => {
+//  const options = [
+//    {emoji : "🏫", name : "General Knowledge" },
+//    {emoji : "🌍", name : "Geography"},
+//    {emoji : "📕", name : "History"},
+//    {emoji : "🧪", name : "Science"}
+//  ];
+//  for (const option of options) {
+//    const optionButton = document.createElement("button");
+//   optionButton.type = "button";
+//    optionButton.innerHTML = option.emoji;
+//    optionButton.addEventListener("click", () => {
+//      dmActor.send({type:"CLICK"});
+//    });
+//    element.appendChild(optionButton);
+//  }
+//  }
+// )
+//}
+// export {setupSelect};
+
 //creating the machine:
 const dialogueGame = setup({
     actions: {
@@ -104,7 +119,25 @@ const dialogueGame = setup({
         },
       }),
 
-      //add assign action hereee
+      displayCategoryButtons(element) {    //we should be able to create the category buttons from here, as an action, then call the action from the state
+        const options = [
+        {emoji : "🏫", name : "General Knowledge" },
+        {emoji : "🌍", name : "Geography"},
+        {emoji : "📕", name : "History"},
+        {emoji : "🧪", name : "Science"}
+      ];
+      for (const option of options) {
+        const optionButton = document.createElement("button");
+        optionButton.type = "button";
+        optionButton.innerHTML = option.emoji;
+        optionButton.addEventListener("click", () => {
+          dmActor.send({type:"CLICK"});
+        });
+      }
+      element.style.display : "none";  //something like this should work for making the button disappear on "CLICK" event
+    }
+
+      //add the button display actions here!
     },
     guards: {
       didPlayerWin: (context, event) => {
@@ -116,10 +149,6 @@ const dialogueGame = setup({
           return context.points < 0;
         }
     },
-
-    actors: {
-    setupSelect
-    }
 
   }).createMachine({
   id: "dialogueGame",
@@ -150,7 +179,7 @@ const dialogueGame = setup({
   },
 
   SayGreeting: {
-    entry: [{type: "say", params: "Welcome to the Typhoon game! What is your name?"}],
+    entry: [{type: "say", params: "Welcome to the Typhoon game! What is your name?"}, "displayCategoryButtons"],
     on: {
         SPEAK_COMPLETE: "ListenGreeting"
         }

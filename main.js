@@ -1,5 +1,5 @@
 import "./style.css";
-import { setupButton,setupSelect } from "./dialogue_game.js"; //setupSelect in the brackets needed 
+import { setupButton,/*setupSelect*/ } from "./dialogue_game.js"; //setupSelect in the brackets needed 
 
 document.querySelector("#app").innerHTML = `
   <div id = "start container">
@@ -13,6 +13,8 @@ document.querySelector("#app").innerHTML = `
 
 setupButton(document.querySelector("#startButton"));
 setupSelect(document.querySelector("#counter"));
+setupSelect(document.querySelector("#displayCategoryButtons")); //not sureeee
+
 //maybe we need to add the buttons in the style and thats why it doesn't work
 //when I am in a specific state can I call this function somehow??-->
 function ChooseCategory() {

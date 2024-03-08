@@ -17,7 +17,32 @@ function chooseQuestion(category) {
  return questionAndAnswer  //modify this so that it only returns the key, not the whole dictionary
 }
 
+//maybe we would need four question states?
 
-//questionState : {
-//    entry: 
-//}
+questionGeography : {
+    entry: chooseQuestion["geography"],
+    on: {
+        SPEAK_COMPLETE: "listenAnswer"
+    }
+}
+
+questionGeneralKnowlege: {
+    entry: chooseQuestion["generalKnowledge"],
+    on: {
+        SPEAK_COMPLETE: "listenAnswer"
+    }
+}
+
+questionHistory: {
+    entry: chooseQuestion["history"],
+    on: {
+        SPEAK_COMPLETE: "listenAnswer"
+    }
+}
+
+QuestionScience: {
+    entry: chooseQuestion["science"],
+    on: {
+        SPEAK_COMPLETE: "listenComplete"
+    }
+}
