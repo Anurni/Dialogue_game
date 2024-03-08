@@ -120,7 +120,7 @@ Miroslav Klose
 Notes from lab 8/3:
 How to make the buttons pop up / disappear: 
 
--the button showing up is an actor, i.e. "showCategoriesButton"
--the button disappearing is also an actor, these we can call from the states (element.style.display : "none";)
+-the button showing up/receiving a CLICK and disappearing is an actor, i.e. "showCategoriesButton"
+-this is the line that makes the button disappear --> (element.style.display : "none";)
 
 
