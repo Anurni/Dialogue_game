@@ -5,6 +5,10 @@ document.querySelector("#app").innerHTML = `
   <div id = "start container">
    <h1>Typhoon game</h1>
       <button id="startButton" class="button">Start</button>
+      <button id="GenKnowButton" class="category-button">General Knowledge</button>
+      <button id="GeogButton" class="category-button">Geography</button>
+      <button id="HistButton" class="category-button">History</button>
+      <button id="ScienceButton" class="category-button">Science</button>
   </div>
   <div class = "card" >
   <button id="counter" type="button" ></button>

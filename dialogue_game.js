@@ -134,7 +134,7 @@ const dialogueGame = setup({
           dmActor.send({type:"CLICK"});
         });
       }
-      element.style.display : "none";  //something like this should work for making the button disappear on "CLICK" event
+      element.style.display = "none";  //something like this should work for making the button disappear on "CLICK" event
     }
 
       //add the button display actions here!
@@ -225,10 +225,7 @@ const dialogueGame = setup({
 
   AskCategory: {
     entry: [{type : "say", params : "Time to choose a category. Choose wisely!"}],
-    invoke: {
-      actors : "setupSelect",
-      src: "setupSelect"  //trying to invoke the callback actor here to display the emoji buttons
-    },
+    
     on: {
       SPEAK_COMPLETE: "ListenCategory"
     }
