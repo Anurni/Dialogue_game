@@ -1,6 +1,23 @@
 const questions = {
-    { geography: { question1 : "answer", question2 : "answer", question3 : "answer", question4: "answer", question5: "answer"}},
-    { history: { question1 : "answer", question2 : "answer", question3 : "answer", question4: "answer", question5: "answer"} },
-    { generalKnowledge : { question1 : "answer", question2 : "answer", question3 : "answer", question4: "answer", question5: "answer"}},
-    { science: { question1 : "answer", question2 : "answer", question3 : "answer", question4: "answer", question5: "answer"}}
+    geography: [{ "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}],
+    generalKnowledge: [{ "Which planet is known as the red planet?" : "Mars"}, {"What is the main ingredient in hummus" : "Chickpea"}, {"Who is the current monarch of Sweden?" : "Carl Gustav"}, {"What is the largest organ in the human body?" : "skin"}, {"What is the tallest mountain in the world?": "Mount Everest"}],
+    history: [{ "Who was the first president of the United States?" : "George Washington"}, {"What year did World War I begin?" : "1914"}, {"What ancient civilization is credited with the invention of democracy?" : "ancient greece"}, {"Who was the leader of Nazi Germany during World War II?" : "hitler"}, {"Which civilization build the Great Pyramids of Giza?": "egyptians"}],
+    science: [{ "What is the process by which plants make their food called?" : "photosynthesis"}, {"What is the force that pulls objects towards the center of the Earth called? " : "gravity"}, {"What is the hardest natural substance on Earth?" : "diamond"}, {"What is the process by which water changes from a liquid to a gas called?" : "evaporation"}, {"What is the only metal that is liquid at room temperature?": "mercury"}]
 }
+
+function randomRepeat(myArray) {
+    const randomIndex = Math.floor(Math.random()*myArray.length);
+    return myArray[randomIndex]
+    }
+
+function chooseQuestion(category) {
+ const questionList = questions[category];
+ // put some if-statement here to check if the question is in the context.askedQuestions
+ const questionAndAnswer = randomRepeat(questionList);
+ return questionAndAnswer  //modify this so that it only returns the key, not the whole dictionary
+}
+
+
+//questionState : {
+//    entry: 
+//}

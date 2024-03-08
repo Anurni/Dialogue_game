@@ -459,7 +459,7 @@ const dialogueGame = setup({
           },
 
       Question3Hist: {
-        entry: [{ type: "say", params: "What ancient civilization is credited with the invention of democracy? "}], 
+        entry: [{ type: "say", params: "What ancient civilization is credited with the invention of democracy?"}], 
         on: {SPEAK_COMPLETE: "Question3ListenHist"}},
 
         Question3ListenHist :  { 
@@ -493,7 +493,7 @@ const dialogueGame = setup({
         },
 
       Question5Hist: {
-        entry: [{ type: "say", params: "Which civilization build the Great Pyramids of Giza? "}], 
+        entry: [{ type: "say", params: "Which civilization build the Great Pyramids of Giza?"}], 
         on: {SPEAK_COMPLETE: "Question5ListenHist"}},
 
       Question5ListenHist :  { 
@@ -592,7 +592,7 @@ const dialogueGame = setup({
         },
 
       Question5Sci: {
-        entry: [{ type: "say", params: "What is the only metal that is liquid at room temperature? "}], 
+        entry: [{ type: "say", params: "What is the only metal that is liquid at room temperature?"}], 
         on: {SPEAK_COMPLETE: "Question5ListenSci"}},
 
       Question5ListenSci :  { 
