@@ -1,0 +1,6 @@
+const questions = {
+    { geography: { question1 : "answer", question2 : "answer", question3 : "answer", question4: "answer", question5: "answer"}},
+    { history: { question1 : "answer", question2 : "answer", question3 : "answer", question4: "answer", question5: "answer"} },
+    { generalKnowledge : { question1 : "answer", question2 : "answer", question3 : "answer", question4: "answer", question5: "answer"}},
+    { science: { question1 : "answer", question2 : "answer", question3 : "answer", question4: "answer", question5: "answer"}}
+}
