@@ -2,7 +2,7 @@ import { assign, createActor, setup, fromCallback, sendTo } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js"; 
-import { nodeModuleNameResolver } from "typescript";
+import { showElements } from "./main.js";
 
 /* comments :
 -should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect --> yes definitely
@@ -118,8 +118,8 @@ const dialogueGame = setup({
           utterance: params
         },
       }),
-
-      displayCategoryButtons(element) {    //we should be able to create the category buttons from here, as an action, then call the action from the state
+      show : showElements("category_buttons")
+      /*displayCategoryButtons(element) {    //we should be able to create the category buttons from here, as an action, then call the action from the state
         const options = [
         {emoji : "🏫", name : "General Knowledge" },
         {emoji : "🌍", name : "Geography"},
@@ -135,7 +135,7 @@ const dialogueGame = setup({
         });
       }
       element.style.display = "none";  //something like this should work for making the button disappear on "CLICK" event
-    }
+    } */
 
       //add the button display actions here!
     },
@@ -222,10 +222,9 @@ const dialogueGame = setup({
       target : "AskCategory"}
     }
   },
-
-  AskCategory: {
-    entry: [{type : "say", params : "Time to choose a category. Choose wisely!"}],
-    
+  AskCategory: { 
+    entry: "show",
+    actions : "say", params : "Time to choose a category. Choose wisely!", //I think it doesn't work but I wil figure it out
     on: {
       SPEAK_COMPLETE: "ListenCategory"
     }
