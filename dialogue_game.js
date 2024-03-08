@@ -7,7 +7,7 @@ import { nodeModuleNameResolver } from "typescript";
 /* comments :
 shouldn't we implement a listen without nlu since we are using that to check the answer to the questions?
 should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect
-we need to randomize the states or change the typhoon its always in 6 position
+we need to randomize the states or change the typhoon its always in 6 position 
 */
 const inspector = createBrowserInspector();
 
