@@ -74,16 +74,19 @@ function checkPositive(event) {
 //this function should work with the new randomizing questions state, once we have one...
 function chooseQuestion(category) {
   const questionList = questions[category];
-  // put some if-statement here to check if the question is in the context.askedQuestions
+  // put some if-statement here to check if the question is in the context.askedQuestions, eventually...
   const questionAndAnswer = randomRepeat(questionList);
-  const onlyQuestion = Object.keys(questionAndAnswer);
-  return onlyQuestion  // need to test if this works and now only the key (the question) is returned
+  //const onlyQuestion = Object.keys(questionAndAnswer);
+  return questionAndAnswer 
  }
 
 //new function that checks if the user's answer is correct  -- works only with 'questions'
 function checkAnswer(event, question) {
-  const correctAnswer = Object.values(question[0]);
-  return event.toLowerCase() === correctAnswer.toLowerCase();
+  const correctAnswer = Object.values(question);
+  const finalEvent = event.toLowerCase();
+  const finalCorrectAnswer = correctAnswer.toLowerCase();   //why tf doestn this work?
+  //console.log(correctAnswer);
+  return (finalEvent === finalCorrectAnswer);
 }
 
 
@@ -169,7 +172,8 @@ const dialogueGame = setup({
     something_2: '',
     something_3: '',
     points: 0,
-    currentQuestion: null
+    currentQuestion: null,
+    askedQuestions: [],
   },
   states: {
     Prepare: {
@@ -257,13 +261,13 @@ const dialogueGame = setup({
   Geography: {    
     initial: "questionGeography",
     states: {
-      questionGeography : {   // testing the question randomizing function here
+      questionGeography : {   
         entry: [
-          assign({ currentQuestion: () => chooseQuestion(['geography'])}),  //assigning the randomly chosen question into context so that we can use it to check if the answer is correct later
-          { type: 'say', params: ({ context }) => Object.values(context.currentQuestion)[0] }
+          assign({ currentQuestion: () => chooseQuestion(['geography'])}),  //assigning the randomly chosen question object to the context
+          { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
               ],         
         on: {
-            SPEAK_COMPLETE: "listenGeography"
+            SPEAK_COMPLETE: {target: "listenGeography", actions: ({ context }) => console.log(context.currentQuestion)}
         }
     },
 
@@ -271,8 +275,8 @@ const dialogueGame = setup({
       entry: "listen",
       on: {
         RECOGNISED: [
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, Object.keys(context.currentQuestion)[0]), actions: ({context}) =>  context.points ++ , target: "reactCorrectGeography"},
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, Object.keys(context.currentQuestion)[0]) === false, actions: ({context}) =>  context.points - 1 , target: "reactIncorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions: ({context}) =>  context.points ++ , target: "reactCorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions: ({context}) =>  context.points - 1 , target: "reactIncorrectGeography"},
       ]}
     },
    
@@ -296,6 +300,19 @@ const dialogueGame = setup({
         SPEAK_COMPLETE: "#dialogueGame.Done"}}, // need to set the target elsewhere eventually
           },
       },
+
+  GeneralKnowledge: {
+
+  },
+
+  History: {
+
+  },
+
+  Science: {
+
+  },
+
 
   //the rest three states "General Knowledge", "History" and "Science" will go here
 
