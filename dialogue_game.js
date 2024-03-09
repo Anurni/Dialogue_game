@@ -84,7 +84,7 @@ function chooseQuestion(category) {
 function checkAnswer(event, question) {
   const correctAnswer = Object.values(question);
   const finalEvent = event.toLowerCase();
-  const finalCorrectAnswer = correctAnswer.toLowerCase();   //why tf doestn this work?
+  const finalCorrectAnswer = correctAnswer[0].toLowerCase();   //why tf doestn this work?
   //console.log(correctAnswer);
   return (finalEvent === finalCorrectAnswer);
 }
