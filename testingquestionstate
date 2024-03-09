@@ -20,7 +20,7 @@ function chooseQuestion(category) {
 //maybe we would need four question states?
 
 questionGeography : {
-    entry: chooseQuestion["geography"],
+    entry: () => chooseQuestion["geography"],
     on: {
         SPEAK_COMPLETE: "listenAnswer"
     }
