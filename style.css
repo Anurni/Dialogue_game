@@ -1,3 +1,8 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  font-family: Gotham Rounded;
+}
+
 #start-container {
   text-align: center;
   justify-content: center;
@@ -20,6 +25,10 @@ body {
   text-align: center;
 }
 
+#game_title {
+  font-size: 50px;
+}
+
 #startButton {
   width: 100px;
   max-width: 80%;
@@ -27,7 +36,7 @@ body {
   padding: 10px;
   box-shadow: 0 0 10px 2px;
   font-family: inherit;
-  font-size: 20px;
+  font-size: 30px;
   background-color: #a7d1d4;
   cursor: pointer;
   transition: border-color 0.25s;
@@ -38,37 +47,23 @@ body {
 #startButton:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+  display: "none";
 }
 
-.category-container {
-  text-align: center;
-  width: 800px;
-  max-width: 80%;
-  background-color: bisque;
-  border-radius: 5px;
-  padding: 10px;
-  box-shadow: 0 0 10px 2px;
+.category_buttons {
+  display: block;
+  background-color: blanchedalmond;
+  color: rgb(38, 66, 150);
+  font-size: 25px;
+  margin-left: 20px;
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: center;
+  width: 300px;
+  height: 60px;
+  box-shadow: 0 0 7px 2px;
 }
 
-.category-button {
-  background-color: blueviolet;
-  color: azure;
-  padding: auto;
-  border-radius: 2px;
-  font-size: 16px;
+#category {
+  font-size: 45px;
 }
-
-#counter {
-  padding: 0%;
-  text-align: center;
-  color: #a7d1d4;
-  background-color: darkcyan;
-  max-width: 80%;
-  border-radius: 5px;
-  width: 100px;
-  height: 100px;
-  font-family: inherit;
-  display: none;
-}
-
-

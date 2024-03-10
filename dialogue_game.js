@@ -1,8 +1,8 @@
-import { assign, createActor, setup, fromCallback, sendTo } from "xstate";
+import { assign, createActor, setup } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js"; 
-import { showElements } from "./main.js";
+import { showElements,hideElement } from "./main.js";
 
 /* comments :
 -should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect --> yes definitely
@@ -41,6 +41,7 @@ const settings = {
 //};
 
 //new question database, will work once we have one/four working question states
+//we can put the typhoon in here as one of the questions?? but the problem is the player doesnt choose the question it becomes on random??????
 const questions = {
   geography: [{ "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}],
   generalKnowledge: [{ "Which planet is known as the red planet?" : "Mars"}, {"What is the main ingredient in hummus" : "Chickpea"}, {"Who is the current monarch of Sweden?" : "Carl Gustav"}, {"What is the largest organ in the human body?" : "skin"}, {"What is the tallest mountain in the world?": "Mount Everest"}],
@@ -84,33 +85,11 @@ function chooseQuestion(category) {
 function checkAnswer(event, question) {
   const correctAnswer = Object.values(question);
   const finalEvent = event.toLowerCase();
-  const finalCorrectAnswer = correctAnswer[0].toLowerCase();   //why tf doestn this work?
+  const finalCorrectAnswer = correctAnswer[0].toLowerCase();  
   //console.log(correctAnswer);
   return (finalEvent === finalCorrectAnswer);
 }
 
-
-// trying to move the setupSelect logic into a callback actor that we can invoke from the "choose a category" state  
-//function setupSelect(element) { fromCallback(({ sendBack, receive }) => {
-//  const options = [
-//    {emoji : "🏫", name : "General Knowledge" },
-//    {emoji : "🌍", name : "Geography"},
-//    {emoji : "📕", name : "History"},
-//    {emoji : "🧪", name : "Science"}
-//  ];
-//  for (const option of options) {
-//    const optionButton = document.createElement("button");
-//   optionButton.type = "button";
-//    optionButton.innerHTML = option.emoji;
-//    optionButton.addEventListener("click", () => {
-//      dmActor.send({type:"CLICK"});
-//    });
-//    element.appendChild(optionButton);
-//  }
-//  }
-// )
-//}
-// export {setupSelect};
 
 //creating the machine:
 const dialogueGame = setup({
@@ -130,27 +109,8 @@ const dialogueGame = setup({
           utterance: params
         },
       }),
-      show : () => showElements("category_buttons")  //tested adding () =>
-
-      /*displayCategoryButtons(element) {    //we should be able to create the category buttons from here, as an action, then call the action from the state
-        const options = [
-        {emoji : "🏫", name : "General Knowledge" },
-        {emoji : "🌍", name : "Geography"},
-        {emoji : "📕", name : "History"},
-        {emoji : "🧪", name : "Science"}
-      ];
-      for (const option of options) {
-        const optionButton = document.createElement("button");
-        optionButton.type = "button";
-        optionButton.innerHTML = option.emoji;
-        optionButton.addEventListener("click", () => {
-          dmActor.send({type:"CLICK"});
-        });
-      }
-      element.style.display = "none";  //something like this should work for making the button disappear on "CLICK" event
-    } */
-
-      //add the button display actions here!
+      show : () => showElements("category_buttons"),
+      hideStart : () => hideElement(["startButton","game_title"])  //tested adding () =>
     },
     guards: {
       didPlayerWin: (context, event) => {
@@ -177,7 +137,7 @@ const dialogueGame = setup({
   },
   states: {
     Prepare: {
-        entry: [
+        entry: [ 
         assign({
         ssRef: ({ spawn }) => spawn(speechstate, { input: settings }),
             }),
@@ -194,7 +154,7 @@ const dialogueGame = setup({
   },
 
   SayGreeting: {
-    entry: [{type: "say", params: "Welcome to the Typhoon game! What is your name?"}, "displayCategoryButtons"],
+    entry: [{type : "say", params: "Welcome to the Typhoon game! What is your name?"}],
     on: {
         SPEAK_COMPLETE: "ListenGreeting"
         }
@@ -239,7 +199,7 @@ const dialogueGame = setup({
   },
 
   AskCategory: { 
-    entry: ["show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
+    entry: ["hideStart","show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
     on: {
       SPEAK_COMPLETE: "ClickOnCategory"
     }
@@ -259,8 +219,21 @@ const dialogueGame = setup({
   },
 
   Geography: {    
-    initial: "questionGeography",
+    initial: "ChooseBoxQuestion",
     states: {
+      ChooseBoxQuestion : {
+        entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+        on : {
+          SPEAK_COMPLETE : "ListenToChoise"
+        }
+      },
+      ListenToChoise : {
+        entry : "listenNlu", //maybe we should add a new topIntent of boxes
+        on : {
+          RECOGNISED : "questionGeography",
+          actions : assign({questionNumber : (event)}) //this needs an actual event also not sure about the logic lets talk about it..
+        }
+      },
       questionGeography : {   
         entry: [
           assign({ currentQuestion: () => chooseQuestion(['geography'])}),  //assigning the randomly chosen question object to the context
