@@ -33,7 +33,6 @@ const settings = {
 };
 
 //new question database, will work once we have one/four working question states
-//we can put the typhoon in here as one of the questions?? but the problem is the player doesnt choose the question it becomes on random??????
 const questions = {
   geography: [{"typhoon": "typhoon"}, { "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}],
   generalKnowledge: [{"typhoon": "typhoon"}, { "Which planet is known as the red planet?" : "Mars"}, {"What is the main ingredient in hummus" : "Chickpea"}, {"Who is the current monarch of Sweden?" : "Carl Gustav"}, {"What is the largest organ in the human body?" : "skin"}, {"What is the tallest mountain in the world?": "Mount Everest"}],

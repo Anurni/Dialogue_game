@@ -51,17 +51,16 @@ button:focus-visible {
 }
 
 .category_buttons {
-  display: block;
-  background-color: blanchedalmond;
+  display : block;
+  margin-block-start: 30px;
+  background-color:rgb(240, 205, 159);
   color: rgb(38, 66, 150);
   font-size: 25px;
-  margin-left: 20px;
-  margin-bottom: 20px;
-  align-items: center;
-  justify-content: center;
   width: 300px;
   height: 60px;
   box-shadow: 0 0 7px 2px;
+  margin-bottom: 30px;
+  position: relative; top: -90px;
 }
 
 .question_boxes {
@@ -80,6 +79,12 @@ button:focus-visible {
 }
 
 #category {
-  font-size: 45px;
+  background-color: transparent;
+  font-size: 35px;
+  color:rgb(78, 8, 143) ;
+  margin-block-start: 0;
+  margin-block-end: 50px;
+  margin-inline-start: 0;
   text-align: center;
+  position: relative; top: -100px;
 }
