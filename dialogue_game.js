@@ -95,6 +95,7 @@ const dialogueGame = setup({
         },
       }),
       show : () => showElements("category_buttons"),
+      showBoxes : () => showElements("question_boxes"),
       hideStart : () => hideElement(["startButton","game_title"])  //tested adding () =>
     },
     guards: {  //lets see if we will use these
@@ -186,11 +187,11 @@ const dialogueGame = setup({
   AskCategory: { 
     entry: ["hideStart","show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
     on: {
-      SPEAK_COMPLETE: "ClickOnCategory"
+      SPEAK_COMPLETE: "ChooseCategory"
     }
   },
 
-  ClickOnCategory : {   //work in process here, had to change this back so that I can test the geography state:
+  ChooseCategory : {   //work in process here, had to change this back so that I can test the geography state:
     entry: "listen",
     on : {
       RECOGNISED : 
@@ -208,7 +209,7 @@ const dialogueGame = setup({
     initial: "ChooseBoxQuestion",
     states: {
       ChooseBoxQuestion : {
-        entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+        entry : ["showBoxes", {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
         on : {
           SPEAK_COMPLETE : "ListenToChoise"
         }
@@ -242,14 +243,14 @@ const dialogueGame = setup({
     reactCorrectGeography: {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
         on: { 
-          SPEAK_COMPLETE: "questionGeography"
+          SPEAK_COMPLETE: "ChooseBoxQuestion"
           },
         },
 
     reactIncorrectGeography: {
       entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
       on: { 
-        SPEAK_COMPLETE: "questionGeography"
+        SPEAK_COMPLETE: "ChooseBoxQuestion"
         },
       },
 
@@ -259,6 +260,7 @@ const dialogueGame = setup({
      //   SPEAK_COMPLETE: "#dialogueGame.Done"}}, // need to set the target elsewhere eventually
      //     },
       },
+  },
 
   GeneralKnowledge: {
     initial: "ChooseBoxQuestion",
@@ -305,9 +307,10 @@ const dialogueGame = setup({
     reactIncorrectGeneralKnowledge: {
       entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
       on: { 
-        SPEAK_COMPLETE: "chooseBoxQuestion"
+        SPEAK_COMPLETE: "ChooseBoxQuestion"
         },
       },
+    },
   },
 
   History: {
@@ -326,7 +329,7 @@ const dialogueGame = setup({
             actions : assign({questionNumber : (event) => event.value[0].utterance}) 
           }
         },
-        questionGeneralKnowledge : {   
+        questionHistory : {   
           entry: [
             assign({ currentQuestion: ( context) => chooseQuestion(['history'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
             { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
@@ -355,7 +358,7 @@ const dialogueGame = setup({
       reactIncorrectHistory: {
         entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
         on: { 
-          SPEAK_COMPLETE: "chooseBoxQuestion"
+          SPEAK_COMPLETE: "ChooseBoxQuestion"
           },
       },
     },
@@ -377,7 +380,7 @@ const dialogueGame = setup({
             actions : assign({questionNumber : (event) => event.value[0].utterance}) //this needs an actual event also not sure about the logic lets talk about it..
           }
         },
-        questionGeneralKnowledge : {   
+        questionScience : {   
           entry: [
             assign({ currentQuestion: ( context) => chooseQuestion(['science'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
             { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
@@ -406,13 +409,11 @@ const dialogueGame = setup({
       reactIncorrectScience: {
         entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
         on: { 
-          SPEAK_COMPLETE: "chooseBoxQuestion"
+          SPEAK_COMPLETE: "ChooseBoxQuestion"
           },
         },
       },
-    }
-  },
-},
+    },
 
   Done: {
     on: { CLICK: "SayGreeting"}

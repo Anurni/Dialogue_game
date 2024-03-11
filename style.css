@@ -64,6 +64,21 @@ button:focus-visible {
   box-shadow: 0 0 7px 2px;
 }
 
+.question_boxes {
+  display: block;
+  background-color: cadetblue;
+  color: #0a1ce2;
+  font-size: medium;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  box-shadow: #0a1ce2;
+}
+
 #category {
   font-size: 45px;
   text-align: center;
