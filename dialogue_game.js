@@ -2,7 +2,7 @@ import { assign, createActor, setup } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js"; 
-import { showElements,hideElement } from "./main.js";
+import { showElements,hideElement, hideAllElements } from "./main.js";
 
 /* comments :
 -should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect --> yes definitely
@@ -94,8 +94,9 @@ const dialogueGame = setup({
         },
       }),
       show : () => showElements("category_buttons"),
-      showBoxes : () => showElements("question_boxes"),
-      hideStart : () => hideElement(["startButton","game_title"])  //tested adding () =>
+      showBoxes : () => showElements("question_boxes"), //let's check how to combine all show actions ??
+      hideStart : () => hideAllElements(["startButton","game_title"]),  // let's check how to combine all hide actions ??
+      hideCategories : () => hideElement("category_buttons")
     },
     guards: {  //lets see if we will use these
       didPlayerWin: (context, event) => {
@@ -194,10 +195,10 @@ const dialogueGame = setup({
     entry: "listen",
     on : {
       RECOGNISED : 
-      [{guard : ({ event }) => event.value[0].utterance === "Geography", target : "Geography"},
-      {guard : ({ event }) => event.value[0].utterance === "General Knowledge", target : "GeneralKnowledge"},
-      {guard : ({ event }) => event.value[0].utterance === "History", target : "History"},
-      {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science"},
+      [{guard : ({ event }) => event.value[0].utterance === "Geography", target : "Geography", actions: "hideCategories"},
+      {guard : ({ event }) => event.value[0].utterance === "General Knowledge", target : "GeneralKnowledge", actions: "hideCategories"},
+      {guard : ({ event }) => event.value[0].utterance === "History", target : "History", actions: "hideCategories"},
+      {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science", actions: "hideCategories"},
       {target : "AskCategory", //in case the user's utterance does not match the given categories
       reenter : true, 
       actions : {type : "say", params : ({context}) => `You need to choose a category from the screen, ${context.user_name}`}}]

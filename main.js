@@ -12,6 +12,14 @@ document.querySelector("#app").innerHTML = `
       <button class="category_buttons">Geography</button>
       <button class="category_buttons">History</button>
       <button class="category_buttons">Science</button>
+  <div class="question_boxes" style = "display : none">
+    <h2 id="category"> Pick a box! </h2>
+    <button class="question_boxes">1</button>
+      <button class="question_boxes">2</button>
+      <button class="question_boxes">3</button>
+      <button class="question_boxes">4</button>
+      <button class="question_boxes">5</button>
+      <button class="question_boxes">6</button>
   </div>
   </div>
 `;
@@ -26,10 +34,14 @@ export function showElements(element) {
   }
 }
 
-export function hideElement(elements) {
+export function hideAllElements(elements) {
   elements.forEach(element => {
     document.getElementById(element).style.display="none";
   });
- 
 }
+
+export function hideElement(element) {
+  document.getElementById(element).style.display="none";
+}
+ 
 //
