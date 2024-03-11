@@ -15,12 +15,12 @@ document.querySelector("#app").innerHTML = `
       </div>
   <div class="question_boxes" style = "display : none">
     <h2 id="category"> Pick a box! </h2>
-    <button class="question_boxes">1</button>
-      <button class="question_boxes">2</button>
-      <button class="question_boxes">3</button>
-      <button class="question_boxes">4</button>
-      <button class="question_boxes">5</button>
-      <button class="question_boxes">6</button>
+      <button class="question_boxes" button id="box1">1</button>
+      <button class="question_boxes" button id="box2">2</button>
+      <button class="question_boxes" button id="box3">3</button>
+      <button class="question_boxes" button id="box4">4</button>
+      <button class="question_boxes" button id="box5">5</button>
+      <button class="question_boxes" button id="box6">6</button>
   </div>
   </div>
 `;
@@ -35,14 +35,21 @@ export function showElements(element) {
   }
 }
 
-export function hideAllElements(elements) {
+export function hideAllElements(elements) {   //leaving this for now
   elements.forEach(element => {
     document.getElementById(element).style.display="none";
   });
 }
 
 export function hideElement(element) {
-  document.getElementsByClassName(element).style.display="none";
+  document.getElementById(element).style.display="none";
+}
+
+export function hideCategoryElements(element) {  //this will be used to hide the category buttons
+  const elements = document.getElementsByClassName(element);
+  for (let i = 0; i < elements.length; i++) {
+      elements[i].style.display = "none";
+  }
 }
  
 //

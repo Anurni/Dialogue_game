@@ -2,7 +2,7 @@ import { assign, createActor, setup } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js"; 
-import { showElements,hideElement, hideAllElements } from "./main.js";
+import { showElements,hideElement, hideAllElements, hideCategoryElements } from "./main.js";
 
 /* comments :
 -should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect --> yes definitely
@@ -96,7 +96,9 @@ const dialogueGame = setup({
       show : () => showElements("category_buttons"),
       showBoxes : () => showElements("question_boxes"), //let's check how to combine all show actions ??
       hideStart : () => hideAllElements(["startButton","game_title"]),  // let's check how to combine all hide actions ??
-      hideCategories : () => hideElement("category_buttons")
+      hideCategories : () => hideCategoryElements("category_buttons"),
+      hideBox1 : () => hideElement("box1")
+      
     },
     guards: {  //lets see if we will use these
       didPlayerWin: (context, event) => {
@@ -114,9 +116,7 @@ const dialogueGame = setup({
   initial: "Prepare",
   context: {
     user_name: '',
-    something_1: '',
-    something_2: '',
-    something_3: '',
+    questionNumber: 0,
     points: 0,
     currentQuestion: null,
     askedQuestions: [],
@@ -169,7 +169,7 @@ const dialogueGame = setup({
   },
 
   SayInstructions: {
-    entry: [{ type: "say", params: `Here we go! These are the instructions..Are you ready?`}], 
+    entry: [{ type: "say", params: `Here we go! These are the instructions...`}], 
     on: {
       SPEAK_COMPLETE: "CheckIfReady"
       },
@@ -223,7 +223,7 @@ const dialogueGame = setup({
       },
       questionGeography : {   
         entry: [
-          assign({ currentQuestion: ( context ) => chooseQuestion(['geography'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
+          assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
           { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
               ],         
         on: {
@@ -235,8 +235,8 @@ const dialogueGame = setup({
       entry: "listen",
       on: {
         RECOGNISED: [
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions: ({context}) =>  context.points ++ , target: "reactCorrectGeography"},
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions: ({context}) =>  context.points - 1 , target: "reactIncorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++, "hideBox1" ], target: "reactCorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1, "hideBox1"], target: "reactIncorrectGeography"},
       ]}
     },
    
