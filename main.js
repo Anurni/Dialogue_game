@@ -6,7 +6,7 @@ document.querySelector("#app").innerHTML = `
    <h1 id="game_title">Typhoon game</h1>
       <button id="startButton" class="button">Start</button>
       </div>
-  <div id="category_buttons"style =  "display : none" >
+  <div class="category_buttons"style =  "display : none" >
     <h2 id="category">Choose your poison</h2>
       <button class="category_buttons">General Knowledge</button>
       <button class="category_buttons">Geography</button>
