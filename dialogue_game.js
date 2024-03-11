@@ -32,21 +32,13 @@ const settings = {
   ttsDefaultVoice: "en-US-JaneNeural",
 };
 
-// old grammar, works with old states
-//const grammar = {
-//  geography: {question1: "canberra", question2: "mali", question3: "7", question4: "pacific", question5: "chile"},  
-//  generalKnowledge: {question1: "mars", question2: "mount everest", question3: "chickpea", question4: "carl gustav", question5: "skin"}, 
-//  history: {question1: ["george washington"], question2: ["1914"], question3: ["ancient greece"], question4: ["hitler"] || ["adolfus hitler"], question5: ["egyptians"]||["the egyptians"]}, 
-//  science: {question1: ["photosynthesis"], question2: ["gravity"], question3: ["diamond"], question4: ["evaporation"], question5: ["mercury"]}  
-//};
-
 //new question database, will work once we have one/four working question states
 //we can put the typhoon in here as one of the questions?? but the problem is the player doesnt choose the question it becomes on random??????
 const questions = {
-  geography: [{ "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}],
-  generalKnowledge: [{ "Which planet is known as the red planet?" : "Mars"}, {"What is the main ingredient in hummus" : "Chickpea"}, {"Who is the current monarch of Sweden?" : "Carl Gustav"}, {"What is the largest organ in the human body?" : "skin"}, {"What is the tallest mountain in the world?": "Mount Everest"}],
-  history: [{ "Who was the first president of the United States?" : "George Washington"}, {"What year did World War I begin?" : "1914"}, {"What ancient civilization is credited with the invention of democracy?" : "ancient greece"}, {"Who was the leader of Nazi Germany during World War II?" : "hitler"}, {"Which civilization build the Great Pyramids of Giza?": "egyptians"}],
-  science: [{ "What is the process by which plants make their food called?" : "photosynthesis"}, {"What is the force that pulls objects towards the center of the Earth called? " : "gravity"}, {"What is the hardest natural substance on Earth?" : "diamond"}, {"What is the process by which water changes from a liquid to a gas called?" : "evaporation"}, {"What is the only metal that is liquid at room temperature?": "mercury"}]
+  geography: [{"typhoon": "typhoon"}, { "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}],
+  generalKnowledge: [{"typhoon": "typhoon"}, { "Which planet is known as the red planet?" : "Mars"}, {"What is the main ingredient in hummus" : "Chickpea"}, {"Who is the current monarch of Sweden?" : "Carl Gustav"}, {"What is the largest organ in the human body?" : "skin"}, {"What is the tallest mountain in the world?": "Mount Everest"}],
+  history: [{"typhoon": "typhoon"}, { "Who was the first president of the United States?" : "George Washington"}, {"What year did World War I begin?" : "1914"}, {"What ancient civilization is credited with the invention of democracy?" : "ancient greece"}, {"Who was the leader of Nazi Germany during World War II?" : "hitler"}, {"Which civilization build the Great Pyramids of Giza?": "egyptians"}],
+  science: [{"typhoon": "typhoon"}, { "What is the process by which plants make their food called?" : "photosynthesis"}, {"What is the force that pulls objects towards the center of the Earth called? " : "gravity"}, {"What is the hardest natural substance on Earth?" : "diamond"}, {"What is the process by which water changes from a liquid to a gas called?" : "evaporation"}, {"What is the only metal that is liquid at room temperature?": "mercury"}]
 }
 
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
@@ -67,26 +59,19 @@ function checkPositive(event) {
     return event === "yes";
   }
 
-//old function that checks if the user's answer is correct  -- works only with 'grammar'
-//function checkAnswer (event, category, question) {
-//    return grammar[category][question].includes(event.toLowerCase());
-//}
-
-//this function should work with the new randomizing questions state, once we have one...
-function chooseQuestion(category) {
+//retrieves a 'random' question from the question database based on the index of the box the user has chosen
+function chooseQuestion(category, index) {
   const questionList = questions[category];
   // put some if-statement here to check if the question is in the context.askedQuestions, eventually...
-  const questionAndAnswer = randomRepeat(questionList);
-  //const onlyQuestion = Object.keys(questionAndAnswer);
+  const questionAndAnswer = questionList[index];
   return questionAndAnswer 
  }
 
-//new function that checks if the user's answer is correct  -- works only with 'questions'
+//function that checks if the user's answer is correct
 function checkAnswer(event, question) {
   const correctAnswer = Object.values(question);
   const finalEvent = event.toLowerCase();
   const finalCorrectAnswer = correctAnswer[0].toLowerCase();  
-  //console.log(correctAnswer);
   return (finalEvent === finalCorrectAnswer);
 }
 
@@ -112,7 +97,7 @@ const dialogueGame = setup({
       show : () => showElements("category_buttons"),
       hideStart : () => hideElement(["startButton","game_title"])  //tested adding () =>
     },
-    guards: {
+    guards: {  //lets see if we will use these
       didPlayerWin: (context, event) => {
           // check if player won
           return context.points > 99;
@@ -212,9 +197,10 @@ const dialogueGame = setup({
       [{guard : ({ event }) => event.value[0].utterance === "Geography", target : "Geography"},
       {guard : ({ event }) => event.value[0].utterance === "General Knowledge", target : "GeneralKnowledge"},
       {guard : ({ event }) => event.value[0].utterance === "History", target : "History"},
-      {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science"}],
-      //{target : "AskCategory", reenter : true,
-      //actions : {type : "say", params : ({context}) => `You need to choose a category, ${context.user_name}`}}] //does this work? --> yes it asked me that
+      {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science"},
+      {target : "AskCategory", //in case the user's utterance does not match the given categories
+      reenter : true, 
+      actions : {type : "say", params : ({context}) => `You need to choose a category from the screen, ${context.user_name}`}}]
     }
   },
 
@@ -228,15 +214,15 @@ const dialogueGame = setup({
         }
       },
       ListenToChoise : {
-        entry : "listenNlu", //maybe we should add a new topIntent of boxes
+        entry : "listen", //maybe we should add a new topIntent of boxes --> let's check this !!!
         on : {
           RECOGNISED : "questionGeography",
-          actions : assign({questionNumber : (event)}) //this needs an actual event also not sure about the logic lets talk about it..
+          actions : assign({questionNumber : (event) => event.value[0].utterance}) //this should work, let's see
         }
       },
       questionGeography : {   
         entry: [
-          assign({ currentQuestion: () => chooseQuestion(['geography'])}),  //assigning the randomly chosen question object to the context
+          assign({ currentQuestion: ( context ) => chooseQuestion(['geography'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
           { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
               ],         
         on: {
@@ -267,33 +253,172 @@ const dialogueGame = setup({
         },
       },
 
-    Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
-      actions: assign({points: 0}), //player loses all their points
-      on: { 
-        SPEAK_COMPLETE: "#dialogueGame.Done"}}, // need to set the target elsewhere eventually
-          },
+    //Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
+    //  actions: assign({points: 0}), //player loses all their points
+     // on: { 
+     //   SPEAK_COMPLETE: "#dialogueGame.Done"}}, // need to set the target elsewhere eventually
+     //     },
       },
 
   GeneralKnowledge: {
+    initial: "ChooseBoxQuestion",
+    states: {
+      ChooseBoxQuestion : {
+        entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+        on : {
+          SPEAK_COMPLETE : "ListenToChoise"
+        }
+      },
+      ListenToChoise : {
+        entry : "listenNlu", //maybe we should add a new topIntent of boxes
+        on : {
+          RECOGNISED : "questionGeneralKnowledge",
+          actions : assign({questionNumber : (event) => event.value[0].utterance}) 
+        }
+      },
+      questionGeneralKnowledge : {   
+        entry: [
+          assign({ currentQuestion: ( context ) => chooseQuestion(['generalKnowledge'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
+          { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
+              ],         
+        on: {
+            SPEAK_COMPLETE: {target: "listenGeneralKnowledge", actions: ({ context }) => console.log(context.currentQuestion)}
+        }
+    },
 
+    listenGeneralKnowledge: {
+      entry: "listen",
+      on: {
+        RECOGNISED: [
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions: ({context}) =>  context.points ++ , target: "reactCorrectGeneralKnowledge"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions: ({context}) =>  context.points - 1 , target: "reactIncorrectGeneralKnowledge"},
+      ]}
+    },
+   
+    reactCorrectGeneralKnowledge: {
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
+        on: { 
+          SPEAK_COMPLETE: "ChooseBoxQuestion"
+          },
+        },
+
+    reactIncorrectGeneralKnowledge: {
+      entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+      on: { 
+        SPEAK_COMPLETE: "chooseBoxQuestion"
+        },
+      },
   },
 
   History: {
-
+      initial: "ChooseBoxQuestion",
+      states: {
+        ChooseBoxQuestion : {
+          entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+          on : {
+            SPEAK_COMPLETE : "ListenToChoise"
+          }
+        },
+        ListenToChoise : {
+          entry : "listenNlu", //maybe we should add a new topIntent of boxes
+          on : {
+            RECOGNISED : "questionHistory",
+            actions : assign({questionNumber : (event) => event.value[0].utterance}) 
+          }
+        },
+        questionGeneralKnowledge : {   
+          entry: [
+            assign({ currentQuestion: ( context) => chooseQuestion(['history'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
+            { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
+                ],         
+          on: {
+              SPEAK_COMPLETE: {target: "listenHistory", actions: ({ context }) => console.log(context.currentQuestion)}
+          }
+      },
+  
+      listenHistory: {
+        entry: "listen",
+        on: {
+          RECOGNISED: [
+          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions: ({context}) =>  context.points ++ , target: "reactCorrectHistory"},
+          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions: ({context}) =>  context.points - 1 , target: "reactIncorrectHistory"},
+        ]}
+      },
+     
+      reactCorrectHistory: {
+          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
+          on: { 
+            SPEAK_COMPLETE: "ChooseBoxQuestion"
+            },
+          },
+  
+      reactIncorrectHistory: {
+        entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+        on: { 
+          SPEAK_COMPLETE: "chooseBoxQuestion"
+          },
+      },
+    },
   },
 
   Science: {
-
+      initial: "ChooseBoxQuestion",
+      states: {
+        ChooseBoxQuestion : {
+          entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+          on : {
+            SPEAK_COMPLETE : "ListenToChoise"
+          }
+        },
+        ListenToChoise : {
+          entry : "listenNlu", //maybe we should add a new topIntent of boxes
+          on : {
+            RECOGNISED : "questionScience",
+            actions : assign({questionNumber : (event) => event.value[0].utterance}) //this needs an actual event also not sure about the logic lets talk about it..
+          }
+        },
+        questionGeneralKnowledge : {   
+          entry: [
+            assign({ currentQuestion: ( context) => chooseQuestion(['science'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
+            { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
+                ],         
+          on: {
+              SPEAK_COMPLETE: {target: "listenScience", actions: ({ context }) => console.log(context.currentQuestion)}
+          }
+      },
+  
+      listenScience: {
+        entry: "listen",
+        on: {
+          RECOGNISED: [
+          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions: ({context}) =>  context.points ++ , target: "reactCorrectScience"},
+          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions: ({context}) =>  context.points - 1 , target: "reactIncorrectScience"},
+        ]}
+      },
+     
+      reactCorrectScience: {
+          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
+          on: { 
+            SPEAK_COMPLETE: "ChooseBoxQuestion"
+            },
+          },
+  
+      reactIncorrectScience: {
+        entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+        on: { 
+          SPEAK_COMPLETE: "chooseBoxQuestion"
+          },
+        },
+      },
+    }
   },
+},
 
-
-  //the rest three states "General Knowledge", "History" and "Science" will go here
-
-    Done: {
+  Done: {
     on: { CLICK: "SayGreeting"}
   },
 
-  AHistory: {
+  AHistory: {  //let's see if we will even use this
     type: "history",
     history: "deep"
     },
