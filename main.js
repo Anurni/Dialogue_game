@@ -12,6 +12,7 @@ document.querySelector("#app").innerHTML = `
       <button class="category_buttons">Geography</button>
       <button class="category_buttons">History</button>
       <button class="category_buttons">Science</button>
+      </div>
   <div class="question_boxes" style = "display : none">
     <h2 id="category"> Pick a box! </h2>
     <button class="question_boxes">1</button>
@@ -41,7 +42,7 @@ export function hideAllElements(elements) {
 }
 
 export function hideElement(element) {
-  document.getElementById(element).style.display="none";
+  document.getElementsByClassName(element).style.display="none";
 }
  
 //
