@@ -87,6 +87,10 @@ function shuffleQuestions (questions) {
 }
 }
 
+function checkBoxNumber(box) {
+  return box;
+}
+
 //creating the machine:
 const dialogueGame = setup({
     actions: {
@@ -110,12 +114,7 @@ const dialogueGame = setup({
       showBoxes : () => showElements("question_boxes"), //didn't manage to combine them lets leave them as is?
       hideStart : () => hideAllElements(["startButton","game_title"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
-      hideBox1 : () => hideElement("box1"),
-      hideBox2 : () => hideElement("box2"),
-      hideBox3 : () => hideElement("box3"),
-      hideBox4 : () => hideElement("box4"),
-      hideBox5 : () => hideElement("box5"),
-      hideBox6 : () => hideElement("box6")
+      hideBox : ({context}) => hideElement(`box${context.questionNumber}`),
       
     },
     guards: {  //lets see if we will use these
@@ -126,7 +125,7 @@ const dialogueGame = setup({
       didPlayerLose: (context, event) => {
           // check if player lost
           return context.points < 0;
-        }
+        },
     },
 
   }).createMachine({
@@ -250,11 +249,11 @@ const dialogueGame = setup({
     },
 
     listenGeography: {
-      entry: "listen",
+      entry: ["listen", "hideBox"],
       on: {
         RECOGNISED: [
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++, "hideBox1" ], target: "reactCorrectGeography"},
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1, "hideBox1"], target: "reactIncorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
       ]}
     },
    
