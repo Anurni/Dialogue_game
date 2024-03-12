@@ -34,10 +34,10 @@ const settings = {
 
 //new question database, will work once we have one/four working question states
 const questions = {
-  geography: [{"typhoon": "typhoon"}, { "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}],
+  geography: [{"typhoon": "typhoon"}, { "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}, {"What is the smallest country in the world by land area?": "Vatican City"}, {"Which desert is the largest in the world?": "Sahara Desert"}, {"Which country is both in Europe and Asia?":"Russia"},{"Which continent is the least populated?":"Antarctica"},{"Which city is referred as the City of Lights": "Paris"}],
   generalKnowledge: [{"typhoon": "typhoon"}, { "Which planet is known as the red planet?" : "Mars"}, {"What is the main ingredient in hummus" : "Chickpea"}, {"Who is the current monarch of Sweden?" : "Carl Gustav"}, {"What is the largest organ in the human body?" : "skin"}, {"What is the tallest mountain in the world?": "Mount Everest"}],
-  history: [{"typhoon": "typhoon"}, { "Who was the first president of the United States?" : "George Washington"}, {"What year did World War I begin?" : "1914"}, {"What ancient civilization is credited with the invention of democracy?" : "ancient greece"}, {"Who was the leader of Nazi Germany during World War II?" : "hitler"}, {"Which civilization build the Great Pyramids of Giza?": "egyptians"}],
-  science: [{"typhoon": "typhoon"}, { "What is the process by which plants make their food called?" : "photosynthesis"}, {"What is the force that pulls objects towards the center of the Earth called? " : "gravity"}, {"What is the hardest natural substance on Earth?" : "diamond"}, {"What is the process by which water changes from a liquid to a gas called?" : "evaporation"}, {"What is the only metal that is liquid at room temperature?": "mercury"}]
+  history: [{"typhoon": "typhoon"}, { "Who was the first president of the United States?" : "George Washington"}, {"What year did World War I begin?" : "1914"}, {"What ancient civilization is credited with the invention of democracy?" : "Ancient Greece"}, {"Who was the leader of Nazi Germany during World War II?" : "Hitler"}, {"Which civilization build the Great Pyramids of Giza?": "Egyptians"}],
+  science: [{"typhoon": "typhoon"}, { "What is the process by which plants make their food called?" : "Photosynthesis"}, {"What is the force that pulls objects towards the center of the Earth called? " : "Gravity"}, {"What is the hardest natural substance on Earth?" : "Diamond"}, {"What is the process by which water changes from a liquid to a gas called?" : "Evaporation"}, {"What is the only metal that is liquid at room temperature?": "Mercury"},{"What type of energy is stored in food?": "Chemical energy"},{"What is the center of an atom called?":"Nucleus"}, {"What is the study of the atmosphere and its phenomena called?":"Meteorology"}, {"What is the unit of electrical power?":"Watt"}]
 }
 
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
@@ -58,7 +58,7 @@ function checkPositive(event) {
     return event === "yes";
   }
 
-//retrieves a 'random' question from the question database based on the index of the box the user has chosen
+//retrieves a question from the question database based on the index of the box the user has chosen
 function chooseQuestion(category, index) {
   const questionList = questions[category];
   // put some if-statement here to check if the question is in the context.askedQuestions, eventually...
@@ -73,7 +73,19 @@ function checkAnswer(event, question) {
   const finalCorrectAnswer = correctAnswer[0].toLowerCase();  
   return (finalEvent === finalCorrectAnswer);
 }
-
+//function to shuffle questions and typhoon so they aren't in the same place always
+function shuffleQuestions (questions) {
+  for (const category in questions) {
+    if (questions.hasOwnProperty(category)) {
+      const categoryQuestions = questions[category];
+    
+    for (let i = categoryQuestions.length -1; i > 0; i --) {
+      const j = Math.floor(Math.random()*(i+1));
+      [categoryQuestions[i],categoryQuestions[j] = [categoryQuestions[j],categoryQuestions[i]]];
+    }
+  }
+}
+}
 
 //creating the machine:
 const dialogueGame = setup({
@@ -93,9 +105,10 @@ const dialogueGame = setup({
           utterance: params
         },
       }),
+      shuffle : () => shuffleQuestions(questions),
       show : () => showElements("category_buttons"),
-      showBoxes : () => showElements("question_boxes"), //let's check how to combine all show actions ??
-      hideStart : () => hideAllElements(["startButton","game_title"]),  // let's check how to combine all hide actions ??
+      showBoxes : () => showElements("question_boxes"), //didn't manage to combine them lets leave them as is?
+      hideStart : () => hideAllElements(["startButton","game_title"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
       hideBox1 : () => hideElement("box1"),
       hideBox2 : () => hideElement("box2"),
@@ -145,7 +158,7 @@ const dialogueGame = setup({
   },
 
   SayGreeting: {
-    entry: [{type : "say", params: "Welcome to the Typhoon game! What is your name?"}],
+    entry: ["shuffle", {type : "say", params: "Welcome to the Typhoon game! What is your name?"}],
     on: {
         SPEAK_COMPLETE: "ListenGreeting"
         }
@@ -444,23 +457,6 @@ export function setupButton(element) {
     dmActor.send({ type: "CLICK" });
   })}
   
-  //} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
-  /*export function setupSelect(element) {
-  const options = [
-    {emoji : "🏫", name : "General Knowledge" },
-    {emoji : "🌍", name : "Geography"},
-    {emoji : "📕", name : "History"},
-    {emoji : "🧪", name : "Science"}
-    ];
-    for (const option of options) {
-      const optionButton = document.createElement("button");
-      optionButton.type = "button";
-      optionButton.innerHTML = option.emoji;
-      optionButton.addEventListener("click", () => {
-        dmActor.send({type:"CLICK"});
-      });
-      element.appendChild(optionButton);
-    }*/
   
   //dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
   //  element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
