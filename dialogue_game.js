@@ -34,10 +34,43 @@ const settings = {
 
 //new question database, will work once we have one/four working question states
 const questions = {
-  geography: [{"typhoon": "typhoon"}, { "What is the capital city of Australia?" : "Canberra"}, {"What is the hottest country in the world?" : "Mali"}, {"How many continents are there?" : "7"}, {"What is the name of the largest ocean in the world?" : "Pacific"}, {"Which country does the Easter Island belong to?": "Chile"}, {"What is the smallest country in the world by land area?": "Vatican City"}, {"Which desert is the largest in the world?": "Sahara Desert"}, {"Which country is both in Europe and Asia?":"Russia"},{"Which continent is the least populated?":"Antarctica"},{"Which city is referred as the City of Lights": "Paris"}],
-  generalKnowledge: [{"typhoon": "typhoon"}, { "Which planet is known as the red planet?" : "Mars"}, {"What is the main ingredient in hummus" : "Chickpea"}, {"Who is the current monarch of Sweden?" : "Carl Gustav"}, {"What is the largest organ in the human body?" : "skin"}, {"What is the tallest mountain in the world?": "Mount Everest"}],
-  history: [{"typhoon": "typhoon"}, { "Who was the first president of the United States?" : "George Washington"}, {"What year did World War I begin?" : "1914"}, {"What ancient civilization is credited with the invention of democracy?" : "Ancient Greece"}, {"Who was the leader of Nazi Germany during World War II?" : "Hitler"}, {"Which civilization build the Great Pyramids of Giza?": "Egyptians"}],
-  science: [{"typhoon": "typhoon"}, { "What is the process by which plants make their food called?" : "Photosynthesis"}, {"What is the force that pulls objects towards the center of the Earth called? " : "Gravity"}, {"What is the hardest natural substance on Earth?" : "Diamond"}, {"What is the process by which water changes from a liquid to a gas called?" : "Evaporation"}, {"What is the only metal that is liquid at room temperature?": "Mercury"},{"What type of energy is stored in food?": "Chemical energy"},{"What is the center of an atom called?":"Nucleus"}, {"What is the study of the atmosphere and its phenomena called?":"Meteorology"}, {"What is the unit of electrical power?":"Watt"}]
+  geography: [
+  {"typhoon": "typhoon"},
+  { "What is the capital city of Australia?" : ["Canberra", "This capital city is also known as the Bush Capital"]}, 
+  {"What is the hottest country in the world?" : ["Mali", "This country is located in West Africa."]},
+  {"How many continents are there?" : ["7", "Don't forget the one where penguins live!"]}, 
+  {"What is the name of the largest ocean in the world?" : ["Pacific", "This ocean starts with P"]}, 
+  {"Which country does the Easter Island belong to?": ["Chile", "The shape of this country is skinny!"]}, 
+  {"What is the smallest country in the world by land area?": ["Vatican City", "This is where the Pope lives."]},
+  {"Which desert is the largest in the world?": ["Sahara Desert", "This desert spreads over many countries of the Northern Africa"]},
+  {"Which country is both in Europe and Asia?":["Russia", "It happens to also be the largest country in the world."]},
+  {"Which continent is the least populated?":["Antarctica", "It's very cool in there!"]},
+  {"Which city is referred as the City of Lights": ["Paris", "Its most visited monument is a very iconic tower."]}],
+  generalKnowledge: [
+  {"typhoon": "typhoon"},
+  { "Which planet is known as the red planet?" : "Mars"}, 
+  {"What is the main ingredient in hummus" : "Chickpea"}, 
+  {"Who is the current monarch of Sweden?" : "Carl Gustav"}, 
+  {"What is the largest organ in the human body?" : "skin"}, 
+  {"What is the tallest mountain in the world?": "Mount Everest"}],
+  history: [
+  {"typhoon": "typhoon"}, 
+  { "Who was the first president of the United States?" : "George Washington"}, 
+  {"What year did World War I begin?" : "1914"}, 
+  {"What ancient civilization is credited with the invention of democracy?" : "Ancient Greece"}, 
+  {"Who was the leader of Nazi Germany during World War II?" : "Hitler"}, 
+  {"Which civilization build the Great Pyramids of Giza?": "Egyptians"}],
+  science: [
+  {"typhoon": "typhoon"}, 
+  { "What is the process by which plants make their food called?" : "Photosynthesis"}, 
+  {"What is the force that pulls objects towards the center of the Earth called? " : "Gravity"}, 
+  {"What is the hardest natural substance on Earth?" : "Diamond"}, 
+  {"What is the process by which water changes from a liquid to a gas called?" : "Evaporation"}, 
+  {"What is the only metal that is liquid at room temperature?": "Mercury"},
+  {"What type of energy is stored in food?": "Chemical energy"},
+  {"What is the center of an atom called?":"Nucleus"}, 
+  {"What is the study of the atmosphere and its phenomena called?":"Meteorology"}, 
+  {"What is the unit of electrical power?":"Watt"}]
 }
 
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
@@ -68,11 +101,19 @@ function chooseQuestion(category, index) {
 
 //function that checks if the user's answer is correct
 function checkAnswer(event, question) {
-  const correctAnswer = Object.values(question);
+  const correctAnswer = Object.values[0](question);  //let's see if adding an index [0] will work to get the answer
   const finalEvent = event.toLowerCase();
   const finalCorrectAnswer = correctAnswer[0].toLowerCase();  
   return (finalEvent === finalCorrectAnswer);
 }
+
+//function that retrieves the hint for the question
+function retrieveHint(question) {
+  const answerAndHint = Object.values(question);
+  const finalhint = answerAndHint[1];
+  return finalhint;
+}
+
 //function to shuffle questions and typhoon so they aren't in the same place always
 function shuffleQuestions (questions) {
   for (const category in questions) {
@@ -181,25 +222,25 @@ const dialogueGame = setup({
     entry: "listenNlu",
     on: {
       RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "SayInstructions" },
-      {guard:({event}) => event.nluValue.entities[0].category === "no", target: "Done" }],
+      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `See you maybe another time, ${context.user_name}`}], target: "Done" }],
     }
   },
 
   SayInstructions: {
-    entry: [{ type: "say", params: `Here we go! These are the instructions...`}], 
+    entry: [{ type: "say", params: `Here we go! These are the instructions. If you need a hint, say "hint". Let's start!`}], 
     on: {
-      SPEAK_COMPLETE: "CheckIfReady"
+      SPEAK_COMPLETE: "AskCategory"
       },
     },
 
-  CheckIfReady : {
-    entry : "listenNlu",
-    on : {
-      RECOGNISED :
-       { guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
-      target : "AskCategory"}
-    }
-  },
+  //CheckIfReady : {
+  //  entry : "listenNlu",
+  //  on : {
+  //    RECOGNISED :
+  //     { guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
+  //    target : "AskCategory"}
+  //  }
+  //},
 
   AskCategory: { 
     entry: ["hideStart","show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
@@ -218,7 +259,7 @@ const dialogueGame = setup({
       {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science", actions: "hideCategories"},
       {target : "AskCategory", //in case the user's utterance does not match the given categories
       reenter : true, 
-      actions : {type : "say", params : ({context}) => `You need to choose a category from the screen, ${context.user_name}`}}]
+      actions : {type : "say", params : ({context}) => `You need to choose one of the categories on the screen, ${context.user_name}`}}]
     }
   },
 
@@ -251,7 +292,8 @@ const dialogueGame = setup({
     listenGeography: {
       entry: ["listen", "hideBox"],
       on: {
-        RECOGNISED: [
+        RECOGNISED: [     //lets change the hint to NluListen the intent is something like "hint"
+        { guard: ({ event }) => event.value[0].utterance === "Hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}]},
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeography"},
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
       ]}
