@@ -64,7 +64,7 @@ button:focus-visible {
 }
 
 .question_boxes {
-  display: block;
+  display: inline-block;
   background-color: cadetblue;
   color: #0a1ce2;
   font-size: medium;
