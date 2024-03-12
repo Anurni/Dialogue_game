@@ -457,23 +457,6 @@ export function setupButton(element) {
     dmActor.send({ type: "CLICK" });
   })}
   
-  //} <= if i close this here i can export the second one as well and even the start name works but there is a different error :') 
-  /*export function setupSelect(element) {
-  const options = [
-    {emoji : "🏫", name : "General Knowledge" },
-    {emoji : "🌍", name : "Geography"},
-    {emoji : "📕", name : "History"},
-    {emoji : "🧪", name : "Science"}
-    ];
-    for (const option of options) {
-      const optionButton = document.createElement("button");
-      optionButton.type = "button";
-      optionButton.innerHTML = option.emoji;
-      optionButton.addEventListener("click", () => {
-        dmActor.send({type:"CLICK"});
-      });
-      element.appendChild(optionButton);
-    }*/
   
   //dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
   //  element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
