@@ -97,7 +97,12 @@ const dialogueGame = setup({
       showBoxes : () => showElements("question_boxes"), //let's check how to combine all show actions ??
       hideStart : () => hideAllElements(["startButton","game_title"]),  // let's check how to combine all hide actions ??
       hideCategories : () => hideCategoryElements("category_buttons"),
-      hideBox1 : () => hideElement("box1")
+      hideBox1 : () => hideElement("box1"),
+      hideBox2 : () => hideElement("box2"),
+      hideBox3 : () => hideElement("box3"),
+      hideBox4 : () => hideElement("box4"),
+      hideBox5 : () => hideElement("box5"),
+      hideBox6 : () => hideElement("box6")
       
     },
     guards: {  //lets see if we will use these
