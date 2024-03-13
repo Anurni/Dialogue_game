@@ -38,7 +38,7 @@ const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch 
 //new question database, will work once we have one/four working question states
 const questions = {
   geography: [
-  {"typhoon": "well you are done"},
+  {"typhoon": randomRepeat(typhoonReaction)},
   { "What is the capital city of Australia?" : ["Canberra", "This capital city is also known as the Bush Capital"]}, 
   {"What is the hottest country in the world?" : ["Mali", "This country is located in West Africa."]},
   {"How many continents are there?" : ["7", "Don't forget the one where penguins live!"]}, 
@@ -116,9 +116,8 @@ function checkAnswer(event, question) {
 
 //function that retrieves the hint for the question
 function retrieveHint(question) {
-  const answerAndHint = Object.values(question);
-  const finalhint = answerAndHint[1];
-  return finalhint;
+  const hint = Object.values(question)[1];
+  return hint;
 }
 
 //function to shuffle questions and typhoon so they aren't in the same place always
@@ -167,7 +166,7 @@ const dialogueGame = setup({
       showBoxes : () => showElements("question_boxes"), //didn't manage to combine them lets leave them as is?
       hideStart : () => hideAllElements(["startButton","game_title"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
-      hideBox : ({context},params) => hideElement(params), //this doesn't work either
+      hideBox : (params) => hideElement(params), //this doesn't work either
       
     },
     guards: {  //lets see if we will use these
@@ -297,18 +296,21 @@ const dialogueGame = setup({
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
            target : "Typhoon"},
-          {guard : ({context})=> Object.keys(context.questionNumber) ==! "typhoon", target: "questionGeography" }],
+          {guard : ({context})=> Object.keys(context.currentQuestion) ==! "typhoon", target: "questionGeography" }],
         },
+
       Typhoon : {
         entry : {type : "say", params : ({context}) => Object.values(context.currentQuestion)},
         on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
       },
+
       questionGeography : {   
         entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
          on: {SPEAK_COMPLETE :"listenGeography"}
       },
+
     listenGeography: {
-      entry: ["listenNlu"],//{type : "hideBox", params : ({context}) => `box${context.questionNumber}`}],
+      entry: ["listenNlu", {type : "hideBox", params : ({ context }) => `${context.questionNumber}`}],
       on: {
         RECOGNISED: [     //lets change the hint to NluListen the intent is something like "hint"
         { guard: ({ event }) => event.nluValue.topIntent === "hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}],target: "listenGeography", reenter : true },

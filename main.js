@@ -15,12 +15,12 @@ document.querySelector("#app").innerHTML = `
       </div>
   <div class="question_boxes" style = "display : none">
     <h2 id="category"> Pick a box! </h2>
-      <button class="question_boxes" button id="box1">1</button>
-      <button class="question_boxes" button id="box2">2</button>
-      <button class="question_boxes" button id="box3">3</button>
-      <button class="question_boxes" button id="box4">4</button>
-      <button class="question_boxes" button id="box5">5</button>
-      <button class="question_boxes" button id="box6">6</button>
+      <button class="question_boxes" button id="1">1</button>
+      <button class="question_boxes" button id="2">2</button>
+      <button class="question_boxes" button id="3">3</button>
+      <button class="question_boxes" button id="4">4</button>
+      <button class="question_boxes" button id="5">5</button>
+      <button class="question_boxes" button id="6">6</button>
   </div>
   </div>
 `;
@@ -41,8 +41,8 @@ export function hideAllElements(elements) {   //leaving this for now
   });
 }
 
-export function hideElement(element) {
-  document.getElementById(element).style.display="none";
+export function hideElement(params) {
+  document.getElementById(params).style.display="none";
 }
 
 export function hideCategoryElements(element) {  //this will be used to hide the category buttons
