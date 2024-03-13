@@ -122,7 +122,7 @@ function shuffleQuestions (questions) {
     
     for (let i = categoryQuestions.length -1; i > 0; i --) {
       const j = Math.floor(Math.random()*(i+1));
-      [categoryQuestions[i],categoryQuestions[j] = [categoryQuestions[j],categoryQuestions[i]]];
+      [categoryQuestions[i],categoryQuestions[j]] = [categoryQuestions[j],categoryQuestions[i]];
     }
   }
 }
@@ -155,7 +155,7 @@ const dialogueGame = setup({
       showBoxes : () => showElements("question_boxes"), //didn't manage to combine them lets leave them as is?
       hideStart : () => hideAllElements(["startButton","game_title"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
-      hideBox : ({context}) => hideElement(`box${context.questionNumber}`),
+      hideBox : ({context},params) => hideElement(params), //this doesn't work either
       
     },
     guards: {  //lets see if we will use these
@@ -290,7 +290,7 @@ const dialogueGame = setup({
     },
 
     listenGeography: {
-      entry: ["listen", "hideBox"],
+      entry: ["listen", {type : "hideBox", params : ({context}) => `box${context.questionNumber}`}],
       on: {
         RECOGNISED: [     //lets change the hint to NluListen the intent is something like "hint"
         { guard: ({ event }) => event.value[0].utterance === "Hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}]},

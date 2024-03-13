@@ -64,13 +64,13 @@ button:focus-visible {
 }
 
 .question_boxes {
-  display: inline-block;
+  display: -ms-inline-grid;
   background-color: cadetblue;
   color: #0a1ce2;
   font-size: medium;
   margin-top: auto;
   margin-bottom: auto;
-  margin-left: auto;
+  margin-left: 2px;
   margin-right: auto;
   justify-content: center;
   width: 100px;
