@@ -244,15 +244,6 @@ const dialogueGame = setup({
       },
     },
 
-  //CheckIfReady : {
-  //  entry : "listenNlu",
-  //  on : {
-  //    RECOGNISED :
-  //     { guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
-  //    target : "AskCategory"}
-  //  }
-  //},
-
   AskCategory: { 
     entry: ["hideStart","show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
     on: {
@@ -283,20 +274,32 @@ const dialogueGame = setup({
           SPEAK_COMPLETE : "ListenToChoise"
         }
       },
+
       ListenToChoise : {
-        entry : "listen", //maybe we should add a new topIntent of boxes --> let's check this !!!
+        entry : "listenNlu", //maybe we should add a new topIntent of boxes --> let's check this !!!
         on : {
-          RECOGNISED : "CheckTyphoon",
-          actions : assign({questionNumber : (event) => event.value[0].utterance}),
-          //this should work, let's see
+          RECOGNISED : [ 
+            // checking if the user wants to quit:
+            { guard: ({ event }) => event.nluValue.topIntent === "game_options",
+             actions: [{ type: "say", params: "Are you sure you want to exit the game?"}]},
+            // otherwise, assigning the box/question number to context:
+            {actions : assign({questionNumber : (event) => event.value[0].utterance}), target: "CheckTyphoon"}],
+
+          SPEAK_COMPLETE: "verifyExit"
+        },
+        exit: {
+          actions: ({ context }) => console.log(context.questionNumber)
         }
       }, 
+
       CheckTyphoon : {
         entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}),
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
            target : "Typhoon"},
-          {guard : ({context})=> Object.keys(context.currentQuestion) ==! "typhoon", target: "questionGeography" }],
+          {guard : ({context})=> Object.keys(context.currentQuestion) ==! "typhoon",
+           target: "questionGeography", 
+           actions: ({ context }) => console.log(context.currentQuestion)}],
         },
 
       Typhoon : {
@@ -312,8 +315,12 @@ const dialogueGame = setup({
     listenGeography: {
       entry: ["listenNlu", {type : "hideBox", params : ({ context }) => `${context.questionNumber}`}],
       on: {
-        RECOGNISED: [     //lets change the hint to NluListen the intent is something like "hint"
+        RECOGNISED: [  
+        // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}],target: "listenGeography", reenter : true },
+        // checking if the user wants to quit:
+        { guard: ({ event }) => event.nluValue.topIntent === "game_options", actions: [{ type: "say", params: "Are you sure you want to exit the game?"}], target: "verifyExit"},
+        // cheking if the user's answer is correct/incorrect:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeography"},
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
       ]}
@@ -332,14 +339,18 @@ const dialogueGame = setup({
         SPEAK_COMPLETE: "ChooseBoxQuestion"
         },
       },
-
-    //Typhoon: { entry: [{type: "say", params: randomRepeat(typhoonReaction)}], 
-    //  actions: assign({points: 0}), //player loses all their points
-     // on: { 
-     //   SPEAK_COMPLETE: "#dialogueGame.Done"}}, // need to set the target elsewhere eventually
-     //     },
-      },
+    // if you want, we can add an extra "say goodbye" state after this  
+    // lets also check where the machine transitions on "no"
+    verifyExit: {
+    entry: "listenNlu",
+    on: {
+      RECOGNISED: [
+        {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done"},
+        {target: "ChooseBoxQuestion"}]
+      }
+    }
   },
+},
 
   GeneralKnowledge: {
     initial: "ChooseBoxQuestion",
