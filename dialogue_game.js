@@ -38,7 +38,7 @@ const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch 
 //new question database, will work once we have one/four working question states
 const questions = {
   geography: [
-  {"typhoon": randomRepeat(typhoonReaction)},
+  {"typhoon": "well you are done"},
   { "What is the capital city of Australia?" : ["Canberra", "This capital city is also known as the Bush Capital"]}, 
   {"What is the hottest country in the world?" : ["Mali", "This country is located in West Africa."]},
   {"How many continents are there?" : ["7", "Don't forget the one where penguins live!"]}, 
@@ -108,7 +108,7 @@ function chooseQuestion(category, index) {
 
 //function that checks if the user's answer is correct
 function checkAnswer(event, question) {
-  const correctAnswer = Object.values[0](question);  //let's see if adding an index [0] will work to get the answer
+  const correctAnswer = Object.values(question)[0];  //let's see if adding an index [0] will work to get the answer
   const finalEvent = event.toLowerCase();
   const finalCorrectAnswer = correctAnswer[0].toLowerCase();  
   return (finalEvent === finalCorrectAnswer);
@@ -287,24 +287,31 @@ const dialogueGame = setup({
       ListenToChoise : {
         entry : "listen", //maybe we should add a new topIntent of boxes --> let's check this !!!
         on : {
-          RECOGNISED : "questionGeography",
+          RECOGNISED : "CheckTyphoon",
           actions : assign({questionNumber : (event) => event.value[0].utterance}),
           //this should work, let's see
         }
       }, 
-      questionGeography : {   
+      CheckTyphoon : {
         entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}),
         always : [
-         {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", actions : {type : "say", params : ({context}) => Object.values(context.currentQuestion)},
-        target : "#dialogueGame.Done"},    
-         {target: "listenGeography", actions: [{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) },({ context }) => console.log(context.currentQuestion)]}]
+          {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
+           target : "Typhoon"},
+          {guard : ({context})=> Object.keys(context.questionNumber) ==! "typhoon", target: "questionGeography" }],
+        },
+      Typhoon : {
+        entry : {type : "say", params : ({context}) => Object.values(context.currentQuestion)},
+        on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
       },
-
+      questionGeography : {   
+        entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
+         on: {SPEAK_COMPLETE :"listenGeography"}
+      },
     listenGeography: {
-      entry: ["listen"],//{type : "hideBox", params : ({context}) => `box${context.questionNumber}`}],
+      entry: ["listenNlu"],//{type : "hideBox", params : ({context}) => `box${context.questionNumber}`}],
       on: {
         RECOGNISED: [     //lets change the hint to NluListen the intent is something like "hint"
-        { guard: ({ event }) => event.value[0].utterance === "Hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}]},
+        { guard: ({ event }) => event.nluValue.topIntent === "hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}],target: "listenGeography", reenter : true },
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeography"},
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
       ]}
