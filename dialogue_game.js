@@ -32,10 +32,13 @@ const settings = {
   ttsDefaultVoice: "en-US-JaneNeural",
 };
 
+const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
+const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
+const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"];
 //new question database, will work once we have one/four working question states
 const questions = {
   geography: [
-  {"typhoon": "typhoon"},
+  {"typhoon": randomRepeat(typhoonReaction)},
   { "What is the capital city of Australia?" : ["Canberra", "This capital city is also known as the Bush Capital"]}, 
   {"What is the hottest country in the world?" : ["Mali", "This country is located in West Africa."]},
   {"How many continents are there?" : ["7", "Don't forget the one where penguins live!"]}, 
@@ -47,14 +50,14 @@ const questions = {
   {"Which continent is the least populated?":["Antarctica", "It's very cool in there!"]},
   {"Which city is referred as the City of Lights": ["Paris", "Its most visited monument is a very iconic tower."]}],
   generalKnowledge: [
-  {"typhoon": "typhoon"},
+  {"typhoon": randomRepeat(typhoonReaction)},
   { "Which planet is known as the red planet?" : ["Mars", "This planet is a key target in the search for extraterrestrial life."]}, 
   {"What is the main ingredient in hummus" : "Chickpea"}, 
   {"Who is the current monarch of Sweden?" : "Carl Gustav"}, 
   {"What is the largest organ in the human body?" : "skin"}, 
   {"What is the tallest mountain in the world?": "Mount Everest"}],
   history: [
-  {"typhoon": "typhoon"}, 
+  {"typhoon": randomRepeat(typhoonReaction)}, 
   { "Who was the first president of the United States?" : ["George Washington","He played an important role in the American Revolutionary War"]}, 
   {"What year did World War I begin?" : ["1914","It's the same year that the Titanic sank"]}, 
   {"What ancient civilization is credited with the invention of democracy?" : ["Ancient Greece","This civilization is famous for starting the Olympic Games"]}, 
@@ -67,21 +70,19 @@ const questions = {
   {"Who was the first woman to win a Nobel Prize?":["Marie Curie","Her contributions has helped in finding treatments of cancer."]}],
 
   science: [
-  {"typhoon": "typhoon"}, 
-  { "What is the process by which plants make their food called?" : "Photosynthesis"}, 
-  {"What is the force that pulls objects towards the center of the Earth called? " : "Gravity"}, 
-  {"What is the hardest natural substance on Earth?" : "Diamond"}, 
-  {"What is the process by which water changes from a liquid to a gas called?" : "Evaporation"}, 
-  {"What is the only metal that is liquid at room temperature?": "Mercury"},
-  {"What type of energy is stored in food?": "Chemical energy"},
-  {"What is the center of an atom called?":"Nucleus"}, 
-  {"What is the study of the atmosphere and its phenomena called?":"Meteorology"}, 
-  {"What is the unit of electrical power?":"Watt"}]
+  {"typhoon": randomRepeat(typhoonReaction)}, 
+  { "What is the process by which plants make their food called?" : ["Photosynthesis","This process involes the conversion of the sun"]}, 
+  {"What is the force that pulls objects towards the center of the Earth called? " : ["Gravity","It's the force that keeps you on the ground and makes things fall downward"]}, 
+  {"What is the hardest natural substance on Earth?" : ["Diamond","It's also used in jewellery"]}, 
+  {"What is the process by which water changes from a liquid to a gas called?" : ["Evaporation","Think about what happens to water when heated"]}, 
+  {"What is the only metal that is liquid at room temperature?": ["Mercury","It's a metal used in thermometers"]},
+  {"What type of energy is stored in food?": ["Chemical energy","This energy is released after digestion"]},
+  {"What is the center of an atom called?": ["Nucleus","It consists of protons and neutrons"]}, 
+  {"What is the study of the atmosphere and its phenomena called?":["Meteorology","This field of study encompasses weather patterns and climate"]}, 
+  {"What is the unit of electrical power?":["Watt","It measures the rate of energy used in electricity"]},
+  {"What is the branch of science that deals with the study of heredity and variation in organisms?": ["Genetics","It involves the study of genes, DNA, and inheritance patterns"]}]
 }
 
-const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
-const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
-const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"];
 
 // our functions:
 function isInGrammar(utterance) {
@@ -138,6 +139,11 @@ function checkBoxNumber(box) {
   return box;
 }
 
+function typhoon(question) {
+  if (question === "typhoon") {
+    Object.values(question);
+  }
+}
 //creating the machine:
 const dialogueGame = setup({
     actions: {
@@ -282,21 +288,20 @@ const dialogueGame = setup({
         entry : "listen", //maybe we should add a new topIntent of boxes --> let's check this !!!
         on : {
           RECOGNISED : "questionGeography",
-          actions : assign({questionNumber : (event) => event.value[0].utterance}) //this should work, let's see
+          actions : assign({questionNumber : (event) => event.value[0].utterance}),
+          //this should work, let's see
         }
-      },
+      }, 
       questionGeography : {   
-        entry: [
-          assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
-          { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
-              ],         
-        on: {
-            SPEAK_COMPLETE: {target: "listenGeography", actions: ({ context }) => console.log(context.currentQuestion)}
-        }
-    },
+        entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}),
+        always : [
+         {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", actions : {type : "say", params : ({context}) => Object.values(context.currentQuestion)},
+        target : "#dialogueGame.Done"},    
+         {target: "listenGeography", actions: [{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) },({ context }) => console.log(context.currentQuestion)]}]
+      },
 
     listenGeography: {
-      entry: ["listen", {type : "hideBox", params : ({context}) => `box${context.questionNumber}`}],
+      entry: ["listen"],//{type : "hideBox", params : ({context}) => `box${context.questionNumber}`}],
       on: {
         RECOGNISED: [     //lets change the hint to NluListen the intent is something like "hint"
         { guard: ({ event }) => event.value[0].utterance === "Hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}]},
