@@ -160,6 +160,7 @@ const dialogueGame = setup({
       }),
       shuffle : () => shuffleQuestions(questions),
       show : () => showElements("category_buttons"),
+      showTyphoon : () => showElements("typhoon"),
       showBoxes : () => showElements("question_boxes"), 
       hideStart : () => hideAllElements(["startButton","game_title"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
@@ -300,7 +301,7 @@ const dialogueGame = setup({
         },
 
       Typhoon : {
-        entry : {type : "say", params : ({context}) => Object.values(context.currentQuestion)},
+        entry : ["showTyphoon",{type : "say", params : ({context}) => Object.values(context.currentQuestion)}],
         on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
       },
 
