@@ -2,7 +2,7 @@ import "./style.css";
 import { setupButton,/*setupSelect*/ } from "./dialogue_game.js"; //setupSelect in the brackets needed 
 
 document.querySelector("#app").innerHTML = `
-  <div id = "start_container">
+  <div id = "start_container"style = "display : none">
    <h1 id="game_title">Typhoon game</h1>
       <button id="startButton" class="button">Start</button></div>
   <div class="category_buttons" style =  "display : none">
@@ -21,6 +21,9 @@ document.querySelector("#app").innerHTML = `
       <button class="question_boxes" button id="5">5</button>
       <button class="question_boxes" button id="6">6</button>
   </div>
+  <div class= "typhoon" src="https://imgflip.com/embed/8j7rlw">
+    <h4 id="lose"> You lose!Better luck next time! </3>
+    </div>
 `;
 
 setupButton(document.querySelector("#startButton"));

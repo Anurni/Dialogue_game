@@ -104,3 +104,13 @@ button:focus-visible {
   align-content: center;
   display: inline-block;
 }
+
+.typhoon {
+  width:260px;
+  max-width:100%;
+  height:0;
+  padding-bottom: 177.69% ;
+  position:relative ;
+  width:100% ;
+  height:100%; 
+}

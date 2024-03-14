@@ -167,9 +167,9 @@ const dialogueGame = setup({
       
     },
     guards: {  //lets see if we will use these
-      didPlayerWin: (context, event) => {
+      didPlayerWin: (context) => {
           // check if player won
-          return context.points > 99;
+          return context.questionAsked === 5;
         },
       didPlayerLose: (context, event) => {
           // check if player lost
@@ -186,6 +186,7 @@ const dialogueGame = setup({
     points: 0,
     currentQuestion: null,
     askedQuestions: [],
+    questionAsked : 0
   },
   states: {
     Prepare: {
@@ -230,7 +231,8 @@ const dialogueGame = setup({
     entry: "listenNlu",
     on: {
       RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "SayInstructions" },
-      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `See you maybe another time, ${context.user_name}`}], target: "Done" }],
+      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `See you maybe another time, ${context.user_name}`}], target: "Done" },
+      {target : "ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
     }
   },
 
@@ -279,6 +281,9 @@ const dialogueGame = setup({
             // checking if the user wants to quit:
             { guard: ({ event }) => event.nluValue.topIntent === "game_options",
              actions: [{ type: "say", params: "Are you sure you want to exit the game?"}], target: "verifyExit"},  //not sure if transition to verifyExit will work 
+             //maybe we can add an intent to change category??
+             {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
+            actions: {type : "say", params : "Are you sure you want to change categories?"}, target : "VerifyChange"},
             // otherwise, assigning the box/question number to context:
             {actions : assign({questionNumber : ({ event }) => event.value[0].utterance}), target: "CheckTyphoon"}],
         },
@@ -325,9 +330,12 @@ const dialogueGame = setup({
   },
    
     reactCorrectGeography: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAsked++],    
         on: { 
-          SPEAK_COMPLETE: "ChooseBoxQuestion"
+          SPEAK_COMPLETE: [
+            {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
+            {guard : ({context}) => context.questionAsked === 5, target : ""}
+          ]
           },
         },
 
@@ -355,6 +363,14 @@ const dialogueGame = setup({
         {target: "ChooseBoxQuestion"}]
       }
     },
+    VerifyChange: {
+      entry: "listenNlu",
+      on: {
+        RECOGNISED: [
+          {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
+          {target: "ChooseBoxQuestion"}]
+        }
+      },
 
     //let's check where we want to implement this other than in the actual question 
     NoUserInput: {
@@ -362,6 +378,18 @@ const dialogueGame = setup({
         on: {
           SPEAK_COMPLETE: "listenGeography"
         }
+    }
+  },
+  Win : { //do we really need points? since in the end the player will have 5 points if they win
+    entry : [ {type : "say", params : ({context}) => `Congratulations ${context.user_name} you won. Your final points were ${context.points}. Do you want to play again?`}],
+    on : {SPEAK_COMPLETE : "ListenPlayAgain"}
+  },
+  ListenPlayAgain : {
+    entry: "listenNlu",
+    on: {
+      RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "AskCategory" },
+      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "Done" },
+      {target : "ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
     }
   },
 },
@@ -518,15 +546,15 @@ const dialogueGame = setup({
         },
       },
     },
-
+  
   Done: {
     on: { CLICK: "SayGreeting"}
   },
-
-  AHistory: {  //let's see if we will even use this
-    type: "history",
-    history: "deep"
-    },
+  
+  //AHistory: {  //let's see if we will even use this
+   // type: "history",
+   // history: "deep"
+    //},
   },
 })
 
