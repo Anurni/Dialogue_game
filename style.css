@@ -63,20 +63,6 @@ button:focus-visible {
   position: relative; top: -90px;
 }
 
-.question_boxes {
-  display: flex;
-  background-color: transparent;
-  color: #0a1ce2;
-  font-size: medium;
-  margin-top: auto;
-  margin-bottom: 3px;
-  margin-left: 30px;
-  margin-right: auto;
-  justify-content: center;
-  width: 700px;
-  height: 60px;
-}
-
 #category {
   background-color: transparent;
   font-size: 35px;
@@ -86,4 +72,35 @@ button:focus-visible {
   margin-inline-start: 0;
   text-align: center;
   position: relative; top: -100px;
+}
+
+.question_boxes {
+  display: flex;
+  flex-direction: row;
+  background-color: rgb(240, 205, 159);
+  color: #0a1ce2;
+  box-shadow: 0 0 1px 1px;
+  font-size: 20px;
+  margin: auto;
+  margin-bottom: 15px;
+  margin-left: 30px;
+  margin-right: auto;
+  justify-content: center;
+  text-justify: auto;
+  text-align: center;
+  width: 100px;
+  height: 60px;
+  border-radius: 3px;
+  position: relative; top: -130px; right: 30px;
+  display: inline;
+}
+
+#box{
+  background-color: transparent;
+  text-align: auto;
+  justify-content: center;
+  position: relative; top: -150px; right : 3px;
+  font-size: 30px;
+  align-content: center;
+  display: inline-block;
 }

@@ -4,8 +4,7 @@ import { setupButton,/*setupSelect*/ } from "./dialogue_game.js"; //setupSelect 
 document.querySelector("#app").innerHTML = `
   <div id = "start_container">
    <h1 id="game_title">Typhoon game</h1>
-      <button id="startButton" class="button">Start</button>
-      </div>
+      <button id="startButton" class="button">Start</button></div>
   <div class="category_buttons" style =  "display : none">
     <h2 id="category"> Choose your poison </h2>
       <button class="category_buttons">General Knowledge</button>
@@ -13,15 +12,14 @@ document.querySelector("#app").innerHTML = `
       <button class="category_buttons">History</button>
       <button class="category_buttons">Science</button>
       </div>
-  <div class="question_boxes" style = "display : none">
-    <h2 id="category"> Pick a box! </h2>
+  <div class="question_boxes"style = "display : none">
+    <h3 id="box">Pick a box!</h3>
       <button class="question_boxes" button id="1">1</button>
       <button class="question_boxes" button id="2">2</button>
       <button class="question_boxes" button id="3">3</button>
       <button class="question_boxes" button id="4">4</button>
       <button class="question_boxes" button id="5">5</button>
       <button class="question_boxes" button id="6">6</button>
-  </div>
   </div>
 `;
 
