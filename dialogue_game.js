@@ -163,10 +163,10 @@ const dialogueGame = setup({
       }),
       shuffle : () => shuffleQuestions(questions),
       show : () => showElements("category_buttons"),
-      showBoxes : () => showElements("question_boxes"), //didn't manage to combine them lets leave them as is?
+      showBoxes : () => showElements("question_boxes"), 
       hideStart : () => hideAllElements(["startButton","game_title"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
-      hideBox : (params) => hideElement(params), //this doesn't work either
+      hideBox : ({context},params) => hideElement(params), //why do we need to put context in even tho it's never read?
       
     },
     guards: {  //lets see if we will use these
@@ -251,7 +251,7 @@ const dialogueGame = setup({
     }
   },
 
-  ChooseCategory : {   //work in process here, had to change this back so that I can test the geography state:
+  ChooseCategory : {   
     entry: "listen",
     on : {
       RECOGNISED : 
@@ -281,15 +281,10 @@ const dialogueGame = setup({
           RECOGNISED : [ 
             // checking if the user wants to quit:
             { guard: ({ event }) => event.nluValue.topIntent === "game_options",
-             actions: [{ type: "say", params: "Are you sure you want to exit the game?"}]},
+             actions: [{ type: "say", params: "Are you sure you want to exit the game?"}], target: "verifyExit"},  //not sure if transition to verifyExit will work 
             // otherwise, assigning the box/question number to context:
-            {actions : assign({questionNumber : (event) => event.value[0].utterance}), target: "CheckTyphoon"}],
-
-          SPEAK_COMPLETE: "verifyExit"
+            {actions : assign({questionNumber : ({ event }) => event.value[0].utterance}), target: "CheckTyphoon"}],
         },
-        exit: {
-          actions: ({ context }) => console.log(context.questionNumber)
-        }
       }, 
 
       CheckTyphoon : {
@@ -297,7 +292,7 @@ const dialogueGame = setup({
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
            target : "Typhoon"},
-          {guard : ({context})=> Object.keys(context.currentQuestion) ==! "typhoon",
+          {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
            target: "questionGeography", 
            actions: ({ context }) => console.log(context.currentQuestion)}],
         },
@@ -313,18 +308,19 @@ const dialogueGame = setup({
       },
 
     listenGeography: {
-      entry: ["listenNlu", {type : "hideBox", params : ({ context }) => `${context.questionNumber}`}],
+      entry: ["listenNlu", {type : "hideBox", params : ({ context }) => context.questionNumber}],  //removed the backticks, let's see if it will make a difference
       on: {
         RECOGNISED: [  
+          // cheking if the user's answer is correct/incorrect:
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}],target: "listenGeography", reenter : true },
         // checking if the user wants to quit:
         { guard: ({ event }) => event.nluValue.topIntent === "game_options", actions: [{ type: "say", params: "Are you sure you want to exit the game?"}], target: "verifyExit"},
-        // cheking if the user's answer is correct/incorrect:
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeography"},
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
-      ]}
-    },
+      ]
+    }
+  },
    
     reactCorrectGeography: {
         entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
