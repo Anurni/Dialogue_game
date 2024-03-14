@@ -14,12 +14,12 @@ document.querySelector("#app").innerHTML = `
       </div>
   <div class="question_boxes"style = "display : none">
     <h3 id="box">Pick a box!</h3>
-      <button class="question_boxes" button id="1">1</button>
-      <button class="question_boxes" button id="2">2</button>
-      <button class="question_boxes" button id="3">3</button>
-      <button class="question_boxes" button id="4">4</button>
-      <button class="question_boxes" button id="5">5</button>
-      <button class="question_boxes" button id="6">6</button>
+    <button class="question_boxes" id="1" data-box-number="1">1</button>
+    <button class="question_boxes" id="2" data-box-number="2">2</button>
+    <button class="question_boxes" id="3" data-box-number="3">3</button>
+    <button class="question_boxes" id="4" data-box-number="4">4</button>
+    <button class="question_boxes" id="5" data-box-number="5">5</button>
+    <button class="question_boxes" id="6" data-box-number="6">6</button>
   </div>
   <div class="typhoon"style =  "display : none">
     <h4 id="lose"style = 'font-size:30px'> You lose! Better luck next time! </3>
@@ -51,6 +51,19 @@ export function hideCategoryElements(element) {  //this will be used to hide the
   const elements = document.getElementsByClassName(element);
   for (let i = 0; i < elements.length; i++) {
       elements[i].style.display = "none";
+  }
+}
+
+// lets see if this will work...
+export function hideChosenBoxes(chosenBoxes) {
+  const boxes = document.getElementsByClassName("question_boxes");
+  for (let i = 1; i < boxes.length; i++) {
+    const boxNumber = parseInt(boxes[i].getAttribute("data-box-number"));  // not sure about this getAtttribute
+    if (chosenBoxes.includes(boxNumber)) {
+      boxes[i].style.display = "none";
+    } else {
+      boxes[i].style.display = "block";
+    }
   }
 }
  

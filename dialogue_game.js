@@ -2,7 +2,7 @@ import { assign, createActor, setup } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js"; 
-import { showElements,hideElement, hideAllElements, hideCategoryElements } from "./main.js";
+import { showElements,hideElement, hideAllElements, hideCategoryElements, hideChosenBoxes } from "./main.js";
 
 /* comments :
 -should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect --> yes definitely
@@ -165,17 +165,9 @@ const dialogueGame = setup({
       hideStart : () => hideAllElements(["startButton","game_title"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
       hideBox : ({context},params) => hideElement(params), //why do we need to put context in even tho it's never read?
-      
+      hideChosenBoxes : (context) => hideChosenBoxes(context.hiddenBoxes)
     },
-    guards: {  //lets see if we will use these
-      didPlayerWin: (context) => {
-          // check if player won
-          return context.questionAsked === 5;
-        },
-      didPlayerLose: (context, event) => {
-          // check if player lost
-          return context.points < 0;
-        },
+    guards: {  //lets see if we will put any of our guards here
     },
 
   }).createMachine({
@@ -184,10 +176,11 @@ const dialogueGame = setup({
   context: {
     user_name: '',
     questionNumber: 0,
-    points: 0,
     currentQuestion: null,
     askedQuestions: [],
-    questionAsked : 0
+    questionAsked : 0,
+   // currentBoxToHide: 0,
+    hiddenBoxes: []
   },
   states: {
     Prepare: {
@@ -269,7 +262,7 @@ const dialogueGame = setup({
     initial: "ChooseBoxQuestion",
     states: {
       ChooseBoxQuestion : {
-        entry : ["showBoxes", {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+        entry : ["hideChosenBoxes", {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
         on : {
           SPEAK_COMPLETE : "ListenToChoise"
         }
@@ -286,7 +279,10 @@ const dialogueGame = setup({
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
             actions: {type : "say", params : "Are you sure you want to change categories?"}, target : "VerifyChange"},
             // otherwise, assigning the box/question number to context:
-            {actions : assign({questionNumber : ({ event }) => event.value[0].utterance}), target: "CheckTyphoon"}],
+            {actions : [assign({questionNumber : ({ event }) => event.value[0].utterance}),
+                         assign({hiddenBoxes: ({ event }) => event[0].value.utterance})], 
+                         target: "CheckTyphoon"}
+          ],
         },
       }, 
 
@@ -311,7 +307,7 @@ const dialogueGame = setup({
       },
 
     listenGeography: {
-      entry: ["listenNlu", {type : "hideBox", params : ({ context }) => context.questionNumber}],  //removed the backticks, let's see if it will make a difference
+      entry: ["listenNlu", /*{type : "hideBox", params : ({ context }) => context.questionNumber}*/],  //removed the backticks, let's see if it will make a difference
       on: {
         RECOGNISED: [  
         // checking if the user's answer is correct:
