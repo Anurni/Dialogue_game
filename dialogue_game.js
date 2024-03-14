@@ -116,7 +116,7 @@ function checkAnswer(event, question) {
 
 //function that retrieves the hint for the question
 function retrieveHint(question) {
-  const hint = Object.values(question)[1];
+  const hint = Object.values(question)[0][1];
   return hint;
 }
 
@@ -134,15 +134,12 @@ function shuffleQuestions (questions) {
 }
 }
 
-function checkBoxNumber(box) {
-  return box;
-}
-
 function typhoon(question) {
   if (question === "typhoon") {
     Object.values(question);
   }
 }
+
 //creating the machine:
 const dialogueGame = setup({
     actions: {
@@ -311,14 +308,19 @@ const dialogueGame = setup({
       entry: ["listenNlu", {type : "hideBox", params : ({ context }) => context.questionNumber}],  //removed the backticks, let's see if it will make a difference
       on: {
         RECOGNISED: [  
-          // cheking if the user's answer is correct/incorrect:
+        // checking if the user's answer is correct:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeography"},
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
         // checking if the user wants a hint:
-        { guard: ({ event }) => event.nluValue.topIntent === "hint", actions: [{ type: "say", params: ({context}) => retrieveHint(context.questionNumber)}],target: "listenGeography", reenter : true },
+        { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintGeography"},
         // checking if the user wants to quit:
         { guard: ({ event }) => event.nluValue.topIntent === "game_options", actions: [{ type: "say", params: "Are you sure you want to exit the game?"}], target: "verifyExit"},
-      ]
+        // checking if the user's answer is incorrect:
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
+      ],
+
+      //ASR_NOINPUT: {
+      //  target: "NoUserInput"
+      //}
     }
   },
    
@@ -335,6 +337,14 @@ const dialogueGame = setup({
         SPEAK_COMPLETE: "ChooseBoxQuestion"
         },
       },
+
+    hintGeography: {
+      entry: [{ type: "say", params: ({context}) => retrieveHint(context.currentQuestion)}],
+      on: {
+        SPEAK_COMPLETE: "listenGeography", reenter: true
+      }
+    },
+
     // if you want, we can add an extra "say goodbye" state after this  
     // lets also check where the machine transitions on "no"
     verifyExit: {
@@ -344,6 +354,14 @@ const dialogueGame = setup({
         {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done"},
         {target: "ChooseBoxQuestion"}]
       }
+    },
+
+    //let's check where we want to implement this other than in the actual question 
+    NoUserInput: {
+        entry: [{ type: "say", params: "Can you please repeat?"}],
+        on: {
+          SPEAK_COMPLETE: "listenGeography"
+        }
     }
   },
 },
