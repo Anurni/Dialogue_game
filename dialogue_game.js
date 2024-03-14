@@ -42,11 +42,11 @@ const questions = {
   { "What is the capital city of Australia?" : ["Canberra", "This capital city is also known as the Bush Capital"]}, 
   {"What is the hottest country in the world?" : ["Mali", "This country is located in West Africa."]},
   {"How many continents are there?" : ["7", "Don't forget the one where penguins live!"]}, 
-  {"What is the name of the largest ocean in the world?" : ["Pacific", "This ocean starts with P"]}, 
+  {"What is the name of the largest ocean in the world?" : ["Pacific", "The mame of this ocean starts with P"]}, 
   {"Which country does the Easter Island belong to?": ["Chile", "The shape of this country is skinny!"]}, 
   {"What is the smallest country in the world by land area?": ["Vatican City", "This is where the Pope lives."]},
   {"Which desert is the largest in the world?": ["Sahara Desert", "This desert spreads over many countries of the Northern Africa"]},
-  {"Which country is both in Europe and Asia?":["Russia", "It happens to also be the largest country in the world."]},
+  {"Which country is both in Europe and Asia?":["Russia", "It also happens to be the largest country in the world."]},
   {"Which continent is the least populated?":["Antarctica", "It's very cool in there!"]},
   {"Which city is referred as the City of Lights": ["Paris", "Its most visited monument is a very iconic tower."]}],
   generalKnowledge: [
@@ -101,14 +101,13 @@ function checkPositive(event) {
 //retrieves a question from the question database based on the index of the box the user has chosen
 function chooseQuestion(category, index) {
   const questionList = questions[category];
-  // put some if-statement here to check if the question is in the context.askedQuestions, eventually...
   const questionAndAnswer = questionList[index];
   return questionAndAnswer 
  }
 
 //function that checks if the user's answer is correct
 function checkAnswer(event, question) {
-  const correctAnswer = Object.values(question)[0];  //let's see if adding an index [0] will work to get the answer
+  const correctAnswer = Object.values(question)[0];  
   const finalEvent = event.toLowerCase();
   const finalCorrectAnswer = correctAnswer[0].toLowerCase();  
   return (finalEvent === finalCorrectAnswer);
@@ -165,7 +164,7 @@ const dialogueGame = setup({
       hideStart : () => hideAllElements(["startButton","game_title"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
       hideBox : ({context},params) => hideElement(params), //why do we need to put context in even tho it's never read?
-      hideChosenBoxes : (context) => hideChosenBoxes(context.hiddenBoxes)
+      hideChosenBoxes : ({context, params}) => hideChosenBoxes(context.hiddenBoxes)
     },
     guards: {  //lets see if we will put any of our guards here
     },
@@ -179,8 +178,8 @@ const dialogueGame = setup({
     currentQuestion: null,
     askedQuestions: [],
     questionAsked : 0,
+    hiddenBoxes: {},
    // currentBoxToHide: 0,
-    hiddenBoxes: []
   },
   states: {
     Prepare: {
@@ -196,7 +195,7 @@ const dialogueGame = setup({
 
   WaitToStart: {
     on: {
-      CLICK: "SayGreeting"
+      CLICK: "AskCategory"  
     }
   },
 
@@ -254,7 +253,7 @@ const dialogueGame = setup({
       {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science", actions: "hideCategories"},
       {target : "AskCategory", //in case the user's utterance does not match the given categories
       reenter : true, 
-      actions : {type : "say", params : ({context}) => `You need to choose one of the categories on the screen, ${context.user_name}`}}]
+      actions : {type : "say", params : ({context}) => `You need to choose one of the categories on the screen,`}}] //let's add the user_name here later
     }
   },
 
@@ -262,7 +261,8 @@ const dialogueGame = setup({
     initial: "ChooseBoxQuestion",
     states: {
       ChooseBoxQuestion : {
-        entry : ["hideChosenBoxes", {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+        entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
+                 {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
         on : {
           SPEAK_COMPLETE : "ListenToChoise"
         }
@@ -278,10 +278,17 @@ const dialogueGame = setup({
              //maybe we can add an intent to change category??
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
             actions: {type : "say", params : "Are you sure you want to change categories?"}, target : "VerifyChange"},
-            // otherwise, assigning the box/question number to context:
-            {actions : [assign({questionNumber : ({ event }) => event.value[0].utterance}),
-                         assign({hiddenBoxes: ({ event }) => event[0].value.utterance})], 
-                         target: "CheckTyphoon"}
+            // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
+            {actions : [
+              assign({
+                questionNumber: ({ event }) => event.value[0].utterance,
+                hiddenBoxes: ({ context, event }) => ({
+                  ...context.hiddenBoxes, // Copy existing properties
+                  [event.value[0].utterance]: event.value[0].utterance // Add new property with event value as key and value
+                })
+                })   //expands the array in the context
+            ],
+            target: "CheckTyphoon"}
           ],
         },
       }, 
@@ -293,7 +300,10 @@ const dialogueGame = setup({
            target : "Typhoon"},
           {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
            target: "questionGeography", 
-           actions: ({ context }) => console.log(context.currentQuestion)}],
+           actions: [({ context }) => console.log(`this is the current question ${context.currentQuestion}`), 
+                    ({ context }) => console.log(`this is the current BoxesToHide ${context.hiddenBoxes}`),
+                    ({ context }) => console.log(`this is the type of the BoxesToHide ${typeof context.hiddenBoxes}`),
+                    ({ context }) => console.log(`these are the values of the BoxesToHide ${Object.values(context.hiddenBoxes)}`)]}],
         },
 
       Typhoon : {
@@ -331,7 +341,7 @@ const dialogueGame = setup({
         on: { 
           SPEAK_COMPLETE: [
             {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
-            {guard : ({context}) => context.questionAsked === 5, target : ""}
+            {guard : ({context}) => context.questionAsked === 5, target : "Win"}
           ]
           },
         },
@@ -360,6 +370,7 @@ const dialogueGame = setup({
         {target: "ChooseBoxQuestion"}]
       }
     },
+
     VerifyChange: {
       entry: "listenNlu",
       on: {
@@ -375,21 +386,23 @@ const dialogueGame = setup({
         on: {
           SPEAK_COMPLETE: "listenGeography"
         }
-    }
-  },
+    },
+
   Win : { //do we really need points? since in the end the player will have 5 points if they win
     entry : [ {type : "say", params : ({context}) => `Congratulations ${context.user_name} you won. Your final points were ${context.points}. Do you want to play again?`}],
     on : {SPEAK_COMPLETE : "ListenPlayAgain"}
   },
+
   ListenPlayAgain : {
     entry: "listenNlu",
     on: {
-      RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "AskCategory" },
-      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "Done" },
-      {target : "ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
-    }
+      RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory" },
+      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "#dialogueGame.Done" },
+      {target : "#dialogueGame.ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
+        }
+      },
+    },
   },
-},
 
   GeneralKnowledge: {
     initial: "ChooseBoxQuestion",
