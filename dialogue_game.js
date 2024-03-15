@@ -80,7 +80,20 @@ const questions = {
   {"What is the center of an atom called?": ["Nucleus","It consists of protons and neutrons"]}, 
   {"What is the study of the atmosphere and its phenomena called?":["Meteorology","This field of study encompasses weather patterns and climate"]}, 
   {"What is the unit of electrical power?":["Watt","It measures the rate of energy used in electricity"]},
-  {"What is the branch of science that deals with the study of heredity and variation in organisms?": ["Genetics","It involves the study of genes, DNA, and inheritance patterns"]}]
+  {"What is the branch of science that deals with the study of heredity and variation in organisms?": ["Genetics","It involves the study of genes, DNA, and inheritance patterns"]}],
+
+  popCulture: [
+  {"typhoon": randomRepeat(typhoonReaction)}, 
+  {"Which tech entrepreneur together with his partner named their son X Æ A-12" : ["Elon Musk","He is the CEO of Tesla."]}, 
+  {"Which movie was mistakenly announced as the Best Picture Oscar winner in 2017? " : ["La La Land","Emma Stone and Ryan Gosling star in this musical."]}, 
+  {"In the sitcom Friends, what was the name of Pheobe's alter ego?" : ["Regina Phalange","The initials are R.P."]}, 
+  {"Which band recorded the album 'The Dark Side of the Moon'?" : ["Pink Floyd","This is one of the most famous British rock bands."]}, 
+  {"What was the nickname of Diana, Princess of Wales?": ["Lady Di","There were many, but this one is a shorter version of her first name."]},
+  {"Which artist made history in 2020 as the youngest winner of the Grammys' four main categories?": ["Billie Eilish","This artist creates music together with her big brother, Finneas."]},
+  {"Which legendary horror movie popularized the quote 'All work and no play makes Jack a dull boy'?": ["The Shining","This movie is based on a Stephen King novel."]}, 
+  {"Which italian band won the Eurovision song contest in 2021?":["Måneskin","The name of this band is danish for 'moonlight'"]}, 
+  {"What is Batman's real name?":["Bruce Wayne","First name rhymes with 'loose' and last name with 'chain'."]},
+  {"Which fashion designer is famous for inventing 'The Little Black Dress'?": ["Coco Chanel","One of the quotes of this iconic Frech designer is 'Fashion changes, but style endures'."]}]
 }
 
 
@@ -251,6 +264,7 @@ const dialogueGame = setup({
       {guard : ({ event }) => event.value[0].utterance === "General Knowledge", target : "GeneralKnowledge", actions: "hideCategories"},
       {guard : ({ event }) => event.value[0].utterance === "History", target : "History", actions: "hideCategories"},
       {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science", actions: "hideCategories"},
+      {guard : ({ event }) => event.value[0].utterance === "Pop culture", target : "popCulture", actions: "hideCategories"},
       {target : "AskCategory", //in case the user's utterance does not match the given categories
       reenter : true, 
       actions : {type : "say", params : ({context}) => `You need to choose one of the categories on the screen,`}}] //let's add the user_name here later
@@ -557,6 +571,10 @@ const dialogueGame = setup({
           },
         },
       },
+    },
+
+    popCulture: {
+
     },
   
   Done: {
