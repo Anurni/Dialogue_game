@@ -2,7 +2,7 @@ import "./style.css";
 import { setupButton } from "./dialogue_game.js";
 
 document.querySelector("#app").innerHTML = `
-  <div id = "start_container">
+  <div id = "start_container" >
    <h1 id="game_title">Typhoon game</h1>
     <button id="startButton" class="button">Start</button></div>
       <img id = "typhoon_gif" src="typhoon_gif.gif">
@@ -14,14 +14,19 @@ document.querySelector("#app").innerHTML = `
       <button class="category_buttons">Science</button>
       <button class="category_buttons">Pop Culture</button>
       </div>
-  <div class="question_boxes" style = "display: none"> 
-    <h3 id="box">Pick a box!</h3>
+      </div>
+  <div class="question_boxes"style = "display: none"> 
     <button class="question_boxes" id="0">1</button>
     <button class="question_boxes" id="1">2</button>
     <button class="question_boxes" id="2">3</button>
     <button class="question_boxes" id="3">4</button>
     <button class="question_boxes" id="4">5</button>
     <button class="question_boxes" id="5">6</button>
+    <button class="question_boxes" id="6">7</button>
+    <button class="question_boxes" id="7">8</button>
+    <button class="question_boxes" id="8">9</button>
+    <button class="question_boxes" id="9">10</button>
+    <h3 id="box">Pick a box!</h3> 
   </div>
   <div class="typhoon"style =  "display : none">
     <h4 id="lose"style = 'font-size:30px'> You lose! Better luck next time! </3>
