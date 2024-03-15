@@ -27,11 +27,11 @@ body {
 
 #game_title {
   font-size: 50px;
-  position: relative; top: 180px;
+  position: relative; top: 15px;
 }
 
 #startButton {
-  width: 100px;
+  width: 110px;
   max-width: 80%;
   border-radius: 5px;
   padding: 10px;
@@ -41,7 +41,8 @@ body {
   background-color: #a7d1d4;
   cursor: pointer;
   transition: border-color 0.25s;
-  position: relative; top: 300px;
+  position: relative; top : 200px;
+
 }
 #startButton:hover {
   border-color: #0a1ce2;
@@ -52,6 +53,10 @@ button:focus-visible {
   display: "none";
 }
 
+#typhoon_gif {
+  width: 200px;
+  position: relative; top: -90px;
+}
 .category_buttons {
   display : block;
   margin-block-start: 30px;

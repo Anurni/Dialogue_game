@@ -174,7 +174,7 @@ const dialogueGame = setup({
       show : () => showElements("category_buttons"),
       showTyphoon : () => showElements("typhoon"),
       showBoxes : () => showElements("question_boxes"), 
-      hideStart : () => hideAllElements(["startButton","game_title"]),  
+      hideStart : () => hideAllElements(["startButton","game_title","typhoon_gif"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
       hideBox : ({context},params) => hideElement(params), //why do we need to put context in even tho it's never read?
       hideChosenBoxes : ({context, params}) => hideChosenBoxes(context.hiddenBoxes)
@@ -604,6 +604,6 @@ export function setupButton(element) {
   
   //dmActor.getSnapshot().context.ssRef.subscribe((snapshot) => {
   //  element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
-  //});
+  //S})
 
 
