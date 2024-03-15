@@ -173,11 +173,13 @@ const dialogueGame = setup({
       shuffle : () => shuffleQuestions(questions),
       show : () => showElements("category_buttons"),
       showTyphoon : () => showElements("typhoon"),
+      showThumbsUp : () => showElements("win"),
       showBoxes : () => showElements("question_boxes"), 
       hideStart : () => hideAllElements(["startButton","game_title","typhoon_gif"]),  
       hideCategories : () => hideCategoryElements("category_buttons"),
-      hideBox : ({context},params) => hideElement(params), //why do we need to put context in even tho it's never read?
-      hideChosenBoxes : ({context, params}) => hideChosenBoxes(context.hiddenBoxes)
+      hideBox : ({context},params) => hideElement(params),
+      hideChosenBoxes : ({context, params}) => hideChosenBoxes(context.hiddenBoxes),
+      hideAllBoxes : () => hideCategoryElements("question_boxes")
     },
     guards: {  //lets see if we will put any of our guards here
     },
@@ -404,8 +406,8 @@ const dialogueGame = setup({
         }
     },
 
-  Win : { //do we really need points? since in the end the player will have 5 points if they win
-    entry : [ {type : "say", params : ({context}) => `Congratulations ${context.user_name} you won. Your final points were ${context.points}. Do you want to play again?`}],
+  Win : { 
+    entry :[ "hideAllBoxes", "showThumbsUp", {type : "say", params : ({context}) => `Congratulations ${context.user_name}, you won! Do you want to play again?`}],
     on : {SPEAK_COMPLETE : "ListenPlayAgain"}
   },
 
