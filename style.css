@@ -27,6 +27,7 @@ body {
 
 #game_title {
   font-size: 50px;
+  position: relative; top: 180px;
 }
 
 #startButton {
@@ -40,6 +41,7 @@ body {
   background-color: #a7d1d4;
   cursor: pointer;
   transition: border-color 0.25s;
+  position: relative; top: 300px;
 }
 #startButton:hover {
   border-color: #0a1ce2;
@@ -109,5 +111,9 @@ button:focus-visible {
   position: relative;
   font-size: 200px;
   justify-content: center;
+}
+
+.starttyphoon {
+  max-width: 100%;
 }
 

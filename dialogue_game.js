@@ -286,7 +286,7 @@ const dialogueGame = setup({
                   ...context.hiddenBoxes, // Copy existing properties
                   [event.value[0].utterance]: event.value[0].utterance // Add new property with event value as key and value
                 })
-                })   //expands the array in the context
+              }) 
             ],
             target: "CheckTyphoon"}
           ],
@@ -325,7 +325,9 @@ const dialogueGame = setup({
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintGeography"},
         // checking if the user wants to quit:
-        { guard: ({ event }) => event.nluValue.topIntent === "game_options", actions: [{ type: "say", params: "Are you sure you want to exit the game?"}], target: "verifyExit"},
+        { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "verifyExit", actions: [{ type: "say", params: "Are you sure you want to exit the game?"}]},
+        //checking if the user wants to hear the question again:
+        { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeography", actions: [{ type: "say", params: "I'm happy to repeat the question!"}]},
         // checking if the user's answer is incorrect:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
       ],

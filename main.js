@@ -5,6 +5,7 @@ document.querySelector("#app").innerHTML = `
   <div id = "start_container">
    <h1 id="game_title">Typhoon game</h1>
       <button id="startButton" class="button">Start</button></div>
+      <div style="width:300px;max-width:100%;"><div style="height:100;padding-bottom:200%;position:relative; left: 90px; margin-bottom = -100px, margin-top = -100px"><iframe width="1000" height="1000" style="position:absolute;top:100px;left:0;width:200%;height:200%;" frameBorder="0" src="typhoon_gif.gif"</iframe></div>
   <div class="category_buttons" style =  "display : none">
     <h2 id="category"> Choose your poison </h2>
       <button class="category_buttons">General Knowledge</button>
@@ -76,3 +77,6 @@ export function hideChosenBoxes(params) {
     }
   }
 }
+
+// typhoon gif that works (even tho a bit small)
+//<div style="width:300px;max-width:100%;"><div style="height:100;padding-bottom:200%;position:relative; left: 90px; margin-bottom = -100px, margin-top = -100px"><iframe width="1000" height="1000" style="position:absolute;top:100px;left:0;width:200%;height:200%;" frameBorder="0" src="typhoon_gif.gif"</iframe></div>
