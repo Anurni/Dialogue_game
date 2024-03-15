@@ -16,12 +16,12 @@ document.querySelector("#app").innerHTML = `
       </div>
   <div class="question_boxes" style = "display: none"> 
     <h3 id="box">Pick a box!</h3>
-    <button class="question_boxes" id="1">1</button>
-    <button class="question_boxes" id="2">2</button>
-    <button class="question_boxes" id="3">3</button>
-    <button class="question_boxes" id="4">4</button>
-    <button class="question_boxes" id="5">5</button>
-    <button class="question_boxes" id="6">6</button>
+    <button class="question_boxes" id="0">1</button>
+    <button class="question_boxes" id="1">2</button>
+    <button class="question_boxes" id="2">3</button>
+    <button class="question_boxes" id="3">4</button>
+    <button class="question_boxes" id="4">5</button>
+    <button class="question_boxes" id="5">6</button>
   </div>
   <div class="typhoon"style =  "display : none">
     <h4 id="lose"style = 'font-size:30px'> You lose! Better luck next time! </3>
@@ -64,17 +64,17 @@ export function hideChosenBoxes(params) {
   const boxes = document.getElementsByClassName("question_boxes");
   const values = Object.values(params);         // Extract the values from the params object into an array
   for (let i = 0; i < boxes.length; i++) {    //need to check if -1 is needed
-    const boxNumber = i + 1;
+    const boxNumber = i;
     const boxNumberAsString = boxNumber.toString();
     //const box = document.getElementById(boxNumber.toString());       
     if (values.includes(boxNumberAsString)) {
       console.log(`This box should be removed ${boxNumber}`)
      // boxes[i].style.display = "none";              //works
-      boxes[boxNumber - 1].style.display = "none";    //works
+      boxes[boxNumber].style.display = "none";    //works
     } else {
       console.log(`This box should be left ${boxNumber}`)
      // boxes[i].style.display = "block";            //works
-      boxes[boxNumber - 1].style.display = "block";  // works
+      boxes[boxNumber].style.display = "block";  // works
     }
   }
 }
