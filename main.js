@@ -12,6 +12,7 @@ document.querySelector("#app").innerHTML = `
       <button class="category_buttons">Geography</button>
       <button class="category_buttons">History</button>
       <button class="category_buttons">Science</button>
+      <button class="category_buttons">Pop Culture</button>
       </div>
   <div class="question_boxes" style = "display: none"> 
     <h3 id="box">Pick a box!</h3>
