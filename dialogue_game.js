@@ -4,9 +4,7 @@ import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js"; 
 import { showElements,hideElement, hideAllElements, hideCategoryElements, hideChosenBoxes } from "./main.js";
 
-/* comments :
--should we give 2nd try to answer the question or provide the hint perhaps? after the answer is incorrect --> yes definitely
-*/
+
 const inspector = createBrowserInspector();
 
 const azureCredentials = {
@@ -35,6 +33,7 @@ const settings = {
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
 const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
 const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"];
+const boxes = ["1","2","3","4","5","6","7","8","9","10"]
 //new question database, will work once we have one/four working question states
 const questions = {
   geography: [
@@ -49,13 +48,21 @@ const questions = {
   {"Which country is both in Europe and Asia?":["Russia", "It also happens to be the largest country in the world."]},
   {"Which continent is the least populated?":["Antarctica", "It's very cool in there!"]},
   {"Which city is referred as the City of Lights": ["Paris", "Its most visited monument is a very iconic tower."]}],
+
   generalKnowledge: [
   {"typhoon": randomRepeat(typhoonReaction)},
-  { "Which planet is known as the red planet?" : ["Mars", "This planet is a key target in the search for extraterrestrial life."]}, 
-  {"What is the main ingredient in hummus" : "Chickpea"}, 
-  {"Who is the current monarch of Sweden?" : "Carl Gustav"}, 
-  {"What is the largest organ in the human body?" : "skin"}, 
-  {"What is the tallest mountain in the world?": "Mount Everest"}],
+  {"Which desert is the largest in the world?": ["Sahara Desert", "This desert spreads over many countries of the Northern Africa"]},
+  {"Which city is referred as the City of Lights": ["Paris", "Its most visited monument is a very iconic tower."]},
+  {"What year did World War I begin?" : ["1914","It's the same year that the Titanic sank"]}, 
+  {"Who was the leader of Nazi Germany during World War II?" : ["Hitler","He was born in Austria"]},
+  {"What is the force that pulls objects towards the center of the Earth called? " : ["Gravity","It's the force that keeps you on the ground and makes things fall downward"]},
+  {"What is the hardest natural substance on Earth?" : ["Diamond","It's also used in jewellery"]}, 
+  {"What is Batman's real name?":["Bruce Wayne","First name rhymes with 'loose' and last name with 'chain'."]},
+  {"What is the largest organ in the human body?" : ["skin","It's an external organ with multiple layers and various functions."]},
+  {"Which tech entrepreneur together with his partner named their son X Æ A-12" : ["Elon Musk","He is the CEO of Tesla."]}, 
+  { "Which planet is known as the red planet?" : ["Mars", "This planet is a key target in the search for extraterrestrial life."]},
+
+ ],
   history: [
   {"typhoon": randomRepeat(typhoonReaction)}, 
   { "Who was the first president of the United States?" : ["George Washington","He played an important role in the American Revolutionary War"]}, 
@@ -185,6 +192,7 @@ const dialogueGame = setup({
     },
 
   }).createMachine({
+  /** @xstate-layout N4IgpgJg5mDOIC5QQJYEMA2B7KBXMA4mgLZgB0ACgE5gAOaNAxAIIDKASgCqesD67AUWYARAJoBtAAwBdRKFpZYKAC4osAOzkgAHogDMkvQHYyANgCMAJgAsADiO2ArLb12ANCACeiS-bPWATiCAx0DLPRCAX0iPVEwcfCJSMgB1NBVOLFZlBmVGAGEAGQBJfIBpKVkkEAUlVQ0tXQQ9FtsyS1MbAL1LSWtzCOsPbwRfE1NA4NCA8KiYkDjsPEISclY0TwIaMFV1KEZWCiEy3nyAeQBZCkKBTgFKrVqVNU1qps7h-VtrU3ajS0c5gcDgCRkkpmisXQS0SqzIhRQsGUYHUWzAOxQe0YgnOBAAcsVWAJhA9qk96q9QE1rOF2pMQmNHJIHHpPs1bJZLGRbKDAaY9OYgnpTBD5osEitkkkwNlcgA1MBUFAAMxQAGM0BSDkdmCdzlcbndSfJFM8Gm99CLrGQjFZrGDzIYLD82ZZzOZrdZJN7JI5er6+tZIQtoRLpfDEcj1KI4GcqHisNiBLiCUSSTJHqaKY19ALJNyeY5TJIAjTJI7TGzhQEyI4mT7zH6jMLLMHxctwwikSiY7A4wmkynCcTxOYqia6i8c80vXobZ17aYjNZnMy2YLXNyjPXLNv3R1W2LQx24V2o73+4mcWd8cOSZZxzUs1OLc1wuNfCXQcueZWvIhzBcX4fR9Xp3VMP022PWFknWTxinUJEqFwNUKVgbVjlOS5rlue4MzJZ9zSpfQwUcMgvV6P1TA5d1zCrUwazrEDG13FsoPiE9kmYWAAGt8k1MAoCwKhPAw3UsINXDjSfSciJ0RB-no31a3+QEjCXBxfXYmFJXIfIAAssEUMB+ORISRMHG9UxHfCJzNSl5IQKx10PKEOJgvTDOM0zBOE0Tr1vNNR0fckX2IhBARrQDl1LAxAk6RwqxLa1AQBd1bEbajvm0sM4QMozYBMgTzP85MrLvcQH0zWSHKaP0ovsQJrDigIEqUkxgT5CDLG-Rwcs4zyCqKsy-MswKRz0ELCNqxAmQamLmr6VqbD-EYOgiG1jCZCY+jBIMj3c3SyHy7zitGgLrJJawppq6d6rIaKmpatr-2aPRAQe+sPXCZqWn6jzjq8wqfJKsbLvERwbvs6cOSrOaHs5QFmucRxbX+o6CDAHAqDQWh9M8QGhoAISwbQAEV8CRF4xL1bDDTwqHs1fcx+WtW0ugmBwRRmdcf3aFoWlRxxQT0Wx0fDTHsdx-GI27dRMnyxEwDBirbJk6HmaCMjlsCIERSBIx1yXMjGxcFoplF-a3J0iWsagHG8YJs8UQVwylZVoKx2qjXwsFEIyB1gI9YsIxDdewDjFrAWWmbcFWr6g6bbhSX7elp3IxdrBFcKj2Ryqgjbs1-3A+Dg3eZsblnBaMtmT6cxxeTu2HZlgywDVHjOE8PGjPURhpNCuSmhsSOBh-HkPR+MORj1tmQI6X8UYbqUm7TwG247ruvN74LvaZ8Lh5MUe7HH6xJ-XZw2gCOfmXsd0l-IFPm4Jzvu40GmJJwo01YHmbRh5Ll+Q-mMPrFmiVw62jIhBZi3pnCuRDIdW2UtHZkAAI6UwpI-NO799SfwZrvMKjkD4PWMMfIOp8lxsjBPmb4wRQQhEdC4e+ZBMHIIwBnVEK9Ha53TIzAh7xGy1jtAEWwfQehB1ZK9XoXpPqgVal6WwjDE65WXkgmWbC5YsPxtwneBcfaOQsGRVKgQRHNR6gMdc5t2hm1cLaEETgmGaIJuoqMjjtH5zsnvfRAijHCNEWYiR09AJcgBMxUEzU5jW2UQ-Thaj2GuIuhVSa+DB6IAMYIroJixHmPDqfE224fT9CvqWBxMSnFxNKdo66yTf5pJ8Zk-x657DBJFCKewEQWYKJKaogmNA0CoXyMJGgqFXGHEwjg+m-dprTndH0AOdonACnUkEKeAFSxkVcCzPaQpqIJ0iQNZhpSyC9P6YMtuygRk6lppJI0XtdGeKaDM60QcbALL1ss10kgORkGZPWe0dYWhwPbADRxRywB9OUAhNUpzhkVNGeJcZUlv5TOZo6J58zHCLIYqCRp-sJibMkD1DkBKxZKP2SC-SmJzmwsuR-CZSLC7hQYtaEUXRmTFlcDyFyPJazWJXJsv6pLgWHO4jxZUwkFRKlVBqLUcKrm4MmQywhPyHrzNPi4H6tg2SlnMLWekwROjLi6anZBEqVSeAENoFQ2j6V6KHgogBJCXDqQsKAtkNEHq0OESEBi9dBUY0Oaa5U5rLV5ASZ7XhKSnKormS8jFbzsXh3BDqq+IESw7KXEap+ZBA2eAMmgPYysw02Qjb-MYDqgHOvAmAkYGV2i0NsBBCedgjCZtXjmvNBbtG3I8Xwnw3odWuCCAo1mAwebh26HOYRAstndAJa25BCYACqhUqAIVoLgPIsraWIpLdOTkNYDxMl3HWFkLpw7VysQLe0QIeT2L9Yg41MsUiYmwXTHd1TpmsxtEIzmDaGKWA+V8n53o-kYp6POmWzt1AUAwBsZgUB0i9yLTwj9r5fBfMAXYYBLqIIWPzJ6hRVFHTCgg+nOWMG4MIZfchnRPbI2+BmGYR12Gq2AfzAS+swp+j2lI7LKMFHPDwcQ243daH-5MYrSA3D47I5bW9Me-cqMSnqEVJgMo6gsAAHcMCQBgITYyJNyboOpluhFX9RO+zoQHGKrVmyOlRis5oQIB0Nh6sKBiynVMYHU1pnT0ByBQddlgd2NGbX3J8Bs9oXQZjlicBBIYr1Fkuf7W57mnmcbeY09p3T5A0FwAwSiLzPnsv+dfdcvBdze2jEi5ySYYE4uhFdF6mR3pSxugBCSvZQqVMZeK35vTziUSYx62prL-XC1lXGihyrkb7M1i-EKBZu46KJfCG0IETIrANsynodLo3fM5bIINjhI3MsHdKzR7t6twtOV9PN2hosMXLarAMLk9hNsMM+cuUUXX-Wnb64d45ygBlUCGVS-7Y2ctlflWFqrLNyzcmCDyZt4QSxVg6Dqpi5ZT6UVBHts7JW9NA8hdC8HRXIeldM2+8zqHfbFh1TyIdpYmkGACC9os7QvrrSCJ8n78Ck7JAABKRj8vpwqhmKb5ZMzSszFW6O-wjsBetjVlr0W+CpTbodmx0JbfeuEwukSi8C1nN2OdQsWcIYKEwg6gj9AXI54U6uhbli1xEIweO9dC5FyJVBxmNAG+UKNKn5WFW2p8FbsgNvtX27hgS8iITvoo3tFbfnUSyAB9F8djPFlze08crbyP9I7CASsO6Kse5yJfSWYR3cTDs9lLlvXrtFumgF6j8XjKboVsjC478Rs-bhYl4mHX73PSwUnNB2cpvweYct4AiuNoBLJgswFAMRriXQ7Wg5JtmYqNh269++GevoLwUk8n6hafMvqdy+u3Dhf3zosr-dO9BLPfua1gT8uUOgpOup-2awNUFAFENUQaAzUmSXKmN+GfOlOfJyDKEwPVY9X0GhV0W0X4P0esbcAEMEfkJhAAoA9QEAvjTObOCbIcIKWHejG9G0SYBRQwERboVAlmD-TAjAnA3bT3NYQA4A3LP3dQfAng6HGAvPIeagmzOg0WEsAJHwDFa0OTPocsAlQ1TgsgAQwg8gY7NQkA61WAsJQvYIDvUvbvHwFkciECZcJkVGboPA7g9Qo7dhLQsg8qcNEQxAPQ9vDKTvMvSRJcdbECIsBiceGwggogoHEHMHRwoQ99GbBXcJePYxJiY2FwV0ERX4UOesFNVqAYDgw-OERwk-VCM-CI2w7Q6A6I+XaZOImkBI7abcZIyRB0cifJZkTkf+XZP-AGYQDQZWIoUoCoSg3+YwJwSPO0JcAwN0VqdcEISdECZqY2HqUUeYDTCAOALQIFXSVwhAAAWmFDZC2O3DrSR0bVPkCHaPWPDGoDoAYDAE2PQ3LSw0rVdUkQ+ij0LAFAnRT3OLhDSAyCyByCoGUE2J6GUnLC6DsCDgYlWh8D8Bs2CHc0hLwI2DRAxD2CBIURMFBPtGZGrFHimKBDMBAmMFtCw0BWgiOig2RN2CgFuLsG5FTR2hs2MPZE5GszSjBH-hLAcVWFlABMDXVE1AIR-junUm+XpAmA5RFirBCGoQ9EAkBGijvhUKgwvHjCwCBMAjaG3E6FX3SN9GrVWUjhXB9Hel6AiHsERPgkQmUGQlQheHgBiOnBfxMAURCAcw5DkVf30B+DpAe06DCQCCYRFRBj8jRMY16EogBV8AsFdArndFoT6H5ABCUxUJOmBjOhEiBJpFrAXDkVvRXAA0S1gT+DSiykyU+LJIfSfiBLZ1egsDnCx3LA9HcwFVyJUUfQJlTLAAlz4M2I9FmQbS6FcF3Agmk2nnsBrFahaVdNYN42N1IN7PdR8VtEFEKXLieWjnimWWHxUJBVbnbhfi3luNYhoOcCCSLBYgLOnn+HXKvVai3PLIQUbm6TIAPJ7luP5EnUdWnLdGbHLj73rAJSsFtDd14zy0gI4W6XfJaADi-LrD9CBGkKcmcGdJCXLHNhsE+V42O0cU2Lt2+QSkMAiAgmrgsUdADmsQiF8FHl4zCNJxwodNfEI0j3ZJZmPiPSZPDJMERm9EorBG3APw6P9WfOJ0ILotKU2IUR1R+C6D7MdGEU1XDiaULxZgYiZG+H6ByMEsrNXgpXUCpUgoYvCkkvIhzNkpLAUTwwAVTUJQJQBF4xFTFSoD5OlUFORX3gxxjTsFSjNNPnXBZikr1S9HUgcFJMfLbKzRzQtRUE2N3xMtZSXGSkFC1UAh9OCF6EbTsp3IDUVDNQ7RgCPIsE8qcCsB8s9LgNLDpNAn5BgVFl4yXRXTXQ3QkscwGDIqnQFhmAymMF42fQciFOZi9Cim6G+24zaUc1NK5F1NEQxX7VnPYQEyE0xAXLdHSUCGXO1RrLWmQJtGaKIpPTnSyoh3O3ysMsci12IR-GdWHKCCawRycH7TZWEQGHxwB38zFy7PAJ7NOoeQcDaCxR5yAt8X1Kc1pOYjdB+E6ofIF2iSOsJwC3YSCyVluJUp2smGbFtBEV-MSw9EX1cw9H-WykOvJ2Ot4Klw0GG2JrhtuL9EX2iw6GFgFGBp6lanIjt1Dl8AFE5BeopwG3KVhvGwkoBAuubRZSWU2v0Fa0jwbHBHejBFCuhoOX5sB3H2BzEqVv817J6BMCerWxHI4zKp6FFk537WFAMCAm5pJoKIhVEvPzJ16x5puO+oAh6DIiWmEX+BmQcANtewDi+jlOxwEq+K90NwzKdoQHOqPnsFFqxSrH6BNgTyLGZEdHCBHxDo7KBg+qMzJr6rcsclYq3zpuW0I3okKqQJZmERpEAlTsDx9znNN0doqLQ1ssR1oUBFRlLxLp1TLsCMrt-yDvIGPzAopHr1uMtgeiLxER6Ct1jxrDQOonazrl9VbIHtH3sMb1H0FpNkdSurFrhhZOd0bHtGZqBGrtF1ottpHrDqsH5H5hKuWi+yLHLw+gwNix+E7zOIrP11XpEqhQvo3qvo6HzGZvko206uBt7yi021aWXC42CJ4M2P4uFqjoNRjskVPgxOaIxQvh6jgbsM7O7Ozt7M6F+Fq2EWdHyQUrWgYjnG4vBGbGFnIVwaILruC0KluJA0OKFHaUFldGocge9DGIYZ+CYdJvAscNHogl1SHQbV+ualdFCB1RaSXGijdGAREbXqjHEbDpES3suujpuueNCBYJgVqwxqhrT3yPPuKJCIbtv1m2HlvtmE6AfqhNGFML+W9BomET5HUZ-tJy0cbt9gws4cku3DAd4YcAemaPFIhM0v7rIAUFoHyFwAwGUFwBoAQf9kjp3tQZ7xITMATwsExo92XrIC6JUyBKXFnrtAdCdHxqmKMdTT+XimiGiCAA */
   id: "dialogueGame",
   initial: "Prepare",
   context: {
@@ -245,7 +253,7 @@ const dialogueGame = setup({
   },
 
   SayInstructions: {
-    entry: [{ type: "say", params: `Here we go! These are the instructions. If you need a hint, say "hint". Let's start!`}], 
+    entry: [{ type: "say", params: `Here we go! These are the instructions.`}], 
     on: {
       SPEAK_COMPLETE: "AskCategory"
       },
@@ -267,8 +275,7 @@ const dialogueGame = setup({
       {guard : ({ event }) => event.value[0].utterance === "History", target : "History", actions: "hideCategories"},
       {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science", actions: "hideCategories"},
       {guard : ({ event }) => event.value[0].utterance === "Pop culture", target : "popCulture", actions: "hideCategories"},
-      {target : "AskCategory", //in case the user's utterance does not match the given categories
-      reenter : true, 
+      {target : "AskCategory", reenter : true, 
       actions : {type : "say", params : ({context}) => `You need to choose one of the categories on the screen,`}}] //let's add the user_name here later
     }
   },
@@ -280,22 +287,23 @@ const dialogueGame = setup({
         entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
                  {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
         on : {
-          SPEAK_COMPLETE : "ListenToChoise"
+          SPEAK_COMPLETE : "ListenToChoice"
         }
       },
 
-      ListenToChoise : {
-        entry : "listenNlu", //maybe we should add a new topIntent of boxes --> let's check this !!!
+      ListenToChoice : {
+        entry : "listenNlu", 
         on : {
           RECOGNISED : [ 
             // checking if the user wants to quit:
             { guard: ({ event }) => event.nluValue.topIntent === "game_options",
-             actions: [{ type: "say", params: "Are you sure you want to exit the game?"}], target: "verifyExit"},  //not sure if transition to verifyExit will work 
+              target: "AskforVerification"},  //saying I want to give up doesn't work maybe it needs more training
              //maybe we can add an intent to change category??
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
-            actions: {type : "say", params : "Are you sure you want to change categories?"}, target : "VerifyChange"},
+             target : "AskVerifyChange"},
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
-            {actions : [
+            { guard : ({event})=> boxes.includes(event.value[0].utterance),
+            actions : [
               assign({
                 questionNumber: ({ event }) => event.value[0].utterance,
                 hiddenBoxes: ({ context, event }) => ({
@@ -304,22 +312,21 @@ const dialogueGame = setup({
                 })
               }) 
             ],
-            target: "CheckTyphoon"}
+            target: "CheckTyphoon"},
+            // it doesn't work i will add a new state
+            {target: "ListenToChoice",reenter : true, 
+            actions: {type: "say", params: "You need to pick a box between 1 and 10."}}
           ],
         },
       }, 
 
-      CheckTyphoon : {
+      CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
         entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}),
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
            target : "Typhoon"},
           {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
-           target: "questionGeography", 
-           actions: [({ context }) => console.log(`this is the current question ${context.currentQuestion}`), 
-                    ({ context }) => console.log(`this is the current BoxesToHide ${context.hiddenBoxes}`),
-                    ({ context }) => console.log(`this is the type of the BoxesToHide ${typeof context.hiddenBoxes}`),
-                    ({ context }) => console.log(`these are the values of the BoxesToHide ${Object.values(context.hiddenBoxes)}`)]}],
+           target: "questionGeography"}],
         },
 
       Typhoon : {
@@ -341,9 +348,9 @@ const dialogueGame = setup({
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintGeography"},
         // checking if the user wants to quit:
-        { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "verifyExit", actions: [{ type: "say", params: "Are you sure you want to exit the game?"}]},
+        { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "AskforVerification"},
         //checking if the user wants to hear the question again:
-        { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeography", actions: [{ type: "say", params: "I'm happy to repeat the question!"}]},
+        { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeography"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
         // checking if the user's answer is incorrect:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
       ],
@@ -380,15 +387,25 @@ const dialogueGame = setup({
 
     // if you want, we can add an extra "say goodbye" state after this  
     // lets also check where the machine transitions on "no"
-    verifyExit: {
-    entry: "listenNlu",
+    AskforVerification : {
+      entry:  [{ type: "say", params: "Are you sure you want to exit the game?"}],
+      on : {
+        SPEAK_COMPLETE : "VerifyExit"
+      }
+    },
+    VerifyExit: { 
+    entry:"listenNlu",
     on: {
       RECOGNISED: [
-        {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done"},
+        {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
+        actions : {type: "say", params : "I hope you come to play again"}},
         {target: "ChooseBoxQuestion"}]
       }
     },
-
+    AskVerifyChange : {
+      entry : {type : "say", params : "Are you sure you want to change categories?"},
+      on : {SPEAK_COMPLETE: "VerifyChange"}
+    },
     VerifyChange: {
       entry: "listenNlu",
       on: {

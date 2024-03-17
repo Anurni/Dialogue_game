@@ -2,13 +2,13 @@ import "./style.css";
 import { setupButton } from "./dialogue_game.js";
 
 document.querySelector("#app").innerHTML = `
-  <div id = "start_container" >
+  <div id = "start_container"  >
    <h1 id="game_title">Typhoon game</h1>
     <button id="startButton" class="button">Start</button></div>
       <img id = "typhoon_gif" src="typhoon_gif.gif">
-  <div class="category_buttons" style =  "display : none">
+  <div class="category_buttons" style = "display : none">
     <h2 id="category"> Choose your poison </h2>
-      <button class="category_buttons">General Knowledge</button>
+      <button class="category_buttons" >General Knowledge</button>
       <button class="category_buttons">Geography</button>
       <button class="category_buttons">History</button>
       <button class="category_buttons">Science</button>
@@ -32,14 +32,10 @@ document.querySelector("#app").innerHTML = `
     <h4 id="lose"style = 'font-size:30px'> You lose! Better luck next time! </3>
     <div style="width:280px;max-width:100%;"><div style="height:0;padding-bottom:150.69%;position:relative; left: 45px; margin-bottom = -100px, margin-top = -100px"><iframe width="260" height="200" style="position:absolute;top:100px;left:0;width:100%;height:100%;" frameBorder="0" src="https://imgflip.com/embed/8j7vyq"></iframe></div>
   </div> 
-  </div> 
-  <div class="win" style="display:none;">
+  </div>
+  <div class="win"style="display:none;>
     <h4 id="win" style="font-size:30px;">You win! Congrats!</h4>
-    <div style="width:280px;max-width:100%;">
-        <div style="height:0;padding-bottom:150.69%;position:relative;left:45px;margin-bottom:-100px;margin-top:-100px;">
-            <iframe width="260" height="200" style="position:absolute;top:100px;left:0;width:100%;height:100%;" frameborder="0" src="thumbs-up.gif"></iframe>
-        </div>
-    </div>
+    <img id = "thumbs_up" src="thumbs-up.gif">
 </div>
 `;
 
@@ -53,7 +49,7 @@ export function showElements(element) {
   }
 }
 
-export function hideAllElements(elements) {   //leaving this for now
+export function hideAllElements(elements) {   
   elements.forEach(element => {
     document.getElementById(element).style.display="none";
   });
@@ -88,10 +84,8 @@ export function hideChosenBoxes(params) {
     } else {
       console.log(`This box should be left ${boxNumber}`)
      // boxes[i].style.display = "block";            //works
-      boxes[boxNumber].style.display = "block";  // works
+      boxes[boxNumber].style.display = "grid";  // works
     }
   }
 }
 
-// typhoon gif that works (even tho a bit small)
-//<div style="width:300px;max-width:100%;"><div style="height:100;padding-bottom:200%;position:relative; left: 90px; margin-bottom = -100px, margin-top = -100px"><iframe width="1000" height="1000" style="position:absolute;top:100px;left:0;width:200%;height:200%;" frameBorder="0" src="typhoon_gif.gif"</iframe></div>
