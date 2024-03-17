@@ -352,7 +352,7 @@ const dialogueGame = setup({
         //checking if the user wants to hear the question again:
         { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeography"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
         // checking if the user's answer is incorrect:
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions:[ ({context}) =>  context.points - 1], target: "reactIncorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectGeography"},
       ],
 
       //ASR_NOINPUT: {
