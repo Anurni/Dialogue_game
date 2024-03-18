@@ -72,7 +72,7 @@ const questions = {
   {"Who was the leader of Nazi Germany during World War II?" : [["hitler", "adolf hitler"] ,["He was born in Austria"]]}, 
   {"Which civilization build the Great Pyramids of Giza?": [["egyptians", "the egyptians"], ["They are known for their advanced knowledge in architecture,engineering and astronomy"]]},
   {"Who was the first Emperor of Rome?": [["augustus"],["He was the great-nephew of Julius Caesar"]]},
-  {"Who was the longest-reigning monarch in British history?": [["queen elisabeth II", "elisabeth the second"],["Her nickname when she was a child was Lilibet"]]},
+  {"Who was the longest-reigning monarch in British history?": [["queen elisabeth II", "elisabeth the second","queen elisabeth the 2nd"],["Her nickname when she was a child was Lilibet"]]},
   {"What was the name of the ship that brought the Pilgrims to America in 1620?":[["the mayflower", "mayflower"],["It's named after a flower that blooms in spring"]]},
   {"Who was the first woman to fly solo across the Atlantic Ocean?":[["amelia earhart"], ["She disappeared during an attempted flight around the world in 1937"]]},
   {"Who was the first woman to win a Nobel Prize?":[["marie curie"],["Her contributions has helped in finding treatments of cancer."]]}],
@@ -419,7 +419,8 @@ const dialogueGame = setup({
     initial: "ChooseBoxQuestion",
     states: {
       ChooseBoxQuestion : {
-        entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+        entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
+                 {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
         on : {
           SPEAK_COMPLETE : "ListenToChoice"
         }
@@ -548,7 +549,8 @@ const dialogueGame = setup({
       initial: "ChooseBoxQuestion",
       states: {
         ChooseBoxQuestion : {
-          entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+          entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
+          {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
           on : {
             SPEAK_COMPLETE : "ListenToChoice"
           }
@@ -720,12 +722,6 @@ const dialogueGame = setup({
           {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
            target: "questionScience"}],
         },
-
-      /*Typhoon : {
-        entry : ["showTyphoon",{type : "say", params : ({context}) => Object.values(context.currentQuestion)}],
-        on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
-      },*/
-
       questionScience : {   
         entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
          on: {SPEAK_COMPLETE :"listenScience"}
