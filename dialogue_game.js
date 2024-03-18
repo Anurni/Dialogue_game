@@ -269,6 +269,8 @@ const dialogueGame = setup({
     }
   },
 
+
+// --> GEOGRAPHY STATE STARTS HERE <-- 
   Geography: {    
     initial: "ChooseBoxQuestion",
     states: {
@@ -306,6 +308,7 @@ const dialogueGame = setup({
             {target: "NeedToDo"}
             
           ],
+          ASR_NOINPUT: "noNumberChoise"
         },
       }, 
 
@@ -338,9 +341,7 @@ const dialogueGame = setup({
         {target : "WhatCanDo"}
       ],
 
-      //ASR_NOINPUT: {
-      //  target: "NoUserInput"
-      //}
+      ASR_NOINPUT: "NoUserInput"
     }
   },
    
@@ -409,13 +410,22 @@ const dialogueGame = setup({
     },
   },
 
-    //let's check where we want to implement this other than in the actual question 
+    //NO_ASR state for the question
     NoUserInput: {
         entry: [{ type: "say", params: "Can you please repeat?"}],
         on: {
           SPEAK_COMPLETE: "listenGeography"
         }
     },
+
+    // NO_ASR state for the box choosing
+    noNumberChoise: {
+      entry: [{ type: "say", params: "Can you please repeat?"}],
+      on: {
+        SPEAK_COMPLETE: "ListenToChoice"
+      }
+    },
+
     NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
@@ -426,8 +436,9 @@ const dialogueGame = setup({
     }
     },
   },
-  },
+},
 
+// --> GENERAL KNOWLEDGE STATE STARTS HERE <---
   GeneralKnowledge: {
     initial: "ChooseBoxQuestion",
     states: {
@@ -463,6 +474,7 @@ const dialogueGame = setup({
             // it doesn't work i will add a new state
             {target: "NeedToDo"}
           ],
+          ASR_NOINPUT: "noNumberChoise"
         },
       }, 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
@@ -492,10 +504,7 @@ const dialogueGame = setup({
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectGeneralKnowledge"},
         {target : "WhatCanDo"}
       ],
-
-      //ASR_NOINPUT: {
-      //  target: "NoUserInput"
-      //}
+      ASR_NOINPUT: "NoUserInput"
     }
     },
     hintGeneralKnowledge: {
@@ -559,23 +568,36 @@ const dialogueGame = setup({
           on : {SPEAK_COMPLETE : "VerifyChange"
         },
       },
-      NoUserInput: {
-        entry: [{ type: "say", params: "Can you please repeat?"}],
-        on: {
-          SPEAK_COMPLETE: "listenGeneralKnowledge"
-        }
+    //NO_ASR state for the question
+    NoUserInput: {
+      entry: [{ type: "say", params: "Can you please repeat?"}],
+      on: {
+        SPEAK_COMPLETE: "listenGeneralKnowledge"
+      }
     },
+
+  // NO_ASR state for the box choosing
+  noNumberChoise: {
+    entry: [{ type: "say", params: "Can you please repeat?"}],
+    on: {
+      SPEAK_COMPLETE: "ListenToChoice"
+    }
+   },
+
     NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
     },
+
     WhatCanDo : {
       entry : {type : "say", params: "I am not sure I can help you with that. You need to try answering the question, asking for a hint or ask me to repeat."},
       on : {SPEAK_COMPLETE : "listenGeneralKnowledge"
     }
-    },
-    },
   },
+  },
+},
+
+// --> HISTORY STATE STARTS HERE <---
   History: {
       initial: "ChooseBoxQuestion",
       states: {
@@ -611,6 +633,7 @@ const dialogueGame = setup({
             // it doesn't work i will add a new state
             {target: "NeedToDo"}
           ],
+          ASR_NOINPUT: "noNumberChoise"
         },
       },
         CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
@@ -640,11 +663,9 @@ const dialogueGame = setup({
           {target : "WhatCanDo"}
         ],
   
-        //ASR_NOINPUT: {
-        //  target: "NoUserInput"
-        //}
+        ASR_NOINPUT: "NoUserInput"
       }
-      },
+    },
       hintHistory: {
         entry: [{ type: "say", params: ({context}) => retrieveHint(context.currentQuestion)}],
         on: {
@@ -705,12 +726,22 @@ const dialogueGame = setup({
           on : {SPEAK_COMPLETE : "VerifyChange"
         },
       },
-      NoUserInput: {
-        entry: [{ type: "say", params: "Can you please repeat?"}],
-        on: {
-          SPEAK_COMPLETE: "listenHistory"
-        }
+
+    //NO_ASR state for the question
+    NoUserInput: {
+      entry: [{ type: "say", params: "Can you please repeat?"}],
+      on: {
+        SPEAK_COMPLETE: "listenHistory"
+      }
     },
+
+  // NO_ASR state for the box choosing
+    noNumberChoise: {
+    entry: [{ type: "say", params: "Can you please repeat?"}],
+    on: {
+      SPEAK_COMPLETE: "ListenToChoice"
+    }
+  },
     NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
@@ -720,8 +751,10 @@ const dialogueGame = setup({
       on : {SPEAK_COMPLETE : "listenHistory"
     }
     },
-    },
   },
+},
+
+  // ---> SCIENCE STATE STARTS HERE <----
   Science: {
     initial: "ChooseBoxQuestion",
     states: {
@@ -758,6 +791,7 @@ const dialogueGame = setup({
             // it doesn't work i will add a new state
             {target: "NeedToDo"}
           ],
+          ASR_NOINPUT: "noNumberChoise"
         },
       }, 
 
@@ -788,6 +822,7 @@ const dialogueGame = setup({
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectScience"},
         {target : "WhatCanDo"}
       ],
+      ASR_NOINPUT: "NoUserInput"
     }
   },
    
@@ -854,13 +889,23 @@ const dialogueGame = setup({
         on : {SPEAK_COMPLETE : "VerifyChange"
       },
     },
-    //let's check where we want to implement this other than in the actual question 
+
+    //NO_ASR state for the question
     NoUserInput: {
-        entry: [{ type: "say", params: "Can you please repeat?"}],
-        on: {
-          SPEAK_COMPLETE: "listenScience"
-        }
+      entry: [{ type: "say", params: "Can you please repeat?"}],
+      on: {
+        SPEAK_COMPLETE: "listenScience"
+      }
     },
+
+  // NO_ASR state for the box choosing
+  noNumberChoise: {
+    entry: [{ type: "say", params: "Can you please repeat?"}],
+    on: {
+      SPEAK_COMPLETE: "ListenToChoice"
+    }
+   },
+    
     NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
@@ -873,6 +918,8 @@ const dialogueGame = setup({
   },
 },
 
+
+// --> POP CULTURE STATE STARTS HERE <---
 popCulture: {
       initial: "ChooseBoxQuestion",
       states: {
@@ -908,6 +955,7 @@ popCulture: {
             // it doesn't work i will add a new state
             {target: "NeedToDo"}
           ],
+          ASR_NOINPUT: "noNumberChoise"
         },
       }, 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
@@ -938,9 +986,7 @@ popCulture: {
         {target : "WhatCanDo"}
       ],
 
-      //ASR_NOINPUT: {
-      //  target: "NoUserInput"
-      //}
+      ASR_NOINPUT: "NoUserInput"
     },
   },
    
@@ -1007,29 +1053,41 @@ popCulture: {
         on : {SPEAK_COMPLETE : "VerifyChange"
       },
     },
-    //let's check where we want to implement this other than in the actual question 
+
+    //NO_ASR state for the question
     NoUserInput: {
-        entry: [{ type: "say", params: "Can you please repeat?"}],
-        on: {
-          SPEAK_COMPLETE: "listenPopCulture"
-        }
+      entry: [{ type: "say", params: "Can you please repeat?"}],
+      on: {
+        SPEAK_COMPLETE: "listenPopCulture"
+      }
     },
-    NeedToDo : {
+
+  // NO_ASR state for the box choosing
+  noNumberChoise: {
+    entry: [{ type: "say", params: "Can you please repeat?"}],
+    on: {
+      SPEAK_COMPLETE: "ListenToChoice"
+    }
+   },
+
+  NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
     },
-    WhatCanDo : {
+
+  WhatCanDo : {
       entry : {type : "say", params: "I am not sure I can help with that. You need to try answering the question, asking for a hint or ask me to repeat."},
       on : {SPEAK_COMPLETE : "listenPopCulture"
     }
     },
+  },
 },
-    },
 
 Typhoon : {
   entry : ["showTyphoon",{type : "say", params : ({context}) => Object.values(context.currentQuestion)}],
   on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
   },
+
 Win : { 
   entry :[ "hideAllBoxes", "showThumbsUp", {type : "say", params : ({context}) => `Congratulations ${context.user_name}, you won! Do you want to play again?`}],
   on : {SPEAK_COMPLETE : "ListenPlayAgain"}
@@ -1043,6 +1101,7 @@ ListenPlayAgain : {
     {target : "#dialogueGame.ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
       }
     },
+
   Done: {
     on: { CLICK: "SayGreeting"}
     },
