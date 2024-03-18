@@ -309,7 +309,7 @@ const dialogueGame = setup({
             target: "CheckTyphoon"},
             // it doesn't work i will add a new state
             {target: "ListenToChoice",reenter : true, 
-            actions: {type: "say", params: "You need to pick a box between 1 and 10."}}
+            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
           ],
         },
       }, 
@@ -318,15 +318,10 @@ const dialogueGame = setup({
         entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}),
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
-           target : "Typhoon"},
+           target : "#dialogueGame.Typhoon"},
           {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
            target: "questionGeography"}],
         },
-
-      Typhoon : {
-        entry : ["showTyphoon",{type : "say", params : ({context}) => Object.values(context.currentQuestion)}],
-        on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
-      },
 
       questionGeography : {   
         entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
@@ -355,31 +350,31 @@ const dialogueGame = setup({
     }
   },
    
-    reactCorrectGeography: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAsked++],    
-        on: { 
-          SPEAK_COMPLETE: [
-            {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
-            {guard : ({context}) => context.questionAsked === 5, target : "Win"}
-          ]
-          },
-        },
-
-    reactIncorrectGeography: {
-      entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
-      on: { 
-        SPEAK_COMPLETE: "ChooseBoxQuestion"
-        },
-      },
-
     hintGeography: {
       entry: [{ type: "say", params: ({context}) => retrieveHint(context.currentQuestion)}],
       on: {
-        SPEAK_COMPLETE: "listenGeography", reenter: true
+        SPEAK_COMPLETE: "listenGeography"
       }
     },
+    reactCorrectGeography: {
+      entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAsked++],    
+      on: { 
+        SPEAK_COMPLETE: [
+          {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
+          {guard : ({context}) => context.questionAsked === 5, target : "#dialogueGame.Win"}
+        ]
+        },
+      },
 
-    AskforVerification : {
+  reactIncorrectGeography: {
+    entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+    on: { 
+      SPEAK_COMPLETE: "ChooseBoxQuestion"
+      },
+    },
+
+
+   AskforVerification : {
       entry:  [{ type: "say", params: "Are you sure you want to exit the game?"}],
       on : {
         SPEAK_COMPLETE : "VerifyExit"
@@ -417,20 +412,6 @@ const dialogueGame = setup({
           SPEAK_COMPLETE: "listenGeography"
         }
     },
-
-  Win : { 
-    entry :[ "hideAllBoxes", "showThumbsUp", {type : "say", params : ({context}) => `Congratulations ${context.user_name}, you won! Do you want to play again?`}],
-    on : {SPEAK_COMPLETE : "ListenPlayAgain"}
-  },
-
-  ListenPlayAgain : {
-    entry: "listenNlu",
-    on: {
-      RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory" },
-      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "#dialogueGame.Done" },
-      {target : "#dialogueGame.ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
-        }
-      },
     },
   },
 
@@ -440,84 +421,204 @@ const dialogueGame = setup({
       ChooseBoxQuestion : {
         entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
         on : {
-          SPEAK_COMPLETE : "ListenToChoise"
+          SPEAK_COMPLETE : "ListenToChoice"
         }
       },
-      ListenToChoise : {
-        entry : "listenNlu", //maybe we should add a new topIntent of boxes
+      ListenToChoice : {
+        entry : "listenNlu", 
         on : {
-          RECOGNISED : "questionGeneralKnowledge",
-          actions : assign({questionNumber : (event) => event.value[0].utterance}) 
-        }
-      },
+          RECOGNISED : [ 
+            // checking if the user wants to quit:
+            { guard: ({ event }) => event.nluValue.topIntent === "game_options",
+              target: "AskforVerification"},  //more examples added to the model, let's see if it makes a difference
+              //checking if the user wants to change the category:
+             {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
+             target : "AskVerifyChange"},
+            // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
+            { guard : ({event})=> boxes.includes(event.value[0].utterance),
+            actions : [
+              assign({
+                questionNumber: ({ event }) => event.value[0].utterance,
+                hiddenBoxes: ({ context, event }) => ({
+                  ...context.hiddenBoxes, // Copy existing properties
+                  [event.value[0].utterance]: event.value[0].utterance // Add new property with event value as key and value
+                })
+              }) 
+            ],
+            target: "CheckTyphoon"},
+            // it doesn't work i will add a new state
+            {target: "ListenToChoice",reenter : true, 
+            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
+          ],
+        },
+      }, 
+      CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
+        entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['generalKnowledge'], context.questionNumber)}),
+        always : [
+          {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
+           target : "#dialogueGame.Typhoon"},
+          {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
+           target: "questionGeneralKnowledge"}],
+        },
       questionGeneralKnowledge : {   
-        entry: [
-          assign({ currentQuestion: ( context ) => chooseQuestion(['generalKnowledge'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
-          { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
-              ],         
-        on: {
-            SPEAK_COMPLETE: {target: "listenGeneralKnowledge", actions: ({ context }) => console.log(context.currentQuestion)}
-        }
+        entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
+         on: {SPEAK_COMPLETE :"listenGeneralKnowledge"}
     },
 
     listenGeneralKnowledge: {
-      entry: "listen",
+      entry: "listenNlu",  
       on: {
-        RECOGNISED: [
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions: ({context}) =>  context.points ++ , target: "reactCorrectGeneralKnowledge"},
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions: ({context}) =>  context.points - 1 , target: "reactIncorrectGeneralKnowledge"},
-      ]}
+        RECOGNISED: [  
+        // checking if the user's answer is correct:
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeneralKnowledge"},
+        // checking if the user wants a hint:
+        { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintGeneralKnowledge"},
+        // checking if the user wants to quit:
+        { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "AskforVerification"},
+        //checking if the user wants to hear the question again:
+        { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeneralKnowledge"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
+        // checking if the user's answer is incorrect:
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectGeneralKnowledge"},
+      ],
+
+      //ASR_NOINPUT: {
+      //  target: "NoUserInput"
+      //}
+    }
+    },
+    hintGeneralKnowledge: {
+      entry: [{ type: "say", params: ({context}) => retrieveHint(context.currentQuestion)}],
+      on: {
+        SPEAK_COMPLETE: "listenGeneralKnowledge"
+      }
     },
    
     reactCorrectGeneralKnowledge: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
-        on: { 
-          SPEAK_COMPLETE: "ChooseBoxQuestion"
-          },
+      entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAsked++],    
+      on: { 
+        SPEAK_COMPLETE: [
+          {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
+          {guard : ({context}) => context.questionAsked === 5, target : "#dialogueGame.Win"}
+        ]
         },
-
+        },
     reactIncorrectGeneralKnowledge: {
       entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
       on: { 
         SPEAK_COMPLETE: "ChooseBoxQuestion"
         },
       },
+      AskforVerification : {
+        entry:  [{ type: "say", params: "Are you sure you want to exit the game?"}],
+        on : {
+          SPEAK_COMPLETE : "VerifyExit"
+        }
+      },
+      VerifyExit: { 
+      entry:"listenNlu",
+      on: {
+        RECOGNISED: [
+          {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
+          actions : {type: "say", params : "I hope you come to play again"}},
+          {target: "ChooseBoxQuestion"}]   //lets double check that this transition works
+        }
+      },
+      AskVerifyChange : {
+        entry : {type : "say", params : "Are you sure you want to change categories?"},
+        on : {SPEAK_COMPLETE: "VerifyChange"}
+      },
+  
+      VerifyChange: {
+        entry: "listenNlu",
+        on: {
+          RECOGNISED: [
+            {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
+            {target: "ChooseBoxQuestion"}]
+          }
+        },
+      NoUserInput: {
+        entry: [{ type: "say", params: "Can you please repeat?"}],
+        on: {
+          SPEAK_COMPLETE: "listenGeneralKnowledge"
+        }
+    },
     },
   },
-
   History: {
       initial: "ChooseBoxQuestion",
       states: {
         ChooseBoxQuestion : {
           entry : [{type : "say", params : "Choose a box. I hope you don't get unlucky."}],
           on : {
-            SPEAK_COMPLETE : "ListenToChoise"
+            SPEAK_COMPLETE : "ListenToChoice"
           }
         },
-        ListenToChoise : {
-          entry : "listenNlu", //maybe we should add a new topIntent of boxes
-          on : {
-            RECOGNISED : "questionHistory",
-            actions : assign({questionNumber : (event) => event.value[0].utterance}) 
-          }
+      ListenToChoice : {
+        entry : "listenNlu", 
+        on : {
+          RECOGNISED : [ 
+            // checking if the user wants to quit:
+            { guard: ({ event }) => event.nluValue.topIntent === "game_options",
+              target: "AskforVerification"},  //more examples added to the model, let's see if it makes a difference
+              //checking if the user wants to change the category:
+             {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
+             target : "AskVerifyChange"},
+            // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
+            { guard : ({event})=> boxes.includes(event.value[0].utterance),
+            actions : [
+              assign({
+                questionNumber: ({ event }) => event.value[0].utterance,
+                hiddenBoxes: ({ context, event }) => ({
+                  ...context.hiddenBoxes, // Copy existing properties
+                  [event.value[0].utterance]: event.value[0].utterance // Add new property with event value as key and value
+                })
+              }) 
+            ],
+            target: "CheckTyphoon"},
+            // it doesn't work i will add a new state
+            {target: "ListenToChoice",reenter : true, 
+            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
+          ],
         },
-        questionHistory : {   
-          entry: [
-            assign({ currentQuestion: ( context) => chooseQuestion(['history'], context.questionNumber)}),  //assigning the randomly chosen question object to the context
-            { type: 'say', params: ({ context }) => Object.keys(context.currentQuestion) } //saying the key of the question object
-                ],         
-          on: {
-              SPEAK_COMPLETE: {target: "listenHistory", actions: ({ context }) => console.log(context.currentQuestion)}
-          }
       },
-  
+        CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
+          entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['history'], context.questionNumber)}),
+          always : [
+            {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
+             target : "#dialogueGame.Typhoon"},
+            {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
+             target: "questionHistory"}],
+          },
+        questionHistory : {   
+          entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
+         on: {SPEAK_COMPLETE :"listenHistory"}
+      },
       listenHistory: {
-        entry: "listen",
+        entry: "listenNlu",  
         on: {
-          RECOGNISED: [
-          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions: ({context}) =>  context.points ++ , target: "reactCorrectHistory"},
-          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, actions: ({context}) =>  context.points - 1 , target: "reactIncorrectHistory"},
-        ]}
+          RECOGNISED: [  
+          // checking if the user's answer is correct:
+          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectHistory"},
+          // checking if the user wants a hint:
+          { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintHistory"},
+          // checking if the user wants to quit:
+          { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "AskforVerification"},
+          //checking if the user wants to hear the question again:
+          { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionHistory"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
+          // checking if the user's answer is incorrect:
+          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectHistory"},
+        ],
+  
+        //ASR_NOINPUT: {
+        //  target: "NoUserInput"
+        //}
+      }
+      },
+      hintHistory: {
+        entry: [{ type: "say", params: ({context}) => retrieveHint(context.currentQuestion)}],
+        on: {
+          SPEAK_COMPLETE: "listenHistory"
+        }
       },
      
       reactCorrectHistory: {
@@ -533,9 +634,44 @@ const dialogueGame = setup({
           SPEAK_COMPLETE: "ChooseBoxQuestion"
           },
       },
+      AskforVerification : {
+        entry:  [{ type: "say", params: "Are you sure you want to exit the game?"}],
+        on : {
+          SPEAK_COMPLETE : "VerifyExit"
+        }
+      },
+  
+      VerifyExit: { 
+      entry:"listenNlu",
+      on: {
+        RECOGNISED: [
+          {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
+          actions : {type: "say", params : "I hope you come to play again"}},
+          {target: "ChooseBoxQuestion"}]   //lets double check that this transition works
+        }
+      },
+  
+      AskVerifyChange : {
+        entry : {type : "say", params : "Are you sure you want to change categories?"},
+        on : {SPEAK_COMPLETE: "VerifyChange"}
+      },
+  
+      VerifyChange: {
+        entry: "listenNlu",
+        on: {
+          RECOGNISED: [
+            {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
+            {target: "ChooseBoxQuestion"}]
+          }
+        },
+      NoUserInput: {
+        entry: [{ type: "say", params: "Can you please repeat?"}],
+        on: {
+          SPEAK_COMPLETE: "listenHistory"
+        }
+    },
     },
   },
-
   Science: {
     initial: "ChooseBoxQuestion",
     states: {
@@ -571,7 +707,7 @@ const dialogueGame = setup({
             target: "CheckTyphoon"},
             // it doesn't work i will add a new state
             {target: "ListenToChoice",reenter : true, 
-            actions: {type: "say", params: "You need to pick a box between 1 and 10."}}
+            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
           ],
         },
       }, 
@@ -580,15 +716,15 @@ const dialogueGame = setup({
         entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['science'], context.questionNumber)}),
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
-           target : "Typhoon"},
+           target : "#dialogueGame.Typhoon"},
           {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
            target: "questionScience"}],
         },
 
-      Typhoon : {
+      /*Typhoon : {
         entry : ["showTyphoon",{type : "say", params : ({context}) => Object.values(context.currentQuestion)}],
         on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
-      },
+      },*/
 
       questionScience : {   
         entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
@@ -622,7 +758,7 @@ const dialogueGame = setup({
         on: { 
           SPEAK_COMPLETE: [
             {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
-            {guard : ({context}) => context.questionAsked === 5, target : "Win"}
+            {guard : ({context}) => context.questionAsked === 5, target : "#dialogueGame.Win"}
           ]
           },
         },
@@ -679,24 +815,10 @@ const dialogueGame = setup({
           SPEAK_COMPLETE: "listenScience"
         }
     },
-
-  Win : { 
-    entry :[ "hideAllBoxes", "showThumbsUp", {type : "say", params : ({context}) => `Congratulations ${context.user_name}, you won! Do you want to play again?`}],
-    on : {SPEAK_COMPLETE : "ListenPlayAgain"}
   },
+},
 
-  ListenPlayAgain : {
-    entry: "listenNlu",
-    on: {
-      RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory" },
-      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "#dialogueGame.Done" },
-      {target : "#dialogueGame.ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
-        }
-      },
-    },
-    },
-
-    popCulture: {
+popCulture: {
       initial: "ChooseBoxQuestion",
       states: {
         ChooseBoxQuestion : {
@@ -706,7 +828,6 @@ const dialogueGame = setup({
           SPEAK_COMPLETE : "ListenToChoice"
         }
       },
-
       ListenToChoice : {
         entry : "listenNlu", 
         on : {
@@ -731,25 +852,18 @@ const dialogueGame = setup({
             target: "CheckTyphoon"},
             // it doesn't work i will add a new state
             {target: "ListenToChoice",reenter : true, 
-            actions: {type: "say", params: "You need to pick a box between 1 and 10."}}
+            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
           ],
         },
       }, 
-
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
         entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['popCulture'], context.questionNumber)}),
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
-           target : "Typhoon"},
+           target : "#dialogueGame.Typhoon"},
           {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
            target: "questionPopCulture"}],
         },
-
-      Typhoon : {
-        entry : ["showTyphoon",{type : "say", params : ({context}) => Object.values(context.currentQuestion)}],
-        on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
-      },
-
       questionPopCulture : {   
         entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
          on: {SPEAK_COMPLETE :"listenPopCulture"}
@@ -774,7 +888,7 @@ const dialogueGame = setup({
       //ASR_NOINPUT: {
       //  target: "NoUserInput"
       //}
-    }
+    },
   },
    
     reactCorrectPopCulture: {
@@ -782,7 +896,7 @@ const dialogueGame = setup({
         on: { 
           SPEAK_COMPLETE: [
             {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
-            {guard : ({context}) => context.questionAsked === 5, target : "Win"}
+            {guard : ({context}) => context.questionAsked === 5, target : "#dialogueGame.Win"}
           ]
           },
         },
@@ -801,7 +915,7 @@ const dialogueGame = setup({
       }
     },
 
-    AskforVerification : {
+   AskforVerification : {
       entry:  [{ type: "say", params: "Are you sure you want to exit the game?"}],
       on : {
         SPEAK_COMPLETE : "VerifyExit"
@@ -839,23 +953,26 @@ const dialogueGame = setup({
           SPEAK_COMPLETE: "listenPopCulture"
         }
     },
-
-  Win : { 
-    entry :[ "hideAllBoxes", "showThumbsUp", {type : "say", params : ({context}) => `Congratulations ${context.user_name}, you won! Do you want to play again?`}],
-    on : {SPEAK_COMPLETE : "ListenPlayAgain"}
-  },
-
-  ListenPlayAgain : {
-    entry: "listenNlu",
-    on: {
-      RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory" },
-      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "#dialogueGame.Done" },
-      {target : "#dialogueGame.ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
-        }
-      },
+},
     },
+
+Typhoon : {
+  entry : ["showTyphoon",{type : "say", params : ({context}) => Object.values(context.currentQuestion)}],
+  on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
   },
-  
+Win : { 
+  entry :[ "hideAllBoxes", "showThumbsUp", {type : "say", params : ({context}) => `Congratulations ${context.user_name}, you won! Do you want to play again?`}],
+  on : {SPEAK_COMPLETE : "ListenPlayAgain"}
+},
+
+ListenPlayAgain : {
+  entry: "listenNlu",
+  on: {
+    RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory" },
+    {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "#dialogueGame.Done" },
+    {target : "#dialogueGame.ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
+      }
+    },
   Done: {
     on: { CLICK: "SayGreeting"}
     },
