@@ -40,6 +40,7 @@ const questions = {
   geography: [
   {"typhoon": randomRepeat(typhoonReaction)},
   { "What is the capital city of Australia?" : [["canberra"], ["This capital city is also known as the Bush Capital"]]}, 
+  {"What is the hottest country in the world?": [["mali", ["This country is located in West Africa."]]]},
   {"How many continents are there?" : [["7"], ["Don't forget the one where penguins live!"]]}, 
   {"What is the name of the largest ocean in the world?" : [["pacific", "the pacific ocean"], ["The name of this ocean starts with P"]]}, 
   {"Which country does the Easter Island belong to?": [["chile"], ["The shape of this country is skinny!"]]}, 
@@ -57,6 +58,7 @@ const questions = {
   {"Who was the leader of Nazi Germany during World War II?" : [["hitler", "adolf hitler"],["He was born in Austria"]]},
   {"What is the force that pulls objects towards the center of the Earth called? " : [["gravity"],["It's the force that keeps you on the ground and makes things fall downward"]]},
   {"What is the hardest natural substance on Earth?" : [["diamond"],["It's also used in jewellery"]]}, 
+  {"What is Batman's real name?":[["bruce wayne"],["First name rhymes with 'loose' and last name with 'chain'."]]},
   {"What is the largest organ in the human body?" : [["skin"],["It's an external organ with multiple layers and various functions."]]},
   {"Which tech entrepreneur together with his partner named their son X Æ A-12" : [["elon musk"],["He is the CEO of Tesla."]]}, 
   {"Which planet is known as the red planet?" : [["mars"], ["This planet is a key target in the search for extraterrestrial life."]]},
@@ -64,7 +66,8 @@ const questions = {
  ],
   history: [
   {"typhoon": randomRepeat(typhoonReaction)}, 
-  { "Who was the first president of the United States?" : [["george washington"],["He played an important role in the American Revolutionary War"]]}, 
+  {"Who was the first president of the United States?" : [["george washington"],["He played an important role in the American Revolutionary War"]]}, 
+  {"Who was the leader of Nazi Germany during World War II?" : [["hitler", "adolf hitler"],["He was born in Austria"]]},
   {"What year did World War I begin?" : [["1914"],["It started two years after the Titanic sank"]]}, 
   {"What ancient civilization is credited with the invention of democracy?" : [["ancient greece", "greece"],["This civilization is famous for starting the Olympic Games"]]}, 
   {"Which civilization build the Great Pyramids of Giza?": [["egyptians", "the egyptians"], ["They are known for their advanced knowledge in architecture,engineering and astronomy"]]},
@@ -83,6 +86,7 @@ const questions = {
   {"What is the only metal that is liquid at room temperature?": [["mercury"],["It's a metal used in thermometers"]]},
   {"What type of energy is stored in food?": [["chemical energy"],["This energy is released after digestion"]]},
   {"What is the center of an atom called?": [["nucleus", "the nucleus"],["It consists of protons and neutrons"]]}, 
+  {"What is the process by which plants make their food called?" : [["photosynthesis"],["This process involes the conversion of the sun"]]}, 
   {"What is the unit of electrical power?":[["watt", "the watt"],["It measures the rate of energy used in electricity"]]},
   {"What is the branch of science that deals with the study of heredity and variation in organisms?": [["genetics", "the genetics"],["It involves the study of genes, DNA, and inheritance patterns"]]}],
 
@@ -95,6 +99,7 @@ const questions = {
   {"What was the nickname of Diana, Princess of Wales?": [["lady di", "the people's princess", "the princess of hearts"],["There were many, one of them being a shorter version of her first name."]]},
   {"Which artist made history in 2020 as the youngest winner of the Grammys' four main categories?": [["billie eilish"],["This artist creates music together with her big brother, Finneas."]]},
   {"Which legendary horror movie popularized the quote 'All work and no play makes Jack a dull boy'?": [["the shining"],["This movie is based on a Stephen King novel."]]}, 
+  {"What is Batman's real name?":[["bruce wayne"],["First name rhymes with 'loose' and last name with 'chain'."]]},
   {"Which italian band won the Eurovision song contest in 2021?": [["måneskin"],["The name of this band is danish for 'moonlight'"]]}, 
   {"Which fashion designer is famous for inventing 'The Little Black Dress'?": [["coco chanel"],["One of the quotes of this iconic Frech designer is 'Fashion changes, but style endures'."]]}]
 }
