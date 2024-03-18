@@ -67,24 +67,19 @@ export function hideCategoryElements(element) {  //this will be used to hide the
 }
 
 //this function is used to display only those question boxes that have not yet been chosen
-// !!!!! does not yet remove exactly the correct box, but the logic kinda works
-// i think removes by index
 
 export function hideChosenBoxes(params) {
   const boxes = document.getElementsByClassName("question_boxes");
   const values = Object.values(params);         // Extract the values from the params object into an array
-  for (let i = 0; i < boxes.length; i++) {    //need to check if -1 is needed
+  for (let i = 0; i < boxes.length; i++) {  
     const boxNumber = i;
-    const boxNumberAsString = boxNumber.toString();
-    //const box = document.getElementById(boxNumber.toString());       
+    const boxNumberAsString = boxNumber.toString();     
     if (values.includes(boxNumberAsString)) {
       console.log(`This box should be removed ${boxNumber}`)
-     // boxes[i].style.display = "none";              //works
-      boxes[boxNumber].style.display = "none";    //works
+      boxes[boxNumber].style.display = "none";
     } else {
       console.log(`This box should be left ${boxNumber}`)
-     // boxes[i].style.display = "block";            //works
-      boxes[boxNumber].style.display = "grid";  // works
+      boxes[boxNumber].style.display = "grid";
     }
   }
 }
