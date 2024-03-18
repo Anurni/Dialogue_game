@@ -335,6 +335,7 @@ const dialogueGame = setup({
         { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeography"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
         // checking if the user's answer is incorrect:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectGeography"},
+        {target : "WhatCanDo"}
       ],
 
       //ASR_NOINPUT: {
@@ -380,7 +381,8 @@ const dialogueGame = setup({
       RECOGNISED: [
         {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
         actions : {type: "say", params : "I hope you come to play again"}},
-        {target: "ChooseBoxQuestion"}]   //lets double check that this transition works
+        {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+        {target: "Say"}]   //lets double check that this transition works
       }
     },
 
@@ -388,15 +390,24 @@ const dialogueGame = setup({
       entry : {type : "say", params : "Are you sure you want to change categories?"},
       on : {SPEAK_COMPLETE: "VerifyChange"}
     },
-
+    Say : {
+      entry : {type : "say", params: "You need to say yes or no"},
+      on : {SPEAK_COMPLETE : "VerifyExit"}
+    },
     VerifyChange: {
       entry: "listenNlu",
       on: {
         RECOGNISED: [
           {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-          {target: "ChooseBoxQuestion"}]
+          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {target : "Answer"}]
         }
       },
+    Answer : {
+      entry : {type : "say", params: "You need to say yes or no"},
+      on : {SPEAK_COMPLETE : "VerifyChange"
+    },
+  },
 
     //let's check where we want to implement this other than in the actual question 
     NoUserInput: {
@@ -409,7 +420,12 @@ const dialogueGame = setup({
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
     },
+    WhatCanDo : {
+      entry : {type : "say", params: "I am not sure I can help you with that. You need to try answering the question, asking for a hint or ask me to repeat."},
+      on : {SPEAK_COMPLETE : "listenGeography"
+    }
     },
+  },
   },
 
   GeneralKnowledge: {
@@ -470,12 +486,11 @@ const dialogueGame = setup({
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeneralKnowledge"},
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintGeneralKnowledge"},
-        // checking if the user wants to quit:
-        { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "AskforVerification"},
         //checking if the user wants to hear the question again:
         { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeneralKnowledge"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
         // checking if the user's answer is incorrect:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectGeneralKnowledge"},
+        {target : "WhatCanDo"}
       ],
 
       //ASR_NOINPUT: {
@@ -517,8 +532,13 @@ const dialogueGame = setup({
         RECOGNISED: [
           {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
           actions : {type: "say", params : "I hope you come to play again"}},
-          {target: "ChooseBoxQuestion"}]   //lets double check that this transition works
+          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {target: "Say"}]   //lets double check that this transition works
         }
+      },
+      Say : {
+        entry : {type : "say", params: "You need to say yes or no"},
+        on : {SPEAK_COMPLETE : "VerifyExit"}
       },
       AskVerifyChange : {
         entry : {type : "say", params : "Are you sure you want to change categories?"},
@@ -530,9 +550,15 @@ const dialogueGame = setup({
         on: {
           RECOGNISED: [
             {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-            {target: "ChooseBoxQuestion"}]
+            {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {target : "Answer"}]
           }
         },
+        Answer : {
+          entry : {type : "say", params: "You need to say yes or no"},
+          on : {SPEAK_COMPLETE : "VerifyChange"
+        },
+      },
       NoUserInput: {
         entry: [{ type: "say", params: "Can you please repeat?"}],
         on: {
@@ -542,6 +568,11 @@ const dialogueGame = setup({
     NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
+    },
+    WhatCanDo : {
+      entry : {type : "say", params: "I am not sure I can help you with that. You need to try answering the question, asking for a hint or ask me to repeat."},
+      on : {SPEAK_COMPLETE : "listenGeneralKnowledge"
+    }
     },
     },
   },
@@ -602,12 +633,11 @@ const dialogueGame = setup({
           { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectHistory"},
           // checking if the user wants a hint:
           { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintHistory"},
-          // checking if the user wants to quit:
-          { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "AskforVerification"},
           //checking if the user wants to hear the question again:
           { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionHistory"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
           // checking if the user's answer is incorrect:
           { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectHistory"},
+          {target : "WhatCanDo"}
         ],
   
         //ASR_NOINPUT: {
@@ -648,10 +678,14 @@ const dialogueGame = setup({
         RECOGNISED: [
           {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
           actions : {type: "say", params : "I hope you come to play again"}},
-          {target: "ChooseBoxQuestion"}]   //lets double check that this transition works
+          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+        {target: "Say"}]   //lets double check that this transition works
         }
       },
-  
+      Say : {
+        entry : {type : "say", params: "You need to say yes or no"},
+        on : {SPEAK_COMPLETE : "VerifyExit"}
+      },
       AskVerifyChange : {
         entry : {type : "say", params : "Are you sure you want to change categories?"},
         on : {SPEAK_COMPLETE: "VerifyChange"}
@@ -662,9 +696,15 @@ const dialogueGame = setup({
         on: {
           RECOGNISED: [
             {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-            {target: "ChooseBoxQuestion"}]
+            {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {target : "Answer"}]
           }
         },
+        Answer : {
+          entry : {type : "say", params: "You need to say yes or no"},
+          on : {SPEAK_COMPLETE : "VerifyChange"
+        },
+      },
       NoUserInput: {
         entry: [{ type: "say", params: "Can you please repeat?"}],
         on: {
@@ -674,6 +714,11 @@ const dialogueGame = setup({
     NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
+    },
+    WhatCanDo : {
+      entry : {type : "say", params: "I am not sure I can help you with that. You need to try answering the question, asking for a hint or ask me to repeat."},
+      on : {SPEAK_COMPLETE : "listenHistory"
+    }
     },
     },
   },
@@ -737,17 +782,12 @@ const dialogueGame = setup({
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectScience"},
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintScience"},
-        // checking if the user wants to quit:
-        { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "AskforVerification"},
         //checking if the user wants to hear the question again:
         { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionScience"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
         // checking if the user's answer is incorrect:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectScience"},
+        {target : "WhatCanDo"}
       ],
-
-      //ASR_NOINPUT: {
-      //  target: "NoUserInput"
-      //}
     }
   },
    
@@ -771,7 +811,7 @@ const dialogueGame = setup({
     hintScience: {
       entry: [{ type: "say", params: ({context}) => retrieveHint(context.currentQuestion)}],
       on: {
-        SPEAK_COMPLETE: "listenScience", reenter: true
+        SPEAK_COMPLETE: "listenScience"
       }
     },
 
@@ -788,24 +828,32 @@ const dialogueGame = setup({
       RECOGNISED: [
         {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
         actions : {type: "say", params : "I hope you come to play again"}},
-        {target: "ChooseBoxQuestion"}]   //lets double check that this transition works
+        {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+        {target: "Say"}]   //lets double check that this transition works
       }
     },
-
+    Say : {
+      entry : {type : "say", params: "You need to say yes or no"},
+      on : {SPEAK_COMPLETE : "VerifyExit"}
+    },
     AskVerifyChange : {
       entry : {type : "say", params : "Are you sure you want to change categories?"},
       on : {SPEAK_COMPLETE: "VerifyChange"}
     },
-
     VerifyChange: {
       entry: "listenNlu",
       on: {
         RECOGNISED: [
           {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-          {target: "ChooseBoxQuestion"}]
+          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {target : "Answer"}]
         }
       },
-
+      Answer : {
+        entry : {type : "say", params: "You need to say yes or no"},
+        on : {SPEAK_COMPLETE : "VerifyChange"
+      },
+    },
     //let's check where we want to implement this other than in the actual question 
     NoUserInput: {
         entry: [{ type: "say", params: "Can you please repeat?"}],
@@ -816,6 +864,11 @@ const dialogueGame = setup({
     NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
+    },
+    WhatCanDo : {
+      entry : {type : "say", params: "I am not sure I can help with that. You need to try answering the question, asking for a hint or ask me to repeat."},
+      on : {SPEAK_COMPLETE : "listenScience"
+    }
     },
   },
 },
@@ -878,12 +931,11 @@ popCulture: {
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectPopCulture"},
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintPopCulture"},
-        // checking if the user wants to quit:
-        { guard: ({ event }) => event.nluValue.topIntent === "game_options", target: "AskforVerification"},
         //checking if the user wants to hear the question again:
         { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionPopCulture"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
         // checking if the user's answer is incorrect:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectPopCulture"},
+        {target : "WhatCanDo"}
       ],
 
       //ASR_NOINPUT: {
@@ -912,7 +964,7 @@ popCulture: {
     hintPopCulture: {
       entry: [{ type: "say", params: ({context}) => retrieveHint(context.currentQuestion)}],
       on: {
-        SPEAK_COMPLETE: "listenPopCulture", reenter: true
+        SPEAK_COMPLETE: "listenPopCulture"
       }
     },
 
@@ -929,24 +981,32 @@ popCulture: {
       RECOGNISED: [
         {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
         actions : {type: "say", params : "I hope you come to play again"}},
-        {target: "ChooseBoxQuestion"}]   //lets double check that this transition works
+        {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+        {target: "Say"}]   //lets double check that this transition works
       }
     },
-
+    Say : {
+      entry : {type : "say", params: "You need to say yes or no"},
+      on : {SPEAK_COMPLETE : "VerifyExit"}
+    },
     AskVerifyChange : {
       entry : {type : "say", params : "Are you sure you want to change categories?"},
       on : {SPEAK_COMPLETE: "VerifyChange"}
     },
-
     VerifyChange: {
       entry: "listenNlu",
       on: {
         RECOGNISED: [
           {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-          {target: "ChooseBoxQuestion"}]
+          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {target : "Answer"}]
         }
       },
-
+      Answer : {
+        entry : {type : "say", params: "You need to say yes or no"},
+        on : {SPEAK_COMPLETE : "VerifyChange"
+      },
+    },
     //let's check where we want to implement this other than in the actual question 
     NoUserInput: {
         entry: [{ type: "say", params: "Can you please repeat?"}],
@@ -957,6 +1017,11 @@ popCulture: {
     NeedToDo : {
       entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
+    },
+    WhatCanDo : {
+      entry : {type : "say", params: "I am not sure I can help with that. You need to try answering the question, asking for a hint or ask me to repeat."},
+      on : {SPEAK_COMPLETE : "listenPopCulture"
+    }
     },
 },
     },
