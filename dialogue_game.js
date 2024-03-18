@@ -265,7 +265,7 @@ const dialogueGame = setup({
     on : {
       RECOGNISED : 
       [{guard : ({ event }) => event.value[0].utterance === "Geography", target : "Geography", actions: "hideCategories"},
-      {guard : ({ event }) => event.value[0].utterance === "General Knowledge", target : "GeneralKnowledge", actions: "hideCategories"},
+      {guard : ({ event }) => event.value[0].utterance === "General knowledge", target : "GeneralKnowledge", actions: "hideCategories"},
       {guard : ({ event }) => event.value[0].utterance === "History", target : "History", actions: "hideCategories"},
       {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science", actions: "hideCategories"},
       {guard : ({ event }) => event.value[0].utterance === "Pop culture", target : "popCulture", actions: "hideCategories"},
@@ -308,8 +308,8 @@ const dialogueGame = setup({
             ],
             target: "CheckTyphoon"},
             // it doesn't work i will add a new state
-            {target: "ListenToChoice",reenter : true, 
-            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
+            {target: "NeedToDo"}
+            
           ],
         },
       }, 
@@ -412,6 +412,10 @@ const dialogueGame = setup({
           SPEAK_COMPLETE: "listenGeography"
         }
     },
+    NeedToDo : {
+      entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
+    },
     },
   },
 
@@ -448,8 +452,7 @@ const dialogueGame = setup({
             ],
             target: "CheckTyphoon"},
             // it doesn't work i will add a new state
-            {target: "ListenToChoice",reenter : true, 
-            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
+            {target: "NeedToDo"}
           ],
         },
       }, 
@@ -543,6 +546,10 @@ const dialogueGame = setup({
           SPEAK_COMPLETE: "listenGeneralKnowledge"
         }
     },
+    NeedToDo : {
+      entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
+    },
     },
   },
   History: {
@@ -578,8 +585,7 @@ const dialogueGame = setup({
             ],
             target: "CheckTyphoon"},
             // it doesn't work i will add a new state
-            {target: "ListenToChoice",reenter : true, 
-            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
+            {target: "NeedToDo"}
           ],
         },
       },
@@ -672,6 +678,10 @@ const dialogueGame = setup({
           SPEAK_COMPLETE: "listenHistory"
         }
     },
+    NeedToDo : {
+      entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
+    },
     },
   },
   Science: {
@@ -708,8 +718,7 @@ const dialogueGame = setup({
             ],
             target: "CheckTyphoon"},
             // it doesn't work i will add a new state
-            {target: "ListenToChoice",reenter : true, 
-            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
+            {target: "NeedToDo"}
           ],
         },
       }, 
@@ -811,6 +820,10 @@ const dialogueGame = setup({
           SPEAK_COMPLETE: "listenScience"
         }
     },
+    NeedToDo : {
+      entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
+    },
   },
 },
 
@@ -847,8 +860,7 @@ popCulture: {
             ],
             target: "CheckTyphoon"},
             // it doesn't work i will add a new state
-            {target: "ListenToChoice",reenter : true, 
-            actions: {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."}}
+            {target: "NeedToDo"}
           ],
         },
       }, 
@@ -948,6 +960,10 @@ popCulture: {
         on: {
           SPEAK_COMPLETE: "listenPopCulture"
         }
+    },
+    NeedToDo : {
+      entry : {type: "say", params: "You need to pick a box between 1 and 10,ask to quit or change category."},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
     },
 },
     },
