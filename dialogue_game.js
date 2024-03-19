@@ -326,7 +326,7 @@ const dialogueGame = setup({
       }, 
 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}), ({context}) =>  context.questionsAsked.push(context.questionNumber)],
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}), ({context}) => context.questionsAsked.push(context.questionNumber)],
         always : [,
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
