@@ -300,10 +300,11 @@ const dialogueGame = setup({
           RECOGNISED : [ 
             // checking if the user wants to quit:
             {guard: ({ event }) => event.nluValue.topIntent === "game_options",
-              target: "AskforVerification"},  //more examples added to the model, let's see if it makes a difference
-              //checking if the user wants to change the category:
+              target: "AskforVerification"},
+            //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
+             //checking if the user has already picked the same question:
             {guard: ({event,context})=> context.questionsAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             {guard : ({event})=> boxes.includes(event.value[0].utterance),
