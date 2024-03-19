@@ -198,7 +198,7 @@ const dialogueGame = setup({
     questionNumber: 0,
     currentQuestion: null,
     questionAnswered : 0,   
-    questionsAsked : [],
+    questionsAsked : ["0"],
     hiddenBoxes: {},
   },
   states: {
@@ -304,7 +304,7 @@ const dialogueGame = setup({
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
-            {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
+            {guard: ({event,context})=> context.questionsAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             {guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -326,11 +326,11 @@ const dialogueGame = setup({
       }, 
 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber), questionAsked : ({context}) => + context.questionNumber})],
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber), questionsAsked : ({context}) => + context.questionNumber})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
-          {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
+          {guard : ({context})=> Object.keys(context.currentQuestion)[0] !== "typhoon",
            target: "questionGeography"}],
         },
 
@@ -477,7 +477,7 @@ const dialogueGame = setup({
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
-            {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
+            {guard: ({event,context})=> context.questionsAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             { guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -497,11 +497,11 @@ const dialogueGame = setup({
         },
       }, 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['generalKnowledge'], context.questionNumber),questionAsked : ({context}) => + context.questionNumber})],
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['generalKnowledge'], context.questionNumber),questionsAsked : ({context}) => + context.questionNumber})],
         always : [
-          {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
+          {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
-          {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
+          {guard : ({context})=> Object.keys(context.currentQuestion)[0] !== "typhoon",
            target: "questionGeneralKnowledge"}],
         },
       questionGeneralKnowledge : {   
@@ -534,11 +534,11 @@ const dialogueGame = setup({
     },
    
     reactCorrectGeneralKnowledge: {
-      entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAsked++],    
+      entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionsAsked++],    
       on: { 
         SPEAK_COMPLETE: [
-          {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
-          {guard : ({context}) => context.questionAsked === 5, target : "#dialogueGame.Win"}
+          {guard: ({context}) => context.questionsAsked < 5, target :"ChooseBoxQuestion"},
+          {guard : ({context}) => context.questionsAsked === 5, target : "#dialogueGame.Win"}
         ]
         },
         },
@@ -641,7 +641,7 @@ const dialogueGame = setup({
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
-             {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
+             {guard: ({event,context})=> context.questionsAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             { guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -660,11 +660,11 @@ const dialogueGame = setup({
         },
       },
         CheckTyphoon : { 
-          entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['history'], context.questionNumber),questionAsked : ({context}) => + context.questionNumber})],
+          entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['history'], context.questionNumber),questionsAsked : ({context}) => + context.questionNumber})],
           always : [
-            {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
+            {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
              target : "#dialogueGame.Typhoon"},
-            {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
+            {guard : ({context})=> Object.keys(context.currentQuestion)[0] !== "typhoon",
              target: "questionHistory"}],
           },
         questionHistory : {   
@@ -803,7 +803,7 @@ const dialogueGame = setup({
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
-             {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
+             {guard: ({event,context})=> context.questionsAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             { guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -824,11 +824,11 @@ const dialogueGame = setup({
       }, 
 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['science'], context.questionNumber),questionAsked : ({context}) => + context.questionNumber})],
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['science'], context.questionNumber),questionsAsked : ({context}) => + context.questionNumber})],
         always : [
-          {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
+          {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
-          {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
+          {guard : ({context})=> Object.keys(context.currentQuestion)[0] !== "typhoon",
            target: "questionScience"}],
         },
       questionScience : {   
@@ -855,11 +855,11 @@ const dialogueGame = setup({
   },
    
     reactCorrectScience: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAsked++],    
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionsAsked++],    
         on: { 
           SPEAK_COMPLETE: [
-            {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
-            {guard : ({context}) => context.questionAsked === 5, target : "#dialogueGame.Win"}
+            {guard: ({context}) => context.questionsAsked < 5, target :"ChooseBoxQuestion"},
+            {guard : ({context}) => context.questionsAsked === 5, target : "#dialogueGame.Win"}
           ]
           },
         },
@@ -972,7 +972,7 @@ popCulture: {
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
-             {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
+             {guard: ({event,context})=> context.questionsAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             { guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -992,11 +992,11 @@ popCulture: {
         },
       }, 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['popCulture'], context.questionNumber),questionAsked : ({context}) => + context.questionNumber})],
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['popCulture'], context.questionNumber),questionsAsked : ({context}) => + context.questionNumber})],
         always : [
-          {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
+          {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
-          {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
+          {guard : ({context})=> Object.keys(context.currentQuestion)[0] !== "typhoon",
            target: "questionPopCulture"}],
         },
       questionPopCulture : {   
@@ -1024,11 +1024,11 @@ popCulture: {
   },
    
     reactCorrectPopCulture: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAsked++],    
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionsAsked++],    
         on: { 
           SPEAK_COMPLETE: [
-            {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
-            {guard : ({context}) => context.questionAsked === 5, target : "#dialogueGame.Win"}
+            {guard: ({context}) => context.questionsAsked < 5, target :"ChooseBoxQuestion"},
+            {guard : ({context}) => context.questionsAsked === 5, target : "#dialogueGame.Win"}
           ]
           },
         },
