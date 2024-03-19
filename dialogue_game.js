@@ -327,8 +327,8 @@ const dialogueGame = setup({
       }, 
 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}), ({context}) =>  context.questionsAsked.push(context.questionNumber)],
-        always : [,
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
+        always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
           {guard : ({context})=> Object.keys(context.currentQuestion)[0] !== "typhoon",
@@ -336,7 +336,7 @@ const dialogueGame = setup({
         },
 
       questionGeography : {   
-        entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion)],
+        entry :[{ type: 'say', params: ({ context }) => Object.keys(context.currentQuestion)},({ context }) => console.log(context.currentQuestion), ({ context }) => console.log(context.questionsAsked)],
          on: {SPEAK_COMPLETE :"listenGeography"}
       },
 
@@ -349,7 +349,7 @@ const dialogueGame = setup({
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintGeography"},
         //checking if the user wants to hear the question again:
-        { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeography"}, //actions: [{ type: "say", params: "I'm happy to repeat the question!"}]}, this wont work either we dont provide a message or add a state
+        { guard: ({ event }) => event.nluValue.topIntent === "repeat", target: "questionGeography"},
         // checking if the user's answer is incorrect:
         { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion) === false, target: "reactIncorrectGeography"},
         {target : "WhatCanDo"}
@@ -450,7 +450,7 @@ const dialogueGame = setup({
     }
     },
     SameQuestion : {
-      entry: {type : "say", params : "You can't ask the same question,twice!"},
+      entry: {type : "say", params : "You can't answer the same question,twice!"},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
     }
     
@@ -498,7 +498,7 @@ const dialogueGame = setup({
         },
       }, 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['generalKnowledge'], context.questionNumber),questionsAsked : ({context}) => + context.questionNumber})],
+        entry : [assign({ currentQuestion: ({ context }) => chooseQuestion(['generalKnowledge'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
@@ -615,7 +615,7 @@ const dialogueGame = setup({
     }
   },
   SameQuestion : {
-    entry: {type : "say", params : "You can't ask the same question,twice!"},
+    entry: {type : "say", params : "You can't answer the same question,twice!"},
     on : {SPEAK_COMPLETE : "ListenToChoice"}
   }
   },
@@ -661,7 +661,7 @@ const dialogueGame = setup({
         },
       },
         CheckTyphoon : { 
-          entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['history'], context.questionNumber),questionsAsked : ({context}) => + context.questionNumber})],
+          entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['history'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
           always : [
             {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
              target : "#dialogueGame.Typhoon"},
@@ -776,7 +776,7 @@ const dialogueGame = setup({
     }
     },
     SameQuestion : {
-      entry: {type : "say", params : "You can't ask the same question,twice!"},
+      entry: {type : "say", params : "You can't answer the same question,twice!"},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
     }
   },
@@ -825,7 +825,7 @@ const dialogueGame = setup({
       }, 
 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['science'], context.questionNumber),questionsAsked : ({context}) => + context.questionNumber})],
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['science'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
@@ -945,7 +945,7 @@ const dialogueGame = setup({
     }
     },
     SameQuestion : {
-      entry: {type : "say", params : "You can't ask the same question,twice!"},
+      entry: {type : "say", params : "You can't answer the same question,twice!"},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
     }
   },
@@ -993,7 +993,7 @@ popCulture: {
         },
       }, 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['popCulture'], context.questionNumber),questionsAsked : ({context}) => + context.questionNumber})],
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['popCulture'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
@@ -1115,7 +1115,7 @@ popCulture: {
     }
     },
     SameQuestion : {
-      entry: {type : "say", params : "You can't ask the same question,twice!"},
+      entry: {type : "say", params : "You can't answer the same question,twice!"},
       on : {SPEAK_COMPLETE : "ListenToChoice"}
     }
   },
