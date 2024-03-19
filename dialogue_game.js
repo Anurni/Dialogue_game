@@ -40,9 +40,9 @@ const boxes = ["1","2","3","4","5","6","7","8","9","10"]
 //our question database
 const questions = {
   geography: [
+  {"typhoon": randomRepeat(typhoonReaction)},
   { "What is the capital city of Australia?" : [["canberra"], ["This capital city is also known as the Bush Capital"]]}, 
   {"What is the hottest country in the world?": [["mali", ["This country is located in West Africa."]]]},
-  {"typhoon": randomRepeat(typhoonReaction)},
   {"How many continents are there?" : [["7"], ["Don't forget the one where penguins live!"]]}, 
   {"What is the name of the largest ocean in the world?" : [["pacific", "the pacific ocean"], ["The name of this ocean starts with P"]]}, 
   {"Which country does the Easter Island belong to?": [["chile"], ["The shape of this country is skinny!"]]}, 
@@ -304,7 +304,7 @@ const dialogueGame = setup({
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
-            // {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
+            {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             {guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -326,7 +326,7 @@ const dialogueGame = setup({
       }, 
 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber), questionAsked : ({context}) => + context.questionNumber}),
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber), questionAsked : ({context}) => + context.questionNumber})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
@@ -448,6 +448,10 @@ const dialogueGame = setup({
       on : {SPEAK_COMPLETE : "listenGeography"
     }
     },
+    SameQuestion : {
+      entry: {type : "say", params : "You can't ask the same question,twice!"},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
+    }
     
   },
 },
@@ -473,6 +477,7 @@ const dialogueGame = setup({
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
+            {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             { guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -492,7 +497,7 @@ const dialogueGame = setup({
         },
       }, 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['generalKnowledge'], context.questionNumber)}),
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['generalKnowledge'], context.questionNumber),questionAsked : ({context}) => + context.questionNumber})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
            target : "#dialogueGame.Typhoon"},
@@ -608,6 +613,10 @@ const dialogueGame = setup({
       on : {SPEAK_COMPLETE : "listenGeneralKnowledge"
     }
   },
+  SameQuestion : {
+    entry: {type : "say", params : "You can't ask the same question,twice!"},
+    on : {SPEAK_COMPLETE : "ListenToChoice"}
+  }
   },
 },
 
@@ -632,6 +641,7 @@ const dialogueGame = setup({
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
+             {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             { guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -650,7 +660,7 @@ const dialogueGame = setup({
         },
       },
         CheckTyphoon : { 
-          entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['history'], context.questionNumber)}),
+          entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['history'], context.questionNumber),questionAsked : ({context}) => + context.questionNumber})],
           always : [
             {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
              target : "#dialogueGame.Typhoon"},
@@ -764,6 +774,10 @@ const dialogueGame = setup({
       on : {SPEAK_COMPLETE : "listenHistory"
     }
     },
+    SameQuestion : {
+      entry: {type : "say", params : "You can't ask the same question,twice!"},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
+    }
   },
 },
 
@@ -789,6 +803,7 @@ const dialogueGame = setup({
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
+             {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             { guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -809,7 +824,7 @@ const dialogueGame = setup({
       }, 
 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['science'], context.questionNumber)}),
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['science'], context.questionNumber),questionAsked : ({context}) => + context.questionNumber})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
            target : "#dialogueGame.Typhoon"},
@@ -928,6 +943,10 @@ const dialogueGame = setup({
       on : {SPEAK_COMPLETE : "listenScience"
     }
     },
+    SameQuestion : {
+      entry: {type : "say", params : "You can't ask the same question,twice!"},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
+    }
   },
 },
 
@@ -953,6 +972,7 @@ popCulture: {
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
+             {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
             { guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
@@ -972,7 +992,7 @@ popCulture: {
         },
       }, 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['popCulture'], context.questionNumber)}),
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['popCulture'], context.questionNumber),questionAsked : ({context}) => + context.questionNumber})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
            target : "#dialogueGame.Typhoon"},
@@ -1093,6 +1113,10 @@ popCulture: {
       on : {SPEAK_COMPLETE : "listenPopCulture"
     }
     },
+    SameQuestion : {
+      entry: {type : "say", params : "You can't ask the same question,twice!"},
+      on : {SPEAK_COMPLETE : "ListenToChoice"}
+    }
   },
 },
 
