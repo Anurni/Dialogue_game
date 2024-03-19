@@ -110,3 +110,11 @@ button:focus-visible {
   max-width: 100%;
 }
 
+#thumbs_up {
+  width:400px;
+  position: relative; top: -70px;
+}
+
+#congrats {
+  font-size: 80px;
+}

@@ -30,7 +30,7 @@ const settings = {
   ttsDefaultVoice: "en-US-JaneNeural",
 };
 
-const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
+const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!"];
 const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
 const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"];
 const repeatPhrases = ["I didn't catch that.", "Can you please repeat?", "Pardon?", "Sorry, what did you say?"];
@@ -109,7 +109,7 @@ const questions = {
 // our functions:
 
 function randomRepeat(myArray) {
-  const randomIndex = Math.floor(Math.random()*myArray.length);
+  let randomIndex = Math.floor(Math.random()*myArray.length);
   return myArray[randomIndex]
   }
 
@@ -279,15 +279,15 @@ const dialogueGame = setup({
   },
 
   NotHear : {
-    entry: {type : "say", params : randomRepeat(repeatPhrases)},
-    target: "ChooseCategory"
+    entry: [{type : "say", params : randomRepeat(repeatPhrases)}], 
+    on : {SPEAK_COMPLETE : "ChooseCategory"}
   },
 // --> GEOGRAPHY STATE STARTS HERE <-- 
   Geography: {    
     initial: "ChooseBoxQuestion",
     states: {
       ChooseBoxQuestion : {
-        entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
+        entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes }, 
                 {type : "say", params: randomRepeat(chooseBox)}],
         on : {
           SPEAK_COMPLETE : "ListenToChoice"
@@ -344,7 +344,7 @@ const dialogueGame = setup({
       on: {
         RECOGNISED: [  
         // checking if the user's answer is correct:
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeography"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), target: "reactCorrectGeography"},
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintGeography"},
         //checking if the user wants to hear the question again:
@@ -375,7 +375,7 @@ const dialogueGame = setup({
       },
 
   reactIncorrectGeography: {
-    entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+    entry: [randomRepeat(wrongAnswer),{type: "say", params: randomRepeat(wrongAnswer)}],    
     on: { 
       SPEAK_COMPLETE: "ChooseBoxQuestion"
       },
@@ -425,7 +425,7 @@ const dialogueGame = setup({
 
     //NO_ASR state for the question
     NoUserInput: {
-        entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+        entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
         on: {
           SPEAK_COMPLETE: "listenGeography"
         }
@@ -433,7 +433,7 @@ const dialogueGame = setup({
 
     // NO_ASR state for the box choosing
     noNumberChoise: {
-      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+      entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "ListenToChoice"
       }
@@ -461,7 +461,7 @@ const dialogueGame = setup({
     initial: "ChooseBoxQuestion",
     states: {
       ChooseBoxQuestion : {
-        entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
+        entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes }, randomRepeat(chooseBox),
         {type : "say", params: randomRepeat(chooseBox)}],
         on : {
           SPEAK_COMPLETE : "ListenToChoice"
@@ -514,7 +514,7 @@ const dialogueGame = setup({
       on: {
         RECOGNISED: [  
         // checking if the user's answer is correct:
-        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectGeneralKnowledge"},
+        { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), target: "reactCorrectGeneralKnowledge"},
         // checking if the user wants a hint:
         { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintGeneralKnowledge"},
         //checking if the user wants to hear the question again:
@@ -543,7 +543,7 @@ const dialogueGame = setup({
         },
         },
     reactIncorrectGeneralKnowledge: {
-      entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+      entry: [randomRepeat(wrongAnswer),{type: "say", params: randomRepeat(wrongAnswer)}],   
       on: { 
         SPEAK_COMPLETE: "ChooseBoxQuestion"
         },
@@ -589,7 +589,7 @@ const dialogueGame = setup({
       },
     //NO_ASR state for the question
     NoUserInput: {
-      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+      entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "listenGeneralKnowledge"
       }
@@ -597,7 +597,7 @@ const dialogueGame = setup({
 
   // NO_ASR state for the box choosing
   noNumberChoise: {
-    entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+    entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
     on: {
       SPEAK_COMPLETE: "ListenToChoice"
     }
@@ -625,7 +625,7 @@ const dialogueGame = setup({
       initial: "ChooseBoxQuestion",
       states: {
         ChooseBoxQuestion : {
-          entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
+          entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes }, randomRepeat(chooseBox),
           {type : "say", params: randomRepeat(chooseBox)}],
           on : {
             SPEAK_COMPLETE : "ListenToChoice"
@@ -676,7 +676,7 @@ const dialogueGame = setup({
         on: {
           RECOGNISED: [  
           // checking if the user's answer is correct:
-          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), actions:[ ({context}) =>  context.points ++], target: "reactCorrectHistory"},
+          { guard: ({event, context}) => checkAnswer(event.value[0].utterance, context.currentQuestion), target: "reactCorrectHistory"},
           // checking if the user wants a hint:
           { guard: ({ event }) => event.nluValue.topIntent === "hint", target: "hintHistory"},
           //checking if the user wants to hear the question again:
@@ -697,14 +697,17 @@ const dialogueGame = setup({
       },
      
       reactCorrectHistory: {
-          entry: [{type: "say", params: randomRepeat(correctAnswer)}],    
-          on: { 
-            SPEAK_COMPLETE: "ChooseBoxQuestion"
-            },
+        entry: [randomRepeat(correctAnswer),{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
+        on: { 
+          SPEAK_COMPLETE: [
+            {guard: ({context}) => context.questionAnswered < 5, target :"ChooseBoxQuestion"},
+            {guard : ({context}) => context.questionAnswered === 5, target : "#dialogueGame.Win"}
+          ]
           },
+        },
   
       reactIncorrectHistory: {
-        entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+        entry: [randomRepeat(wrongAnswer),{type: "say", params: randomRepeat(wrongAnswer)}],    
         on: { 
           SPEAK_COMPLETE: "ChooseBoxQuestion"
           },
@@ -752,7 +755,7 @@ const dialogueGame = setup({
 
     //NO_ASR state for the question
     NoUserInput: {
-      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+      entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "listenHistory"
       }
@@ -760,7 +763,7 @@ const dialogueGame = setup({
 
   // NO_ASR state for the box choosing
     noNumberChoise: {
-    entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+    entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
     on: {
       SPEAK_COMPLETE: "ListenToChoice"
     }
@@ -855,7 +858,7 @@ const dialogueGame = setup({
   },
    
     reactCorrectScience: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
+        entry: [randomRepeat(correctAnswer),{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
         on: { 
           SPEAK_COMPLETE: [
             {guard: ({context}) => context.questionAnswered < 5, target :"ChooseBoxQuestion"},
@@ -865,7 +868,7 @@ const dialogueGame = setup({
         },
 
     reactIncorrectScience: {
-      entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+      entry: [randomRepeat(wrongAnswer),{type: "say", params: randomRepeat(wrongAnswer)}],    
       on: { 
         SPEAK_COMPLETE: "ChooseBoxQuestion"
         },
@@ -920,7 +923,7 @@ const dialogueGame = setup({
 
     //NO_ASR state for the question
     NoUserInput: {
-      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+      entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "listenScience"
       }
@@ -928,7 +931,7 @@ const dialogueGame = setup({
 
   // NO_ASR state for the box choosing
   noNumberChoise: {
-    entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+    entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
     on: {
       SPEAK_COMPLETE: "ListenToChoice"
     }
@@ -956,7 +959,7 @@ popCulture: {
       initial: "ChooseBoxQuestion",
       states: {
         ChooseBoxQuestion : {
-          entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
+          entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },randomRepeat(chooseBox),
           {type : "say", params: randomRepeat(chooseBox)}],
           on : {
           SPEAK_COMPLETE : "ListenToChoice"
@@ -1024,7 +1027,7 @@ popCulture: {
   },
    
     reactCorrectPopCulture: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
+        entry: [randomRepeat(correctAnswer),{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
         on: { 
           SPEAK_COMPLETE: [
             {guard: ({context}) => context.questionAnswered < 5, target :"ChooseBoxQuestion"},
@@ -1034,7 +1037,7 @@ popCulture: {
         },
 
     reactIncorrectPopCulture: {
-      entry: [{type: "say", params: randomRepeat(wrongAnswer)}],    
+      entry: [randomRepeat(wrongAnswer),{type: "say", params: randomRepeat(wrongAnswer)}],    
       on: { 
         SPEAK_COMPLETE: "ChooseBoxQuestion"
         },
@@ -1089,7 +1092,7 @@ popCulture: {
 
     //NO_ASR state for the question
     NoUserInput: {
-      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+      entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "listenPopCulture"
       }
@@ -1097,7 +1100,7 @@ popCulture: {
 
   // NO_ASR state for the box choosing
   noNumberChoise: {
-    entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
+    entry: [randomRepeat(repeatPhrases),{ type: "say", params: randomRepeat(repeatPhrases)}],
     on: {
       SPEAK_COMPLETE: "ListenToChoice"
     }
@@ -1121,7 +1124,7 @@ popCulture: {
 },
 
 Typhoon : {
-  entry : ["hideAllBoxes","showTyphoon",{type : "say", params : randomRepeat(typhoonReaction)}],
+  entry : ["hideAllBoxes","showTyphoon",randomRepeat(typhoonReaction),{type : "say", params : randomRepeat(typhoonReaction)}],
   on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
   },
 
