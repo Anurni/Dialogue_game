@@ -25,7 +25,7 @@ const settings = {
   azureLanguageCredentials: azureLanguageCredentials,
   azureCredentials: azureCredentials,
   asrDefaultCompleteTimeout: 0,
-  asrDefaultNoInputTimeout: 10000,
+  asrDefaultNoInputTimeout: 15000,
   locale: "en-US",
   ttsDefaultVoice: "en-US-JaneNeural",
 };
@@ -194,8 +194,7 @@ const dialogueGame = setup({
     user_name: '',
     questionNumber: 0,
     currentQuestion: null,
-    askedQuestions: [],  //is this variable used?
-    questionAsked : 0,   //is this variable used?
+    questionAsked : 0,   
     hiddenBoxes: {},
   },
   states: {
@@ -270,11 +269,15 @@ const dialogueGame = setup({
       {guard : ({ event }) => event.value[0].utterance === "Science", target : "Science", actions: "hideCategories"},
       {guard : ({ event }) => event.value[0].utterance === "Pop culture", target : "popCulture", actions: "hideCategories"},
       {target : "AskCategory", reenter : true, 
-      actions : {type : "say", params : ({context}) => `You need to choose one of the categories on the screen, ${context.user_name}`}}] 
+      actions : {type : "say", params : ({context}) => `You need to choose one of the categories on the screen, ${context.user_name}`}}] ,
+      ASR_NOINPUT : "NotHear"
     }
   },
 
-
+  NotHear : {
+    entry: {type : "say", params : "Can you repeat?"},
+    target: "ChooseCategory"
+  },
 // --> GEOGRAPHY STATE STARTS HERE <-- 
   Geography: {    
     initial: "ChooseBoxQuestion",
@@ -635,13 +638,12 @@ const dialogueGame = setup({
               }) 
             ],
             target: "CheckTyphoon"},
-            // it doesn't work i will add a new state
             {target: "NeedToDo"}
           ],
           ASR_NOINPUT: "noNumberChoise"
         },
       },
-        CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
+        CheckTyphoon : { 
           entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['history'], context.questionNumber)}),
           always : [
             {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
