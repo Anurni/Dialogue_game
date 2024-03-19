@@ -211,7 +211,7 @@ const dialogueGame = setup({
 
   WaitToStart: {
     on: {
-      CLICK: "AskCategory"  
+      CLICK: "SayGreeting"  
     }
   },
 
