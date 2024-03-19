@@ -253,7 +253,7 @@ const dialogueGame = setup({
     },
 
   AskCategory: { 
-    entry: ["hideStart","show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
+    entry: ["hideStart","hideAllBoxes","show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
     on: {
       SPEAK_COMPLETE: "ChooseCategory"
     }
