@@ -14,7 +14,6 @@ document.querySelector("#app").innerHTML = `
       <button class="category_buttons">Science</button>
       <button class="category_buttons">Pop Culture</button>
       </div>
-      </div>
   <div class="question_boxes"style = "display: none"> 
     <button class="question_boxes" id="0">1</button>
     <button class="question_boxes" id="1">2</button>
@@ -32,7 +31,6 @@ document.querySelector("#app").innerHTML = `
     <h4 id="lose"style = 'font-size:30px'> You lose! Better luck next time! </3>
     <div style="width:280px;max-width:100%;"><div style="height:0;padding-bottom:150.69%;position:relative; left: 45px; margin-bottom = -100px, margin-top = -100px"><iframe width="260" height="200" style="position:absolute;top:100px;left:0;width:100%;height:100%;" frameBorder="0" src="https://imgflip.com/embed/8j7vyq"></iframe></div>
   </div> 
-  </div>
   <div class="win"style="display:none;>
     <img id = "thumbs_up" src="thumbs-up.gif">
 </div>
