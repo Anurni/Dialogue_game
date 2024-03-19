@@ -33,14 +33,15 @@ const settings = {
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
 const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
 const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"];
+const chooseBox = ["Choose a box ","Pick a box ","Decide on a box"];
 const boxes = ["1","2","3","4","5","6","7","8","9","10"]
 
 //our question database
 const questions = {
   geography: [
-  {"typhoon": randomRepeat(typhoonReaction)},
   { "What is the capital city of Australia?" : [["canberra"], ["This capital city is also known as the Bush Capital"]]}, 
   {"What is the hottest country in the world?": [["mali", ["This country is located in West Africa."]]]},
+  {"typhoon": randomRepeat(typhoonReaction)},
   {"How many continents are there?" : [["7"], ["Don't forget the one where penguins live!"]]}, 
   {"What is the name of the largest ocean in the world?" : [["pacific", "the pacific ocean"], ["The name of this ocean starts with P"]]}, 
   {"Which country does the Easter Island belong to?": [["chile"], ["The shape of this country is skinny!"]]}, 
@@ -57,7 +58,7 @@ const questions = {
   {"What year did World War I begin?" : [["1914"],["It's the same year that the Titanic sank"]]}, 
   {"Who was the leader of Nazi Germany during World War II?" : [["hitler", "adolf hitler"],["He was born in Austria"]]},
   {"What is the force that pulls objects towards the center of the Earth called? " : [["gravity"],["It's the force that keeps you on the ground and makes things fall downward"]]},
-  {"What is the hardest natural substance on Earth?" : [["diamond"],["It's also used in jewellery"]]}, 
+  {"What is the hardest natural substance on Earth?" : [["diamond","diamonds"],["It's also used in jewellery"]]}, 
   {"What is Batman's real name?":[["bruce wayne"],["First name rhymes with 'loose' and last name with 'chain'."]]},
   {"What is the largest organ in the human body?" : [["skin"],["It's an external organ with multiple layers and various functions."]]},
   {"Which tech entrepreneur together with his partner named their son X Æ A-12" : [["elon musk"],["He is the CEO of Tesla."]]}, 
@@ -179,7 +180,8 @@ const dialogueGame = setup({
       showTyphoon : () => showElements("typhoon"),
       showThumbsUp : () => showElements("win"),
       showBoxes : () => showElements("question_boxes"), 
-      hideStart : () => hideAllElements(["startButton","game_title","typhoon_gif"]),  
+      hideStart : () => hideAllElements(["startButton","game_title","typhoon_gif"]), 
+      hideStart1 : () => hideAllElements(["startButton","game_title"]),
       hideCategories : () => hideCategoryElements("category_buttons"),
       hideBox : ({context},params) => hideElement(params),
       hideChosenBoxes : ({context, params}) => hideChosenBoxes(context.hiddenBoxes),
@@ -194,7 +196,8 @@ const dialogueGame = setup({
     user_name: '',
     questionNumber: 0,
     currentQuestion: null,
-    questionAsked : 0,   
+    questionAnswered : 0,   
+    questionsAsked : [],
     hiddenBoxes: {},
   },
   states: {
@@ -211,12 +214,12 @@ const dialogueGame = setup({
 
   WaitToStart: {
     on: {
-      CLICK: "AskCategory"  
+      CLICK: "SayGreeting"  
     }
   },
 
   SayGreeting: {
-    entry: ["shuffle", {type : "say", params: "Welcome to the Typhoon game! What is your name?"}],
+    entry: ["shuffle","hideStart1", {type : "say", params: "Welcome to the Typhoon game! What is your name?"}],
     on: {
         SPEAK_COMPLETE: "ListenGreeting"
         }
@@ -284,7 +287,7 @@ const dialogueGame = setup({
     states: {
       ChooseBoxQuestion : {
         entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
-                 {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+                {type : "say", params: randomRepeat(chooseBox)}],
         on : {
           SPEAK_COMPLETE : "ListenToChoice"
         }
@@ -295,13 +298,14 @@ const dialogueGame = setup({
         on : {
           RECOGNISED : [ 
             // checking if the user wants to quit:
-            { guard: ({ event }) => event.nluValue.topIntent === "game_options",
+            {guard: ({ event }) => event.nluValue.topIntent === "game_options",
               target: "AskforVerification"},  //more examples added to the model, let's see if it makes a difference
               //checking if the user wants to change the category:
              {guard : ({event})=> event.nluValue.topIntent === "changeCategory",
              target : "AskVerifyChange"},
+            // {guard: ({event,context})=> context.questionAsked.includes(event.value[0].utterance), target : "SameQuestion" },
             // otherwise, assigning the box/question number to context and proceeding to "checkTyphoon":
-            { guard : ({event})=> boxes.includes(event.value[0].utterance),
+            {guard : ({event})=> boxes.includes(event.value[0].utterance),
             actions : [
               assign({
                 questionNumber: ({ event }) => event.value[0].utterance,
@@ -321,9 +325,9 @@ const dialogueGame = setup({
       }, 
 
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
-        entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}),
+        entry :  assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber), questionAsked : ({context}) => + context.questionNumber}),
         always : [
-          {guard : ({context}) => Object.keys(context.currentQuestion) === "typhoon", 
+          {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
           {guard : ({context})=> Object.keys(context.currentQuestion) !== "typhoon",
            target: "questionGeography"}],
@@ -360,11 +364,11 @@ const dialogueGame = setup({
       }
     },
     reactCorrectGeography: {
-      entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAsked++],    
+      entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
       on: { 
         SPEAK_COMPLETE: [
-          {guard: ({context}) => context.questionAsked < 5, target :"ChooseBoxQuestion"},
-          {guard : ({context}) => context.questionAsked === 5, target : "#dialogueGame.Win"}
+          {guard: ({context}) => context.questionAnswered < 5, target :"ChooseBoxQuestion"},
+          {guard : ({context}) => context.questionAnswered === 5, target : "#dialogueGame.Win"}
         ]
         },
       },
@@ -443,6 +447,7 @@ const dialogueGame = setup({
       on : {SPEAK_COMPLETE : "listenGeography"
     }
     },
+    
   },
 },
 
@@ -452,7 +457,7 @@ const dialogueGame = setup({
     states: {
       ChooseBoxQuestion : {
         entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
-                 {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+        {type : "say", params: randomRepeat(chooseBox)}],
         on : {
           SPEAK_COMPLETE : "ListenToChoice"
         }
@@ -611,7 +616,7 @@ const dialogueGame = setup({
       states: {
         ChooseBoxQuestion : {
           entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
-          {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+          {type : "say", params: randomRepeat(chooseBox)}],
           on : {
             SPEAK_COMPLETE : "ListenToChoice"
           }
@@ -767,7 +772,7 @@ const dialogueGame = setup({
     states: {
       ChooseBoxQuestion : {
         entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
-                 {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+        {type : "say", params: randomRepeat(chooseBox)}],
         on : {
           SPEAK_COMPLETE : "ListenToChoice"
         }
@@ -932,7 +937,7 @@ popCulture: {
       states: {
         ChooseBoxQuestion : {
           entry : [{ type: "hideChosenBoxes", params: ({ context }) => context.hiddenBoxes },
-                 {type : "say", params : "Choose a box. I hope you don't get unlucky."}],
+          {type : "say", params: randomRepeat(chooseBox)}],
           on : {
           SPEAK_COMPLETE : "ListenToChoice"
         }
@@ -1091,7 +1096,7 @@ popCulture: {
 },
 
 Typhoon : {
-  entry : ["showTyphoon",{type : "say", params : ({context}) => Object.values(context.currentQuestion)}],
+  entry : ["hideAllBoxes","showTyphoon",{type : "say", params : randomRepeat(typhoonReaction)}],
   on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
   },
 
