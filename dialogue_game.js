@@ -33,6 +33,7 @@ const settings = {
 const correctAnswer = ["That's correct!", "Well done!", "Exactly!", "You got it!" ];
 const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
 const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"];
+const repeatPhrases = ["I didn't catch that.", "Can you please repeat?", "Pardon?", "Sorry, what did you say?"];
 const chooseBox = ["Choose a box ","Pick a box ","Decide on a box"];
 const boxes = ["1","2","3","4","5","6","7","8","9","10"]
 
@@ -233,7 +234,7 @@ const dialogueGame = setup({
     },
 
   GameStartVerification: {
-    entry: [{type: "say", params: ({context}) => `Hi there ${context.user_name}!Do you want to start the game?`}],
+    entry: [{type: "say", params: ({context}) => `Hi there ${context.user_name}! Would you like to hear the instructions?`}],
     on: {
       SPEAK_COMPLETE: "ListenYesOrNo"
     }
@@ -243,7 +244,7 @@ const dialogueGame = setup({
     entry: "listenNlu",
     on: {
       RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "SayInstructions" },
-      {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `See you maybe another time, ${context.user_name}`}], target: "Done" },
+      {guard:({event}) => event.nluValue.entities[0].category === "no", target: "AskCategory"},
       {target : "ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
     }
   },
@@ -278,7 +279,7 @@ const dialogueGame = setup({
   },
 
   NotHear : {
-    entry: {type : "say", params : "Can you repeat?"},
+    entry: {type : "say", params : randomRepeat(repeatPhrases)},
     target: "ChooseCategory"
   },
 // --> GEOGRAPHY STATE STARTS HERE <-- 
@@ -424,7 +425,7 @@ const dialogueGame = setup({
 
     //NO_ASR state for the question
     NoUserInput: {
-        entry: [{ type: "say", params: "Can you please repeat?"}],
+        entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
         on: {
           SPEAK_COMPLETE: "listenGeography"
         }
@@ -432,7 +433,7 @@ const dialogueGame = setup({
 
     // NO_ASR state for the box choosing
     noNumberChoise: {
-      entry: [{ type: "say", params: "Can you please repeat?"}],
+      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "ListenToChoice"
       }
@@ -583,7 +584,7 @@ const dialogueGame = setup({
       },
     //NO_ASR state for the question
     NoUserInput: {
-      entry: [{ type: "say", params: "Can you please repeat?"}],
+      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "listenGeneralKnowledge"
       }
@@ -591,7 +592,7 @@ const dialogueGame = setup({
 
   // NO_ASR state for the box choosing
   noNumberChoise: {
-    entry: [{ type: "say", params: "Can you please repeat?"}],
+    entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
     on: {
       SPEAK_COMPLETE: "ListenToChoice"
     }
@@ -741,7 +742,7 @@ const dialogueGame = setup({
 
     //NO_ASR state for the question
     NoUserInput: {
-      entry: [{ type: "say", params: "Can you please repeat?"}],
+      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "listenHistory"
       }
@@ -749,7 +750,7 @@ const dialogueGame = setup({
 
   // NO_ASR state for the box choosing
     noNumberChoise: {
-    entry: [{ type: "say", params: "Can you please repeat?"}],
+    entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
     on: {
       SPEAK_COMPLETE: "ListenToChoice"
     }
@@ -904,7 +905,7 @@ const dialogueGame = setup({
 
     //NO_ASR state for the question
     NoUserInput: {
-      entry: [{ type: "say", params: "Can you please repeat?"}],
+      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "listenScience"
       }
@@ -912,7 +913,7 @@ const dialogueGame = setup({
 
   // NO_ASR state for the box choosing
   noNumberChoise: {
-    entry: [{ type: "say", params: "Can you please repeat?"}],
+    entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
     on: {
       SPEAK_COMPLETE: "ListenToChoice"
     }
@@ -1068,7 +1069,7 @@ popCulture: {
 
     //NO_ASR state for the question
     NoUserInput: {
-      entry: [{ type: "say", params: "Can you please repeat?"}],
+      entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
       on: {
         SPEAK_COMPLETE: "listenPopCulture"
       }
@@ -1076,7 +1077,7 @@ popCulture: {
 
   // NO_ASR state for the box choosing
   noNumberChoise: {
-    entry: [{ type: "say", params: "Can you please repeat?"}],
+    entry: [{ type: "say", params: randomRepeat(repeatPhrases)}],
     on: {
       SPEAK_COMPLETE: "ListenToChoice"
     }
