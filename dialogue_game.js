@@ -325,7 +325,6 @@ const dialogueGame = setup({
           ASR_NOINPUT: "noNumberChoise"
         },
       }, 
-
       CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
         entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
         always : [
