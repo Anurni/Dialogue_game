@@ -326,9 +326,9 @@ const dialogueGame = setup({
         },
       }, 
 
-      CheckTyphoon : {
-        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber), questionsAsked : ({context}) => context.questionsAsked.push(context.questionNumber)})],
-        always : [
+      CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
+        entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}), ({context}) =>  context.questionsAsked.push(context.questionNumber)],
+        always : [,
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
            target : "#dialogueGame.Typhoon"},
           {guard : ({context})=> Object.keys(context.currentQuestion)[0] !== "typhoon",
@@ -535,11 +535,11 @@ const dialogueGame = setup({
     },
    
     reactCorrectGeneralKnowledge: {
-      entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionsAsked++],    
+      entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
       on: { 
         SPEAK_COMPLETE: [
-          {guard: ({context}) => context.questionsAsked < 5, target :"ChooseBoxQuestion"},
-          {guard : ({context}) => context.questionsAsked === 5, target : "#dialogueGame.Win"}
+          {guard: ({context}) => context.questionAnswered < 5, target :"ChooseBoxQuestion"},
+          {guard : ({context}) => context.questionAnswered === 5, target : "#dialogueGame.Win"}
         ]
         },
         },
@@ -856,11 +856,11 @@ const dialogueGame = setup({
   },
    
     reactCorrectScience: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionsAsked++],    
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
         on: { 
           SPEAK_COMPLETE: [
-            {guard: ({context}) => context.questionsAsked < 5, target :"ChooseBoxQuestion"},
-            {guard : ({context}) => context.questionsAsked === 5, target : "#dialogueGame.Win"}
+            {guard: ({context}) => context.questionAnswered < 5, target :"ChooseBoxQuestion"},
+            {guard : ({context}) => context.questionAnswered === 5, target : "#dialogueGame.Win"}
           ]
           },
         },
@@ -1025,11 +1025,11 @@ popCulture: {
   },
    
     reactCorrectPopCulture: {
-        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionsAsked++],    
+        entry: [{type: "say", params: randomRepeat(correctAnswer)}, ({context})=> context.questionAnswered++],    
         on: { 
           SPEAK_COMPLETE: [
-            {guard: ({context}) => context.questionsAsked < 5, target :"ChooseBoxQuestion"},
-            {guard : ({context}) => context.questionsAsked === 5, target : "#dialogueGame.Win"}
+            {guard: ({context}) => context.questionAnswered < 5, target :"ChooseBoxQuestion"},
+            {guard : ({context}) => context.questionAnswered === 5, target : "#dialogueGame.Win"}
           ]
           },
         },
