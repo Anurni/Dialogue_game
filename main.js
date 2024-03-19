@@ -34,7 +34,6 @@ document.querySelector("#app").innerHTML = `
   </div> 
   </div>
   <div class="win"style="display:none;>
-    <h4 id="win" style="font-size:50px;">You win! Congrats!</h4>
     <img id = "thumbs_up" src="thumbs-up.gif">
 </div>
 `;

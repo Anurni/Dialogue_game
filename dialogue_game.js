@@ -79,7 +79,7 @@ const questions = {
 
   science: [
   {"typhoon": randomRepeat(typhoonReaction)}, 
-  {"What is the process by which plants make their food called?" : [["photosynthesis"],["This process involes the conversion of the sun"]]}, 
+  {"What part of the human body serves the purpose of maintaining balance?" : [["ears", "the ears"],["We have two of them."]]}, 
   {"What is the force that pulls objects towards the center of the Earth called? " : [["gravity"],["It's the force that keeps you on the ground and makes things fall downward"]]}, 
   {"What is the hardest natural substance on Earth?" : [["diamond"],["It's also used in jewellery"]]}, 
   {"What is the process by which water changes from a liquid to a gas called?" : [["evaporation"],["Think about what happens to water when heated"]]}, 
@@ -92,9 +92,9 @@ const questions = {
 
   popCulture: [
   {"typhoon": randomRepeat(typhoonReaction)}, 
-  {"Which tech entrepreneur together with his partner named their son X Æ A-12" : [["elon musk"],["He is the CEO of Tesla."]]}, 
+  {"Who played Eleven in the TV show Stranger Things?" : [["millie bobby brown"],["This young Primetime Emmy award nominee was born in Spain but moved to England at the age of four."]]}, 
   {"Which movie was mistakenly announced as the Best Picture Oscar winner in 2017? " : [["la la land"],["Emma Stone and Ryan Gosling star in this musical."]]}, 
-  {"In the sitcom Friends, what was the name of Pheobe's alter ego?" : [["regina phalange"],["The initials are R.P."]]}, 
+  {"Fill in this famous Forrest Gump quote: 'Life is like a box of... " : [["chocolates"],["A box of something people love to eat!"]]}, 
   {"Which band recorded the album 'The Dark Side of the Moon'?" : [["pink floyd"],["This is one of the most famous British rock bands."]]}, 
   {"What was the nickname of Diana, Princess of Wales?": [["lady di", "the people's princess", "the princess of hearts"],["There were many, one of them being a shorter version of her first name."]]},
   {"Which artist made history in 2020 as the youngest winner of the Grammys' four main categories?": [["billie eilish"],["This artist creates music together with her big brother, Finneas."]]},
