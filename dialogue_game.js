@@ -36,6 +36,7 @@ const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch 
 const repeatPhrases = ["I didn't catch that.", "Can you please repeat?", "Pardon?", "Sorry, what did you say?"];
 const chooseBox = ["Choose a box ","Pick a box ","Decide on a box"];
 const boxes = ["1","2","3","4","5","6","7","8","9","10"]
+const typhoon = ["typhoon"]
 
 //our question database
 const questions = {
@@ -152,12 +153,6 @@ function shuffleQuestions (questions) {
 }
 }
 
-function typhoon(question) {   //are we using this function somewhere?
-  if (question === "typhoon") {
-    Object.values(question);
-  }
-}
-
 //creating the machine:
 const dialogueGame = setup({
     actions: {
@@ -200,6 +195,7 @@ const dialogueGame = setup({
     questionAnswered : 0,   
     questionsAsked : ["0"],
     hiddenBoxes: {},
+    no_Questions : 0,
   },
   states: {
     Prepare: {
@@ -295,7 +291,7 @@ const dialogueGame = setup({
       },
 
       ListenToChoice : {
-        entry : "listenNlu", 
+        entry : ["listenNlu", ({context}) => context.no_Questions++],
         on : {
           RECOGNISED : [ 
             // checking if the user wants to quit:
@@ -318,14 +314,14 @@ const dialogueGame = setup({
               }) 
             ],
             target: "CheckTyphoon"},
-            // it doesn't work i will add a new state
+            {guard : ({context})=> context.no_Questions === 10, target : "#dialogueGame.Lose"},
             {target: "NeedToDo"}
             
           ],
           ASR_NOINPUT: "noNumberChoise"
         },
       }, 
-      CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
+      CheckTyphoon : { 
         entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['geography'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
@@ -393,10 +389,10 @@ const dialogueGame = setup({
     entry:"listenNlu",
     on: {
       RECOGNISED: [
-        {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
+        {guard: ({event}) =>event.nluValue.entities.length > 0 && checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
         actions : {type: "say", params : "I hope you come to play again"}},
-        {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
-        {target: "Say"}]   //lets double check that this transition works
+        {guard:({event}) => event.nluValue.entities.length > 0 && event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+        {target: "Say"}]   
       }
     },
 
@@ -412,8 +408,8 @@ const dialogueGame = setup({
       entry: "listenNlu",
       on: {
         RECOGNISED: [
-          {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {guard: ({event}) =>event.nluValue.entities.length > 0 && checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
+          {guard:({event}) =>event.nluValue.entities.length > 0 &&  event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
           {target : "Answer"}]
         }
       },
@@ -468,7 +464,7 @@ const dialogueGame = setup({
         }
       },
       ListenToChoice : {
-        entry : "listenNlu", 
+        entry :  ["listenNlu", ({context}) => context.no_Questions++], 
         on : {
           RECOGNISED : [ 
             // checking if the user wants to quit:
@@ -490,13 +486,13 @@ const dialogueGame = setup({
               }) 
             ],
             target: "CheckTyphoon"},
-            // it doesn't work i will add a new state
+            {guard : ({context})=> context.no_Questions === 10, target : "#dialogueGame.Lose"},
             {target: "NeedToDo"}
           ],
           ASR_NOINPUT: "noNumberChoise"
         },
       }, 
-      CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
+      CheckTyphoon : { 
         entry : [assign({ currentQuestion: ({ context }) => chooseQuestion(['generalKnowledge'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
@@ -558,9 +554,9 @@ const dialogueGame = setup({
       entry:"listenNlu",
       on: {
         RECOGNISED: [
-          {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
+          {guard: ({event}) =>event.nluValue.entities.length > 0 &&  checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
           actions : {type: "say", params : "I hope you come to play again"}},
-          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {guard:({event}) => event.nluValue.entities.length > 0 && event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
           {target: "Say"}]   //lets double check that this transition works
         }
       },
@@ -577,8 +573,8 @@ const dialogueGame = setup({
         entry: "listenNlu",
         on: {
           RECOGNISED: [
-            {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-            {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+            {guard: ({event}) => event.nluValue.entities.length > 0 &&  checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
+            {guard:({event}) =>event.nluValue.entities.length > 0 &&  event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
           {target : "Answer"}]
           }
         },
@@ -632,7 +628,7 @@ const dialogueGame = setup({
           }
         },
       ListenToChoice : {
-        entry : "listenNlu", 
+        entry :  ["listenNlu", ({context}) => context.no_Questions++], 
         on : {
           RECOGNISED : [ 
             // checking if the user wants to quit:
@@ -654,6 +650,7 @@ const dialogueGame = setup({
               }) 
             ],
             target: "CheckTyphoon"},
+            {guard : ({context})=> context.no_Questions === 10, target : "#dialogueGame.Lose"},
             {target: "NeedToDo"}
           ],
           ASR_NOINPUT: "noNumberChoise"
@@ -723,10 +720,10 @@ const dialogueGame = setup({
       entry:"listenNlu",
       on: {
         RECOGNISED: [
-          {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
+          {guard: ({event}) => event.nluValue.entities.length > 0 && checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
           actions : {type: "say", params : "I hope you come to play again"}},
-          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
-        {target: "Say"}]   //lets double check that this transition works
+          {guard:({event}) => event.nluValue.entities.length > 0 &&  event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+        {target: "Say"}]   
         }
       },
       Say : {
@@ -742,8 +739,8 @@ const dialogueGame = setup({
         entry: "listenNlu",
         on: {
           RECOGNISED: [
-            {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-            {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+            {guard: ({event}) =>event.nluValue.entities.length > 0 && checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
+            {guard:({event}) =>event.nluValue.entities.length > 0 &&  event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
           {target : "Answer"}]
           }
         },
@@ -797,7 +794,7 @@ const dialogueGame = setup({
       },
 
       ListenToChoice : {
-        entry : "listenNlu", 
+        entry :  ["listenNlu", ({context}) => context.no_Questions++], 
         on : {
           RECOGNISED : [ 
             // checking if the user wants to quit:
@@ -819,6 +816,7 @@ const dialogueGame = setup({
               }) 
             ],
             target: "CheckTyphoon"},
+            {guard : ({context})=> context.no_Questions === 10, target : "#dialogueGame.Lose"},
             // it doesn't work i will add a new state
             {target: "NeedToDo"}
           ],
@@ -826,7 +824,7 @@ const dialogueGame = setup({
         },
       }, 
 
-      CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
+      CheckTyphoon : { 
         entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['science'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
@@ -892,10 +890,10 @@ const dialogueGame = setup({
     entry:"listenNlu",
     on: {
       RECOGNISED: [
-        {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
+        {guard: ({event}) => event.nluValue.entities.length > 0 &&  checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
         actions : {type: "say", params : "I hope you come to play again"}},
-        {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
-        {target: "Say"}]   //lets double check that this transition works
+        {guard:({event}) => event.nluValue.entities.length > 0 &&  event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+        {target: "Say"}]  
       }
     },
     Say : {
@@ -910,8 +908,8 @@ const dialogueGame = setup({
       entry: "listenNlu",
       on: {
         RECOGNISED: [
-          {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {guard: ({event}) => event.nluValue.entities.length > 0 && checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
+          {guard:({event}) =>event.nluValue.entities.length > 0 &&  event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
           {target : "Answer"}]
         }
       },
@@ -966,7 +964,7 @@ popCulture: {
         }
       },
       ListenToChoice : {
-        entry : "listenNlu", 
+        entry :  ["listenNlu", ({context}) => context.no_Questions++], 
         on : {
           RECOGNISED : [ 
             // checking if the user wants to quit:
@@ -988,13 +986,14 @@ popCulture: {
               }) 
             ],
             target: "CheckTyphoon"},
+            {guard : ({context})=> context.no_Questions === 10, target : "#dialogueGame.Lose"},
             // it doesn't work i will add a new state
             {target: "NeedToDo"}
           ],
           ASR_NOINPUT: "noNumberChoise"
         },
       }, 
-      CheckTyphoon : { //we need to fix this somehow to add a target if the machine makes a mistake
+      CheckTyphoon : { 
         entry :  [assign({ currentQuestion: ({ context }) => chooseQuestion(['popCulture'], context.questionNumber)}), assign({ questionsAsked :({context}) => [...context.questionsAsked,context.questionNumber]})],
         always : [
           {guard : ({context}) => Object.keys(context.currentQuestion)[0] === "typhoon", 
@@ -1061,10 +1060,10 @@ popCulture: {
     entry:"listenNlu",
     on: {
       RECOGNISED: [
-        {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
+        {guard: ({event}) => event.nluValue.entities.length > 0 &&  checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.Done",
         actions : {type: "say", params : "I hope you come to play again"}},
-        {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
-        {target: "Say"}]   //lets double check that this transition works
+        {guard:({event}) => event.nluValue.entities.length > 0 && event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+        {target: "Say"}]  
       }
     },
     Say : {
@@ -1079,8 +1078,8 @@ popCulture: {
       entry: "listenNlu",
       on: {
         RECOGNISED: [
-          {guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
-          {guard:({event}) => event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
+          {guard: ({event}) => event.nluValue.entities.length > 0 && checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory"},
+          {guard:({event}) => event.nluValue.entities.length > 0 && event.nluValue.entities[0].category === "no",target: "ChooseBoxQuestion"},
           {target : "Answer"}]
         }
       },
@@ -1124,7 +1123,7 @@ popCulture: {
 },
 
 Typhoon : {
-  entry : ["hideAllBoxes","showTyphoon",randomRepeat(typhoonReaction),{type : "say", params : randomRepeat(typhoonReaction)}],
+  entry : ["hideAllBoxes","showTyphoon",{type : "say", params : randomRepeat(typhoonReaction)},{type : "say", params : "Do you want to play again?"}],
   on : {SPEAK_COMPLETE : "ListenPlayAgain"}
   },
 
@@ -1132,7 +1131,10 @@ Win : {
   entry :[ "hideAllBoxes", "showThumbsUp", {type : "say", params : ({context}) => `Congratulations ${context.user_name}, you won! Do you want to play again?`}],
   on : {SPEAK_COMPLETE : "ListenPlayAgain"}
 },
-
+Lose : {
+  entry : {type : "say", params: "You lose!"},
+  on : {SPEAK_COMPLETE : "ListenPlayAgain"}
+},
 ListenPlayAgain : {
   entry: "listenNlu",
   on: {
