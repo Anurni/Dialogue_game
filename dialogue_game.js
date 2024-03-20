@@ -173,7 +173,9 @@ const dialogueGame = setup({
       shuffle : () => shuffleQuestions(questions),
       show : () => showElements("category_buttons"),
       showTyphoon : () => showElements("typhoon"),
+      hideTyphoon: () => hideCategoryElements("typhoon"),
       showThumbsUp : () => showElements("win"),
+      hideThumbsUp : () => hideCategoryElements("win"),
       showBoxes : () => showElements("question_boxes"), 
       hideStart : () => hideAllElements(["startButton","game_title","typhoon_gif"]), 
       hideStart1 : () => hideAllElements(["startButton","game_title"]),
@@ -252,7 +254,7 @@ const dialogueGame = setup({
     },
 
   AskCategory: { 
-    entry: ["hideStart","hideAllBoxes","show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
+    entry: ["hideTyphoon", "hideThumbsUp", "hideStart","hideAllBoxes","show", {type: "say", params: `Time to choose a category. Choose wisely!`}],
     on: {
       SPEAK_COMPLETE: "ChooseCategory"
     }
@@ -1122,7 +1124,7 @@ popCulture: {
 },
 
 Typhoon : {
-  entry : ["hideAllBoxes","showTyphoon",{type : "say", params : randomRepeat(typhoonReaction)},{type : "say", params : "Do you want to play again?"}],
+  entry : ["hideAllBoxes","showTyphoon",{type : "say", params : `${randomRepeat(typhoonReaction)}. Do you want to play again?`}],
   on : {SPEAK_COMPLETE : "ListenPlayAgain"}
   },
 
@@ -1137,8 +1139,8 @@ Lose : {
 ListenPlayAgain : {
   entry: "listenNlu",
   on: {
-    RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory" },
-    {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "#dialogueGame.Done" },
+    RECOGNISED: [{guard: ({event}) => event.nluValue.entities.length > 0 && checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory" },
+    {guard:({event}) => event.nluValue.entities.length > 0 && event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "#dialogueGame.Done" },
     {target : "HaveToSay"}],
       }
     },
