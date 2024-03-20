@@ -25,7 +25,7 @@ const settings = {
   azureLanguageCredentials: azureLanguageCredentials,
   azureCredentials: azureCredentials,
   asrDefaultCompleteTimeout: 0,
-  asrDefaultNoInputTimeout: 15000,
+  asrDefaultNoInputTimeout: 10000,
   locale: "en-US",
   ttsDefaultVoice: "en-US-JaneNeural",
 };
@@ -1125,7 +1125,7 @@ popCulture: {
 
 Typhoon : {
   entry : ["hideAllBoxes","showTyphoon",randomRepeat(typhoonReaction),{type : "say", params : randomRepeat(typhoonReaction)}],
-  on : {SPEAK_COMPLETE : "#dialogueGame.Done"}
+  on : {SPEAK_COMPLETE : "ListenPlayAgain"}
   },
 
 Win : { 
@@ -1138,10 +1138,13 @@ ListenPlayAgain : {
   on: {
     RECOGNISED: [{guard: ({event}) => checkPositive(event.nluValue.entities[0].category), target: "#dialogueGame.AskCategory" },
     {guard:({event}) => event.nluValue.entities[0].category === "no", actions: [{ type: "say", params: ({ context}) => `I hope to see you again, ${context.user_name}.`}], target: "#dialogueGame.Done" },
-    {target : "#dialogueGame.ListenYesOrNo", reenter : true, actions : {type : "say", params : "You have to say yes or no"}}],
+    {target : "HaveToSay"}],
       }
     },
-
+HaveToSay : {
+  entry : {type : "say", params: "You have to answer the question."},
+  on : {SPEAK_COMPLETE : "ListenPlayAgain"}
+},
   Done: {
     on: { CLICK: "SayGreeting"}
     },
