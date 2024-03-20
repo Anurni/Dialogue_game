@@ -35,8 +35,7 @@ const wrongAnswer = ["Try again!", "Better luck next time!", "Not quite!"];
 const typhoonReaction = ["You've hit the typhoon!", "It's the typhoon!", "Watch out for the typhoon!"];
 const repeatPhrases = ["I didn't catch that.", "Can you please repeat?", "Pardon?", "Sorry, what did you say?"];
 const chooseBox = ["Choose a box ","Pick a box ","Decide on a box"];
-const boxes = ["1","2","3","4","5","6","7","8","9","10"]
-const typhoon = ["typhoon"]
+const boxes = ["1","2","3","4","5","6","7","8","9","10"];
 
 //our question database
 const questions = {
@@ -246,7 +245,7 @@ const dialogueGame = setup({
   },
 
   SayInstructions: {
-    entry: [{ type: "say", params: `Here we go! Start by choosing a category. To win, you need to answer five questions correctly and avoid the typhoon. You can ask for hints and change the category if you wish. I can also repeat the questions on request.`}], 
+    entry: [{ type: "say", params: `Here we go! Start by choosing a category. To win, you need to answer five questions correctly and avoid the typhoon. You can ask for hints and change the category if you wish. I can also repeat the questions on request.I hope you don't get unlucky!`}], 
     on: {
       SPEAK_COMPLETE: "AskCategory"
       },
